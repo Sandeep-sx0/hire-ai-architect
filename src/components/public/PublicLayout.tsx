@@ -12,7 +12,7 @@ function Wordmark({ className }: { className?: string }) {
   );
 }
 
-function PublicHeader() {
+function PublicHeader({ clientName, portalLabel }: { clientName?: string; portalLabel?: string }) {
   const [open, setOpen] = useState(false);
   const navLinks = [
     { to: "/jobs", label: "Open positions" },
@@ -20,33 +20,45 @@ function PublicHeader() {
     { to: "/contact", label: "Contact" },
   ] as const;
 
+  const isPortal = Boolean(clientName);
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6 md:h-16">
         <Wordmark className="text-brand-primary" />
 
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className="text-sm text-brand-text-secondary transition-colors hover:text-brand-primary"
-              activeProps={{ className: "text-sm text-brand-primary font-medium" }}
-              activeOptions={{ exact: true }}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
+        {isPortal ? (
+          <div className="hidden flex-1 justify-center md:flex">
+            <span className="text-[13px] text-brand-text-secondary">{portalLabel ?? "Employer Portal"}</span>
+          </div>
+        ) : (
+          <nav className="hidden items-center gap-8 md:flex">
+            {navLinks.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className="text-sm text-brand-text-secondary transition-colors hover:text-brand-primary"
+                activeProps={{ className: "text-sm text-brand-primary font-medium" }}
+                activeOptions={{ exact: true }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+        )}
 
         <div className="hidden md:block">
-          <Link
-            to="/hire/$token"
-            params={{ token: "demo" }}
-            className="text-sm font-medium text-brand-primary hover:underline"
-          >
-            I'm a hiring client
-          </Link>
+          {isPortal ? (
+            <span className="text-sm font-medium text-brand-text">{clientName}</span>
+          ) : (
+            <Link
+              to="/hire/$token"
+              params={{ token: "demo" }}
+              className="text-sm font-medium text-brand-primary hover:underline"
+            >
+              I'm a hiring client
+            </Link>
+          )}
         </div>
 
         <button
