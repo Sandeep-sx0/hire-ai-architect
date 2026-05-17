@@ -12,7 +12,7 @@ function Wordmark({ className }: { className?: string }) {
   );
 }
 
-function PublicHeader() {
+function PublicHeader({ clientName, portalLabel }: { clientName?: string; portalLabel?: string }) {
   const [open, setOpen] = useState(false);
   const navLinks = [
     { to: "/jobs", label: "Open positions" },
@@ -20,33 +20,45 @@ function PublicHeader() {
     { to: "/contact", label: "Contact" },
   ] as const;
 
+  const isPortal = Boolean(clientName);
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6 md:h-16">
         <Wordmark className="text-brand-primary" />
 
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className="text-sm text-brand-text-secondary transition-colors hover:text-brand-primary"
-              activeProps={{ className: "text-sm text-brand-primary font-medium" }}
-              activeOptions={{ exact: true }}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
+        {isPortal ? (
+          <div className="hidden flex-1 justify-center md:flex">
+            <span className="text-[13px] text-brand-text-secondary">{portalLabel ?? "Employer Portal"}</span>
+          </div>
+        ) : (
+          <nav className="hidden items-center gap-8 md:flex">
+            {navLinks.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className="text-sm text-brand-text-secondary transition-colors hover:text-brand-primary"
+                activeProps={{ className: "text-sm text-brand-primary font-medium" }}
+                activeOptions={{ exact: true }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+        )}
 
         <div className="hidden md:block">
-          <Link
-            to="/hire/$token"
-            params={{ token: "demo" }}
-            className="text-sm font-medium text-brand-primary hover:underline"
-          >
-            I'm a hiring client
-          </Link>
+          {isPortal ? (
+            <span className="text-sm font-medium text-brand-text">{clientName}</span>
+          ) : (
+            <Link
+              to="/hire/$token"
+              params={{ token: "demo" }}
+              className="text-sm font-medium text-brand-primary hover:underline"
+            >
+              I'm a hiring client
+            </Link>
+          )}
         </div>
 
         <button
@@ -73,24 +85,33 @@ function PublicHeader() {
             </button>
           </div>
           <nav className="flex flex-col gap-1 p-6">
-            {navLinks.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-base text-brand-text hover:bg-brand-seafoam/20"
-              >
-                {l.label}
-              </Link>
-            ))}
-            <Link
-              to="/hire/$token"
-              params={{ token: "demo" }}
-              onClick={() => setOpen(false)}
-              className="mt-4 rounded-lg bg-brand-primary px-3 py-3 text-center text-base font-medium text-white"
-            >
-              I'm a hiring client
-            </Link>
+            {isPortal ? (
+              <div className="rounded-lg bg-brand-seafoam/20 px-3 py-3 text-center text-base font-medium text-brand-text">
+                {clientName}
+                <div className="mt-1 text-xs font-normal text-brand-text-secondary">{portalLabel ?? "Employer Portal"}</div>
+              </div>
+            ) : (
+              <>
+                {navLinks.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    onClick={() => setOpen(false)}
+                    className="rounded-lg px-3 py-3 text-base text-brand-text hover:bg-brand-seafoam/20"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+                <Link
+                  to="/hire/$token"
+                  params={{ token: "demo" }}
+                  onClick={() => setOpen(false)}
+                  className="mt-4 rounded-lg bg-brand-primary px-3 py-3 text-center text-base font-medium text-white"
+                >
+                  I'm a hiring client
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       )}
@@ -150,10 +171,10 @@ function PublicFooter() {
   );
 }
 
-export function PublicLayout({ children }: { children: ReactNode }) {
+export function PublicLayout({ children, clientName, portalLabel }: { children: ReactNode; clientName?: string; portalLabel?: string }) {
   return (
     <div className="flex min-h-screen flex-col bg-brand-bg">
-      <PublicHeader />
+      <PublicHeader clientName={clientName} portalLabel={portalLabel} />
       <main className="flex-1">{children}</main>
       <PublicFooter />
     </div>
