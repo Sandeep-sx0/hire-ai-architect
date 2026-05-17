@@ -484,7 +484,7 @@ function CandidatesPage() {
                 title="Your candidate database is empty"
                 description="Import candidates from CVs, LinkedIn profiles, or add them manually to build your talent pool."
                 actionLabel="Import candidates"
-                onAction={() => toast("Import modal coming soon")}
+                onAction={() => setImportOpen(true)}
               />
             )}
           </div>
