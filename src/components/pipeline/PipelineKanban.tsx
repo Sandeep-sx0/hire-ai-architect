@@ -52,6 +52,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScoreRing, SidePanel, StatusBadge } from "@/components/shared";
+import {
+  ScorecardForm,
+  ScorecardsStack,
+  MOCK_RINA_SCORECARD,
+  type SubmittedScorecard,
+} from "./ScorecardForm";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
