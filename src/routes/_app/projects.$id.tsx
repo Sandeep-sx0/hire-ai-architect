@@ -130,7 +130,7 @@ function ProjectDetail() {
               {title}
             </h1>
             <Link
-              to="/_app/clients/$id".replace("/_app", "") as "/clients/$id"
+              to="/clients/$id"
               params={{ id: clientId }}
               className="mt-1 inline-flex items-center gap-1.5 text-sm text-brand-primary hover:underline"
             >
