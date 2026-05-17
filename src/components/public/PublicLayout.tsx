@@ -85,24 +85,33 @@ function PublicHeader({ clientName, portalLabel }: { clientName?: string; portal
             </button>
           </div>
           <nav className="flex flex-col gap-1 p-6">
-            {navLinks.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-base text-brand-text hover:bg-brand-seafoam/20"
-              >
-                {l.label}
-              </Link>
-            ))}
-            <Link
-              to="/hire/$token"
-              params={{ token: "demo" }}
-              onClick={() => setOpen(false)}
-              className="mt-4 rounded-lg bg-brand-primary px-3 py-3 text-center text-base font-medium text-white"
-            >
-              I'm a hiring client
-            </Link>
+            {isPortal ? (
+              <div className="rounded-lg bg-brand-seafoam/20 px-3 py-3 text-center text-base font-medium text-brand-text">
+                {clientName}
+                <div className="mt-1 text-xs font-normal text-brand-text-secondary">{portalLabel ?? "Employer Portal"}</div>
+              </div>
+            ) : (
+              <>
+                {navLinks.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    onClick={() => setOpen(false)}
+                    className="rounded-lg px-3 py-3 text-base text-brand-text hover:bg-brand-seafoam/20"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+                <Link
+                  to="/hire/$token"
+                  params={{ token: "demo" }}
+                  onClick={() => setOpen(false)}
+                  className="mt-4 rounded-lg bg-brand-primary px-3 py-3 text-center text-base font-medium text-white"
+                >
+                  I'm a hiring client
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       )}
