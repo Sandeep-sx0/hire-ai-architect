@@ -150,7 +150,7 @@ function ProjectsPage() {
   const [showClosed, setShowClosed] = useState(false);
 
   const update = (patch: Partial<typeof search>) => {
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    navigate({ search: (prev: typeof search) => ({ ...prev, ...patch }) });
   };
 
   // Filtering
