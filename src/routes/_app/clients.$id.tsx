@@ -290,8 +290,6 @@ function ClientDetailPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="" subtitle="" className="hidden" />
-
       {/* Client header card */}
       <header className="rounded-xl border border-gray-100 bg-card p-6">
         <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
