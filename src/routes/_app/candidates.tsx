@@ -213,8 +213,11 @@ function CandidatesPage() {
     setSelected({});
   };
 
+  const [importOpen, setImportOpen] = useState(false);
+
   return (
     <div className="space-y-3">
+      <ImportCandidateModal open={importOpen} onOpenChange={setImportOpen} />
       <PageHeader
         title="Candidates"
         subtitle={`${CANDIDATES.length} candidates in database`}
