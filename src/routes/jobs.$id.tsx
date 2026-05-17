@@ -148,7 +148,7 @@ export const Route = createFileRoute("/jobs/$id")({
 });
 
 function JobDetailPage() {
-  const { job } = Route.useLoaderData();
+  const { job } = Route.useLoaderData() as { job: JobDetail };
   const formRef = useRef<HTMLDivElement>(null);
   const [showStickyBar, setShowStickyBar] = useState(false);
 
