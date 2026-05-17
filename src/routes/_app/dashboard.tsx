@@ -180,6 +180,8 @@ function greetingPrefix() {
 
 function DashboardPage() {
   const firstName = currentUser.name.split(" ")[0];
+  const [greeting, setGreeting] = useState<string>("Hello");
+  useEffect(() => setGreeting(greetingPrefix()), []);
   const [funnelFilter, setFunnelFilter] = useState<string>("all");
 
   const totalCandidates = funnelStages.reduce((s, x) => s + x.count, 0);
