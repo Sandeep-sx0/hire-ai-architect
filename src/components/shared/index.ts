@@ -8,3 +8,4 @@ export { EmptyState } from "./EmptyState";
 export { FilterBar } from "./FilterBar";
 export { KanbanColumn } from "./KanbanColumn";
 export { SidePanel } from "./SidePanel";
+export { UnderConstruction } from "./UnderConstruction";
