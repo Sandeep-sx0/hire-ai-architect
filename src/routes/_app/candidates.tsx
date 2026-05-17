@@ -229,7 +229,7 @@ function CandidatesPage() {
             </Button>
             <Button
               className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
-              onClick={() => toast("Import modal coming soon")}
+              onClick={() => setImportOpen(true)}
             >
               <Upload className="h-4 w-4" />
               Import candidates
