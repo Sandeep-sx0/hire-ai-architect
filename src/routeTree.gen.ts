@@ -9,38 +9,310 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JobsIdRouteImport } from './routes/jobs.$id'
+import { Route as HireTokenRouteImport } from './routes/hire.$token'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppProjectsRouteImport } from './routes/_app/projects'
+import { Route as AppOutreachRouteImport } from './routes/_app/outreach'
+import { Route as AppInboxRouteImport } from './routes/_app/inbox'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppClientsRouteImport } from './routes/_app/clients'
+import { Route as AppCandidatesRouteImport } from './routes/_app/candidates'
+import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
+import { Route as AppProjectsIdRouteImport } from './routes/_app/projects.$id'
+import { Route as AppOutreachNewRouteImport } from './routes/_app/outreach.new'
+import { Route as AppOutreachIdRouteImport } from './routes/_app/outreach.$id'
+import { Route as AppClientsIdRouteImport } from './routes/_app/clients.$id'
+import { Route as AppCandidatesIdRouteImport } from './routes/_app/candidates.$id'
+import { Route as AppProjectsIdParseRouteImport } from './routes/_app/projects.$id.parse'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobsIdRoute = JobsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => JobsRoute,
+} as any)
+const HireTokenRoute = HireTokenRouteImport.update({
+  id: '/hire/$token',
+  path: '/hire/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsRoute = AppProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOutreachRoute = AppOutreachRouteImport.update({
+  id: '/outreach',
+  path: '/outreach',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInboxRoute = AppInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientsRoute = AppClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCandidatesRoute = AppCandidatesRouteImport.update({
+  id: '/candidates',
+  path: '/candidates',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsIdRoute = AppProjectsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppProjectsRoute,
+} as any)
+const AppOutreachNewRoute = AppOutreachNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AppOutreachRoute,
+} as any)
+const AppOutreachIdRoute = AppOutreachIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppOutreachRoute,
+} as any)
+const AppClientsIdRoute = AppClientsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppClientsRoute,
+} as any)
+const AppCandidatesIdRoute = AppCandidatesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppCandidatesRoute,
+} as any)
+const AppProjectsIdParseRoute = AppProjectsIdParseRouteImport.update({
+  id: '/parse',
+  path: '/parse',
+  getParentRoute: () => AppProjectsIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/jobs': typeof JobsRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/analytics': typeof AppAnalyticsRoute
+  '/candidates': typeof AppCandidatesRouteWithChildren
+  '/clients': typeof AppClientsRouteWithChildren
+  '/dashboard': typeof AppDashboardRoute
+  '/inbox': typeof AppInboxRoute
+  '/outreach': typeof AppOutreachRouteWithChildren
+  '/projects': typeof AppProjectsRouteWithChildren
+  '/settings': typeof AppSettingsRoute
+  '/hire/$token': typeof HireTokenRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/candidates/$id': typeof AppCandidatesIdRoute
+  '/clients/$id': typeof AppClientsIdRoute
+  '/outreach/$id': typeof AppOutreachIdRoute
+  '/outreach/new': typeof AppOutreachNewRoute
+  '/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/jobs': typeof JobsRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/analytics': typeof AppAnalyticsRoute
+  '/candidates': typeof AppCandidatesRouteWithChildren
+  '/clients': typeof AppClientsRouteWithChildren
+  '/dashboard': typeof AppDashboardRoute
+  '/inbox': typeof AppInboxRoute
+  '/outreach': typeof AppOutreachRouteWithChildren
+  '/projects': typeof AppProjectsRouteWithChildren
+  '/settings': typeof AppSettingsRoute
+  '/hire/$token': typeof HireTokenRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/candidates/$id': typeof AppCandidatesIdRoute
+  '/clients/$id': typeof AppClientsIdRoute
+  '/outreach/$id': typeof AppOutreachIdRoute
+  '/outreach/new': typeof AppOutreachNewRoute
+  '/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/jobs': typeof JobsRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/_app/analytics': typeof AppAnalyticsRoute
+  '/_app/candidates': typeof AppCandidatesRouteWithChildren
+  '/_app/clients': typeof AppClientsRouteWithChildren
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/inbox': typeof AppInboxRoute
+  '/_app/outreach': typeof AppOutreachRouteWithChildren
+  '/_app/projects': typeof AppProjectsRouteWithChildren
+  '/_app/settings': typeof AppSettingsRoute
+  '/hire/$token': typeof HireTokenRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/_app/candidates/$id': typeof AppCandidatesIdRoute
+  '/_app/clients/$id': typeof AppClientsIdRoute
+  '/_app/outreach/$id': typeof AppOutreachIdRoute
+  '/_app/outreach/new': typeof AppOutreachNewRoute
+  '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/_app/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/jobs'
+    | '/login'
+    | '/signup'
+    | '/analytics'
+    | '/candidates'
+    | '/clients'
+    | '/dashboard'
+    | '/inbox'
+    | '/outreach'
+    | '/projects'
+    | '/settings'
+    | '/hire/$token'
+    | '/jobs/$id'
+    | '/candidates/$id'
+    | '/clients/$id'
+    | '/outreach/$id'
+    | '/outreach/new'
+    | '/projects/$id'
+    | '/projects/$id/parse'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/jobs'
+    | '/login'
+    | '/signup'
+    | '/analytics'
+    | '/candidates'
+    | '/clients'
+    | '/dashboard'
+    | '/inbox'
+    | '/outreach'
+    | '/projects'
+    | '/settings'
+    | '/hire/$token'
+    | '/jobs/$id'
+    | '/candidates/$id'
+    | '/clients/$id'
+    | '/outreach/$id'
+    | '/outreach/new'
+    | '/projects/$id'
+    | '/projects/$id/parse'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/jobs'
+    | '/login'
+    | '/signup'
+    | '/_app/analytics'
+    | '/_app/candidates'
+    | '/_app/clients'
+    | '/_app/dashboard'
+    | '/_app/inbox'
+    | '/_app/outreach'
+    | '/_app/projects'
+    | '/_app/settings'
+    | '/hire/$token'
+    | '/jobs/$id'
+    | '/_app/candidates/$id'
+    | '/_app/clients/$id'
+    | '/_app/outreach/$id'
+    | '/_app/outreach/new'
+    | '/_app/projects/$id'
+    | '/_app/projects/$id/parse'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  JobsRoute: typeof JobsRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
+  HireTokenRoute: typeof HireTokenRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +320,225 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jobs/$id': {
+      id: '/jobs/$id'
+      path: '/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof JobsRoute
+    }
+    '/hire/$token': {
+      id: '/hire/$token'
+      path: '/hire/$token'
+      fullPath: '/hire/$token'
+      preLoaderRoute: typeof HireTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projects': {
+      id: '/_app/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AppProjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/outreach': {
+      id: '/_app/outreach'
+      path: '/outreach'
+      fullPath: '/outreach'
+      preLoaderRoute: typeof AppOutreachRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inbox': {
+      id: '/_app/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AppInboxRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/clients': {
+      id: '/_app/clients'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof AppClientsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/candidates': {
+      id: '/_app/candidates'
+      path: '/candidates'
+      fullPath: '/candidates'
+      preLoaderRoute: typeof AppCandidatesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/analytics': {
+      id: '/_app/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projects/$id': {
+      id: '/_app/projects/$id'
+      path: '/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof AppProjectsIdRouteImport
+      parentRoute: typeof AppProjectsRoute
+    }
+    '/_app/outreach/new': {
+      id: '/_app/outreach/new'
+      path: '/new'
+      fullPath: '/outreach/new'
+      preLoaderRoute: typeof AppOutreachNewRouteImport
+      parentRoute: typeof AppOutreachRoute
+    }
+    '/_app/outreach/$id': {
+      id: '/_app/outreach/$id'
+      path: '/$id'
+      fullPath: '/outreach/$id'
+      preLoaderRoute: typeof AppOutreachIdRouteImport
+      parentRoute: typeof AppOutreachRoute
+    }
+    '/_app/clients/$id': {
+      id: '/_app/clients/$id'
+      path: '/$id'
+      fullPath: '/clients/$id'
+      preLoaderRoute: typeof AppClientsIdRouteImport
+      parentRoute: typeof AppClientsRoute
+    }
+    '/_app/candidates/$id': {
+      id: '/_app/candidates/$id'
+      path: '/$id'
+      fullPath: '/candidates/$id'
+      preLoaderRoute: typeof AppCandidatesIdRouteImport
+      parentRoute: typeof AppCandidatesRoute
+    }
+    '/_app/projects/$id/parse': {
+      id: '/_app/projects/$id/parse'
+      path: '/parse'
+      fullPath: '/projects/$id/parse'
+      preLoaderRoute: typeof AppProjectsIdParseRouteImport
+      parentRoute: typeof AppProjectsIdRoute
+    }
   }
 }
 
+interface AppCandidatesRouteChildren {
+  AppCandidatesIdRoute: typeof AppCandidatesIdRoute
+}
+
+const AppCandidatesRouteChildren: AppCandidatesRouteChildren = {
+  AppCandidatesIdRoute: AppCandidatesIdRoute,
+}
+
+const AppCandidatesRouteWithChildren = AppCandidatesRoute._addFileChildren(
+  AppCandidatesRouteChildren,
+)
+
+interface AppClientsRouteChildren {
+  AppClientsIdRoute: typeof AppClientsIdRoute
+}
+
+const AppClientsRouteChildren: AppClientsRouteChildren = {
+  AppClientsIdRoute: AppClientsIdRoute,
+}
+
+const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
+  AppClientsRouteChildren,
+)
+
+interface AppOutreachRouteChildren {
+  AppOutreachIdRoute: typeof AppOutreachIdRoute
+  AppOutreachNewRoute: typeof AppOutreachNewRoute
+}
+
+const AppOutreachRouteChildren: AppOutreachRouteChildren = {
+  AppOutreachIdRoute: AppOutreachIdRoute,
+  AppOutreachNewRoute: AppOutreachNewRoute,
+}
+
+const AppOutreachRouteWithChildren = AppOutreachRoute._addFileChildren(
+  AppOutreachRouteChildren,
+)
+
+interface AppProjectsIdRouteChildren {
+  AppProjectsIdParseRoute: typeof AppProjectsIdParseRoute
+}
+
+const AppProjectsIdRouteChildren: AppProjectsIdRouteChildren = {
+  AppProjectsIdParseRoute: AppProjectsIdParseRoute,
+}
+
+const AppProjectsIdRouteWithChildren = AppProjectsIdRoute._addFileChildren(
+  AppProjectsIdRouteChildren,
+)
+
+interface AppProjectsRouteChildren {
+  AppProjectsIdRoute: typeof AppProjectsIdRouteWithChildren
+}
+
+const AppProjectsRouteChildren: AppProjectsRouteChildren = {
+  AppProjectsIdRoute: AppProjectsIdRouteWithChildren,
+}
+
+const AppProjectsRouteWithChildren = AppProjectsRoute._addFileChildren(
+  AppProjectsRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
+  AppCandidatesRoute: typeof AppCandidatesRouteWithChildren
+  AppClientsRoute: typeof AppClientsRouteWithChildren
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppInboxRoute: typeof AppInboxRoute
+  AppOutreachRoute: typeof AppOutreachRouteWithChildren
+  AppProjectsRoute: typeof AppProjectsRouteWithChildren
+  AppSettingsRoute: typeof AppSettingsRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAnalyticsRoute: AppAnalyticsRoute,
+  AppCandidatesRoute: AppCandidatesRouteWithChildren,
+  AppClientsRoute: AppClientsRouteWithChildren,
+  AppDashboardRoute: AppDashboardRoute,
+  AppInboxRoute: AppInboxRoute,
+  AppOutreachRoute: AppOutreachRouteWithChildren,
+  AppProjectsRoute: AppProjectsRouteWithChildren,
+  AppSettingsRoute: AppSettingsRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface JobsRouteChildren {
+  JobsIdRoute: typeof JobsIdRoute
+}
+
+const JobsRouteChildren: JobsRouteChildren = {
+  JobsIdRoute: JobsIdRoute,
+}
+
+const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  JobsRoute: JobsRouteWithChildren,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
+  HireTokenRoute: HireTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

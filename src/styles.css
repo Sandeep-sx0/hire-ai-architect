@@ -1,24 +1,22 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
+ * HireSmart white-label design system.
  *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
+ * Tenants re-skin the entire app by swapping the 9 --brand-* and 6 --status-*
+ * variables in :root. Every component references tokens — never hardcoded hex.
  *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * Hex values are preserved in comments so swapping is copy/paste-friendly.
  */
 
 @theme inline {
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -26,6 +24,8 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* shadcn semantic tokens (mapped to brand) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -59,77 +59,85 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* HireSmart brand tokens (white-label swap surface) */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-mint: var(--brand-mint);
+  --color-brand-seafoam: var(--brand-seafoam);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-magenta: var(--brand-magenta);
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-text: var(--brand-text);
+  --color-brand-text-secondary: var(--brand-text-secondary);
+
+  /* Semantic status tokens (fixed across tenants) */
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-danger: var(--status-danger);
+  --color-status-neutral: var(--status-neutral);
+  --color-status-info: var(--status-info);
+  --color-status-ai: var(--status-ai);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
-}
 
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  /* === HireSmart brand palette === */
+  --brand-primary: #004C66;        /* dark teal */
+  --brand-accent: #004703;         /* deep green */
+  --brand-mint: #9FEBC1;           /* mint */
+  --brand-seafoam: #B6F1EB;        /* seafoam */
+  --brand-pink: #FFCEE7;           /* soft pink */
+  --brand-magenta: #6C0042;        /* deep magenta */
+  --brand-bg: #F8FAF9;             /* off-white page bg */
+  --brand-text: #1A1A1A;           /* primary text */
+  --brand-text-secondary: #5A6B6A; /* secondary text */
+
+  /* === Semantic status colors === */
+  --status-success: #16A34A;
+  --status-warning: #D97706;
+  --status-danger: #DC2626;
+  --status-neutral: #6B7280;
+  --status-info: #2563EB;
+  --status-ai: #7C3AED;
+
+  /* === shadcn semantic tokens mapped onto brand === */
+  --background: var(--brand-bg);
+  --foreground: var(--brand-text);
+  --card: #FFFFFF;
+  --card-foreground: var(--brand-text);
+  --popover: #FFFFFF;
+  --popover-foreground: var(--brand-text);
+  --primary: var(--brand-primary);
+  --primary-foreground: #FFFFFF;
+  --secondary: var(--brand-seafoam);
+  --secondary-foreground: var(--brand-primary);
+  --muted: #EEF2F1;
+  --muted-foreground: var(--brand-text-secondary);
+  --accent: var(--brand-mint);
+  --accent-foreground: var(--brand-primary);
+  --destructive: var(--status-danger);
+  --destructive-foreground: #FFFFFF;
+  --border: #E5EAE8;
+  --input: #E5EAE8;
+  --ring: var(--brand-primary);
+
+  --chart-1: var(--brand-primary);
+  --chart-2: var(--brand-mint);
+  --chart-3: var(--brand-magenta);
+  --chart-4: var(--brand-pink);
+  --chart-5: var(--brand-accent);
+
+  /* Sidebar (white surface with brand active states) */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: var(--brand-text);
+  --sidebar-primary: var(--brand-primary);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: color-mix(in oklab, var(--brand-mint) 25%, transparent);
+  --sidebar-accent-foreground: var(--brand-primary);
+  --sidebar-border: #E5EAE8;
+  --sidebar-ring: var(--brand-primary);
 }
 
 @layer base {
@@ -137,8 +145,15 @@
     border-color: var(--color-border);
   }
 
+  html,
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
