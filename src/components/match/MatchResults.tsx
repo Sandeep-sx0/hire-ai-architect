@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScoreRing, AIVerdictChip } from "@/components/shared";
 import type { Verdict } from "@/components/shared/AIVerdictChip";
+import { FocusMode, FOCUS_DEMO_CANDIDATES } from "./FocusMode";
 import { cn } from "@/lib/utils";
 
 type Action = "unreviewed" | "approved" | "skipped" | "rejected" | "shortlisted";
@@ -172,6 +173,7 @@ export function MatchResults({ projectId }: { projectId: string }) {
   const [focusIdx, setFocusIdx] = useState(0);
   const [showHint, setShowHint] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
+  const [focusOpen, setFocusOpen] = useState(false);
 
   const visible = useMemo(() => {
     return MATCHES.filter((m) => {
@@ -204,6 +206,7 @@ export function MatchResults({ projectId }: { projectId: string }) {
   };
 
   useEffect(() => {
+    if (focusOpen) return;
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
@@ -220,6 +223,9 @@ export function MatchResults({ projectId }: { projectId: string }) {
       } else if (e.key === "e" || e.key === "E" || e.key === "Enter") {
         e.preventDefault();
         toggleExpand(current.id);
+      } else if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        setFocusOpen(true);
       } else if (e.key === "a" || e.key === "A") {
         setAction(current.id, "approved");
       } else if (e.key === "s" || e.key === "S") {
@@ -232,7 +238,7 @@ export function MatchResults({ projectId }: { projectId: string }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [visible, focusIdx]);
+  }, [visible, focusIdx, focusOpen]);
 
   // Silence unused warning; projectId is for future deep-link wiring.
   void projectId;
@@ -299,7 +305,11 @@ export function MatchResults({ projectId }: { projectId: string }) {
               <RefreshCw className="h-3.5 w-3.5" />
               Re-run matching
             </Button>
-            <Button size="sm" className="gap-1.5 bg-brand-primary text-white hover:bg-brand-primary/90">
+            <Button
+              size="sm"
+              onClick={() => setFocusOpen(true)}
+              className="gap-1.5 bg-brand-primary text-white hover:bg-brand-primary/90"
+            >
               <Maximize2 className="h-3.5 w-3.5" />
               Focus mode
             </Button>
@@ -364,7 +374,7 @@ export function MatchResults({ projectId }: { projectId: string }) {
       {showHint && (
         <div className="fixed bottom-6 right-6 z-30 hidden items-center gap-3 rounded-full bg-brand-text px-4 py-2 text-xs text-white opacity-90 shadow-lg lg:flex">
           <span>
-            <Kbd>A</Kbd> Approve · <Kbd>S</Kbd> Skip · <Kbd>R</Kbd> Reject · <Kbd>L</Kbd> Shortlist · <Kbd>↑↓</Kbd> Nav · <Kbd>E</Kbd> Expand
+            <Kbd>A</Kbd> Approve · <Kbd>S</Kbd> Skip · <Kbd>R</Kbd> Reject · <Kbd>L</Kbd> Shortlist · <Kbd>↑↓</Kbd> Nav · <Kbd>E</Kbd> Expand · <Kbd>F</Kbd> Focus
           </span>
           <button
             onClick={() => setShowHint(false)}
@@ -374,6 +384,16 @@ export function MatchResults({ projectId }: { projectId: string }) {
             <X className="h-3 w-3" />
           </button>
         </div>
+      )}
+
+      {focusOpen && (
+        <FocusMode
+          candidates={FOCUS_DEMO_CANDIDATES}
+          initialActions={actions}
+          initialIndex={focusIdx}
+          onClose={() => setFocusOpen(false)}
+          onCommit={(a) => setActions(a)}
+        />
       )}
     </div>
   );
