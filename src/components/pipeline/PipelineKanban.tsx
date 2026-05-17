@@ -408,6 +408,8 @@ export function PipelineKanban() {
         {selectedCandidate && (
           <StageDetail
             candidate={selectedCandidate}
+            scorecards={scorecards[selectedCandidate.id] ?? []}
+            onAddScorecard={() => setScorecardOpen(true)}
             onToggleChecklist={(idx) => toggleChecklist(selectedCandidate.id, idx)}
             onAdvance={() => {
               const idx = STAGES.findIndex((s) => s.id === selectedCandidate.stage);
@@ -420,6 +422,36 @@ export function PipelineKanban() {
           />
         )}
       </SidePanel>
+
+      {/* Scorecard form */}
+      {selectedCandidate && (
+        <ScorecardForm
+          open={scorecardOpen}
+          onClose={() => setScorecardOpen(false)}
+          candidate={{
+            name: selectedCandidate.name,
+            title: selectedCandidate.title,
+            company: selectedCandidate.company,
+            score: selectedCandidate.score,
+            initials: selectedCandidate.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase(),
+          }}
+          stageLabel={STAGES.find((s) => s.id === selectedCandidate.stage)!.label}
+          projectLabel="CFO Search — Indorama"
+          evaluatorName="Dewi Anggraini"
+          evaluatorInitials="DA"
+          onSubmit={(card) =>
+            setScorecards((prev) => ({
+              ...prev,
+              [selectedCandidate.id]: [...(prev[selectedCandidate.id] ?? []), card],
+            }))
+          }
+        />
+      )}
 
       {/* Rejection dialog */}
       <RejectDialog
