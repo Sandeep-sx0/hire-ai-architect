@@ -305,7 +305,11 @@ export function MatchResults({ projectId }: { projectId: string }) {
               <RefreshCw className="h-3.5 w-3.5" />
               Re-run matching
             </Button>
-            <Button size="sm" className="gap-1.5 bg-brand-primary text-white hover:bg-brand-primary/90">
+            <Button
+              size="sm"
+              onClick={() => setFocusOpen(true)}
+              className="gap-1.5 bg-brand-primary text-white hover:bg-brand-primary/90"
+            >
               <Maximize2 className="h-3.5 w-3.5" />
               Focus mode
             </Button>
