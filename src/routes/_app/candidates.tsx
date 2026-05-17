@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PageHeader, EmptyState, ScoreRing } from "@/components/shared";
+import { ImportCandidateModal } from "@/components/import/ImportCandidateModal";
 import { cn } from "@/lib/utils";
 
 // ============= Types & mock data ===============================
