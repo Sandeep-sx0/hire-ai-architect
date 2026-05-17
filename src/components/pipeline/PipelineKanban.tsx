@@ -245,8 +245,10 @@ export function PipelineKanban() {
   const [selected, setSelected] = useState<string | null>(null);
   const [rejectModal, setRejectModal] = useState<RejectModalState | null>(null);
   const [placeModal, setPlaceModal] = useState<PlaceModalState | null>(null);
-
-  const sensors = useSensors(
+  const [scorecardOpen, setScorecardOpen] = useState(false);
+  const [scorecards, setScorecards] = useState<Record<string, SubmittedScorecard[]>>({
+    p1: [MOCK_RINA_SCORECARD],
+  });
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
