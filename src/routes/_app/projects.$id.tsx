@@ -33,6 +33,7 @@ import { StatusBadge, EmptyState } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import { projects } from "@/lib/mock-data";
 import { MatchResults } from "@/components/match/MatchResults";
+import { PipelineKanban } from "@/components/pipeline/PipelineKanban";
 
 const tabSchema = z.object({
   tab: fallback(
