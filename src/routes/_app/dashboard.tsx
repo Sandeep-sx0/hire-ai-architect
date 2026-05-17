@@ -10,7 +10,7 @@ import {
   UserPlus,
   TrendingUp,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader, StatCard } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import {
