@@ -375,7 +375,7 @@ function Step1({
                     <ScoreRing score={c.score} size="sm" />
                   </td>
                   <td className="px-4 py-3">
-                    <StatusBadge label={c.stage} tone="neutral" />
+                    <StatusBadge status={c.stage} />
                   </td>
                   <td className="px-4 py-3 text-center">
                     {c.hasLinkedIn ? (
