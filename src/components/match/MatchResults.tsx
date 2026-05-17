@@ -173,6 +173,7 @@ export function MatchResults({ projectId }: { projectId: string }) {
   const [focusIdx, setFocusIdx] = useState(0);
   const [showHint, setShowHint] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
+  const [focusOpen, setFocusOpen] = useState(false);
 
   const visible = useMemo(() => {
     return MATCHES.filter((m) => {
