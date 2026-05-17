@@ -787,13 +787,11 @@ function StageDetail({
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-medium text-brand-text">Scorecards</h3>
-          <Button variant="outline" size="sm" onClick={() => toast("Add scorecard")}>
+          <Button variant="outline" size="sm" onClick={onAddScorecard}>
             Add scorecard
           </Button>
         </div>
-        <p className="text-[13px] text-brand-text-secondary">
-          No scorecards submitted yet. Add one to evaluate this candidate.
-        </p>
+        <ScorecardsStack cards={scorecards} />
       </section>
 
       {/* Stage history */}
