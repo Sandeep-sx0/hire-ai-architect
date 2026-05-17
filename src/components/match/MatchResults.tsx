@@ -206,6 +206,7 @@ export function MatchResults({ projectId }: { projectId: string }) {
   };
 
   useEffect(() => {
+    if (focusOpen) return;
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
@@ -222,6 +223,9 @@ export function MatchResults({ projectId }: { projectId: string }) {
       } else if (e.key === "e" || e.key === "E" || e.key === "Enter") {
         e.preventDefault();
         toggleExpand(current.id);
+      } else if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        setFocusOpen(true);
       } else if (e.key === "a" || e.key === "A") {
         setAction(current.id, "approved");
       } else if (e.key === "s" || e.key === "S") {
@@ -234,7 +238,7 @@ export function MatchResults({ projectId }: { projectId: string }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [visible, focusIdx]);
+  }, [visible, focusIdx, focusOpen]);
 
   // Silence unused warning; projectId is for future deep-link wiring.
   void projectId;
