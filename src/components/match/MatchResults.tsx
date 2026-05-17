@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, forwardRef } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Sparkles,
@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -173,7 +172,6 @@ export function MatchResults({ projectId }: { projectId: string }) {
   const [focusIdx, setFocusIdx] = useState(0);
   const [showHint, setShowHint] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
-  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const visible = useMemo(() => {
     return MATCHES.filter((m) => {
@@ -201,11 +199,10 @@ export function MatchResults({ projectId }: { projectId: string }) {
     }));
   };
 
-  const toggleExpand = (id: string, multi = false) => {
-    setExpanded((curr) => (multi ? (curr === id ? null : id) : curr === id ? null : id));
+  const toggleExpand = (id: string) => {
+    setExpanded((curr) => (curr === id ? null : id));
   };
 
-  // Keyboard nav
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
@@ -236,6 +233,9 @@ export function MatchResults({ projectId }: { projectId: string }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [visible, focusIdx]);
+
+  // Silence unused warning; projectId is for future deep-link wiring.
+  void projectId;
 
   const strong = MATCHES.filter((m) => m.score >= 75).length;
   const possible = MATCHES.filter((m) => m.score >= 50 && m.score < 75).length;
@@ -306,13 +306,15 @@ export function MatchResults({ projectId }: { projectId: string }) {
           </div>
         </div>
 
-        {/* Progress */}
         <div className="mt-4">
-          <div className="flex items-center justify-between text-[12px] text-brand-text-secondary">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[12px] text-brand-text-secondary">
             <span>
               {reviewedCount} of {total} reviewed · {counts.shortlisted} shortlisted · {counts.approved} approved · {counts.rejected} rejected · {counts.skipped} skipped
             </span>
-            <span>Showing {visible.length} of {total} {filter !== "all" ? FILTER_LABELS[filter].toLowerCase() : ""}</span>
+            <span>
+              Showing {visible.length} of {total}
+              {filter !== "all" && ` ${FILTER_LABELS[filter].toLowerCase()}`}
+            </span>
           </div>
           <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
             <div
@@ -323,13 +325,13 @@ export function MatchResults({ projectId }: { projectId: string }) {
         </div>
       </div>
 
-      {/* Score Distribution */}
+      {/* Distribution */}
       <div className="rounded-xl border border-gray-100 bg-white p-5">
         <div className="text-[13px] font-medium text-brand-text">Score distribution</div>
         <div className="mt-3 flex h-8 w-full overflow-hidden rounded-lg">
-          <DistSegment count={strong} total={total} color="bg-status-success" label={`${strong} strong`} />
-          <DistSegment count={possible} total={total} color="bg-status-warning" label={`${possible} possible`} />
-          <DistSegment count={weak} total={total} color="bg-status-danger" label={`${weak} weak`} />
+          <DistSegment count={strong} total={total} color="bg-status-success" />
+          <DistSegment count={possible} total={total} color="bg-status-warning" />
+          <DistSegment count={weak} total={total} color="bg-status-danger" />
         </div>
         <p className="mt-2 text-[13px] text-brand-text-secondary">
           {strong} strong matches · {possible} possible · {weak} weak · {reviewedCount} reviewed
@@ -346,16 +348,12 @@ export function MatchResults({ projectId }: { projectId: string }) {
         {visible.map((m, i) => (
           <MatchCard
             key={m.id}
-            ref={(el) => {
-              cardRefs.current[m.id] = el;
-            }}
             match={m}
             action={actions[m.id] ?? "unreviewed"}
             override={overrides[m.id]}
             expanded={expanded === m.id}
             focused={i === focusIdx}
-            projectId={projectId}
-            onToggle={(multi) => toggleExpand(m.id, multi)}
+            onToggle={() => toggleExpand(m.id)}
             onAction={(a) => setAction(m.id, a)}
             onOverride={(n) => setOverrides((p) => ({ ...p, [m.id]: n }))}
             onFocus={() => setFocusIdx(i)}
@@ -363,7 +361,6 @@ export function MatchResults({ projectId }: { projectId: string }) {
         ))}
       </div>
 
-      {/* Keyboard hint */}
       {showHint && (
         <div className="fixed bottom-6 right-6 z-30 hidden items-center gap-3 rounded-full bg-brand-text px-4 py-2 text-xs text-white opacity-90 shadow-lg lg:flex">
           <span>
@@ -390,24 +387,12 @@ function Kbd({ children }: { children: React.ReactNode }) {
   );
 }
 
-function DistSegment({
-  count,
-  total,
-  color,
-  label,
-}: {
-  count: number;
-  total: number;
-  color: string;
-  label: string;
-}) {
-  const pct = (count / total) * 100;
+function DistSegment({ count, total, color }: { count: number; total: number; color: string }) {
   if (count === 0) return null;
   return (
     <div
       className={cn("flex items-center justify-center text-[11px] font-semibold text-white", color)}
-      style={{ width: `${pct}%` }}
-      title={label}
+      style={{ width: `${(count / total) * 100}%` }}
     >
       {count}
     </div>
@@ -420,276 +405,13 @@ interface MatchCardProps {
   override?: number;
   expanded: boolean;
   focused: boolean;
-  projectId: string;
-  onToggle: (multi: boolean) => void;
+  onToggle: () => void;
   onAction: (a: Action) => void;
   onOverride: (n: number) => void;
   onFocus: () => void;
 }
 
-const MatchCard = (() => {
-  const Comp = (
-    {
-      match,
-      action,
-      override,
-      expanded,
-      focused,
-      onToggle,
-      onAction,
-      onOverride,
-      onFocus,
-    }: MatchCardProps,
-    ref: React.Ref<HTMLDivElement>,
-  ) => {
-    const displayScore = override ?? match.score;
-    const isOverridden = override !== undefined && override !== match.score;
-
-    const borderState =
-      action === "approved"
-        ? "border-l-4 border-l-status-success"
-        : action === "rejected"
-        ? "border-l-4 border-l-status-danger"
-        : action === "shortlisted"
-        ? "border-l-4 border-l-status-warning"
-        : "";
-
-    const cardOpacity =
-      action === "skipped" ? "opacity-50" : action === "rejected" ? "opacity-70" : "";
-
-    return (
-      <div
-        ref={ref}
-        onClick={onFocus}
-        className={cn(
-          "rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300",
-          "hover:border-gray-200",
-          focused && "ring-2 ring-brand-mint",
-          borderState,
-          cardOpacity,
-        )}
-      >
-        {/* Header row */}
-        <div
-          className="flex cursor-pointer items-start gap-4"
-          onClick={(e) => onToggle(e.shiftKey)}
-        >
-          <div className="shrink-0">
-            <ScoreRing score={displayScore} size="md" />
-            {isOverridden && (
-              <div className="mt-1 rounded-full bg-brand-mint/30 px-1.5 py-0.5 text-center text-[9px] font-medium text-brand-primary">
-                Overridden
-              </div>
-            )}
-          </div>
-
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <div className="flex flex-wrap items-center gap-2">
-              {action === "shortlisted" && (
-                <Star className="h-4 w-4 fill-status-warning text-status-warning" />
-              )}
-              <Link
-                to="/candidates/$id"
-                params={{ id: match.id }}
-                onClick={(e) => e.stopPropagation()}
-                className={cn(
-                  "text-[15px] font-medium text-brand-text hover:text-brand-primary hover:underline",
-                  action === "rejected" && "line-through",
-                )}
-              >
-                {match.name}
-              </Link>
-              {match.dnc && (
-                <span
-                  className="inline-flex items-center gap-1 rounded-full bg-status-danger/10 px-1.5 py-0.5 text-[10px] font-medium text-status-danger"
-                  title="Do Not Contact — excluded from outreach"
-                >
-                  <ShieldAlert className="h-3 w-3" />
-                  DNC
-                </span>
-              )}
-              <span className="text-[12px] text-brand-text-secondary">#{match.rank}</span>
-            </div>
-            <div className="text-[13px] text-brand-text-secondary">
-              {match.title} at {match.company}
-            </div>
-            <div className="text-[12px] text-brand-text-secondary">
-              {match.location} · {match.years} yrs · {match.seniority}
-            </div>
-
-            {/* Summary preview */}
-            <div className="mt-2 flex flex-col gap-1 text-[12px]">
-              <div>
-                <span className="font-medium text-brand-text-secondary">Strengths: </span>
-                <span className="text-status-success">
-                  {match.strengths.slice(0, 4).join(" · ")}
-                  {match.strengths.length > 4 && "…"}
-                </span>
-              </div>
-              <div>
-                <span className="font-medium text-brand-text-secondary">Gaps: </span>
-                <span className="text-status-warning">
-                  {match.gaps.slice(0, 2).join(" · ") || "—"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex shrink-0 flex-col items-end gap-2">
-            <AIVerdictChip verdict={match.verdict} />
-            <button
-              className="rounded-md p-1 text-brand-text-secondary hover:bg-brand-bg hover:text-brand-text"
-              aria-label={expanded ? "Collapse" : "Expand"}
-            >
-              {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Expanded explanation panel */}
-        {expanded && (
-          <div className="mt-3 rounded-lg border-t border-gray-100 bg-brand-bg p-5">
-            {/* Score breakdown */}
-            <div>
-              <div className="text-[13px] font-medium text-brand-text">Score breakdown</div>
-              <div className="mt-3 space-y-2">
-                <BreakdownBar label="Must-have skills" weight="30%" value={match.breakdown.skills} />
-                <BreakdownBar label="Experience fit" weight="20%" value={match.breakdown.experience} />
-                <BreakdownBar label="Seniority fit" weight="10%" value={match.breakdown.seniority} />
-                <BreakdownBar label="Location fit" weight="10%" value={match.breakdown.location} />
-                <BreakdownBar
-                  label="Semantic similarity"
-                  weight="30%"
-                  value={match.breakdown.semantic}
-                  variant="ai"
-                />
-              </div>
-            </div>
-
-            {/* Strengths / Gaps / Concerns */}
-            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-              <ExplanationGroup
-                title="Strengths"
-                icon={<CheckCircle2 className="h-3.5 w-3.5 text-status-success" />}
-                items={match.strengths}
-                pillClass="bg-status-success/10 text-status-success border-status-success/20"
-              />
-              <ExplanationGroup
-                title="Gaps"
-                icon={<AlertTriangle className="h-3.5 w-3.5 text-status-warning" />}
-                items={match.gaps}
-                pillClass="bg-status-warning/10 text-status-warning border-status-warning/20"
-              />
-              <ExplanationGroup
-                title="Concerns"
-                icon={<Info className="h-3.5 w-3.5 text-brand-text-secondary" />}
-                items={match.concerns}
-                pillClass="bg-gray-100 text-brand-text-secondary border-gray-200"
-              />
-            </div>
-
-            {/* AI recommendation */}
-            <blockquote className="mt-5 border-l-2 border-brand-mint pl-4 text-[13px] italic leading-relaxed text-brand-text-secondary">
-              {match.recommendation}
-            </blockquote>
-
-            {/* Override */}
-            <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-gray-200 pt-4">
-              <label className="flex items-center gap-2 text-[12px] text-brand-text-secondary">
-                Override score:
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  defaultValue={match.score}
-                  onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => {
-                    const n = Number(e.target.value);
-                    if (!isNaN(n)) onOverride(Math.max(0, Math.min(100, n)));
-                  }}
-                  className="w-16 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm focus:border-brand-primary focus:outline-none"
-                />
-              </label>
-              <label className="flex flex-1 items-center gap-2 text-[12px] text-brand-text-secondary">
-                Note:
-                <input
-                  type="text"
-                  placeholder="Add justification…"
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm focus:border-brand-primary focus:outline-none"
-                />
-              </label>
-            </div>
-          </div>
-        )}
-
-        {/* Action buttons */}
-        <div
-          className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <ActionBtn
-            active={action === "approved"}
-            onClick={() => onAction("approved")}
-            icon={<Check className="h-3.5 w-3.5" />}
-            label="Approve"
-            color="success"
-          />
-          <ActionBtn
-            active={action === "skipped"}
-            onClick={() => onAction("skipped")}
-            icon={<SkipForward className="h-3.5 w-3.5" />}
-            label="Skip"
-            color="neutral"
-          />
-          <ActionBtn
-            active={action === "rejected"}
-            onClick={() => onAction("rejected")}
-            icon={<X className="h-3.5 w-3.5" />}
-            label="Reject"
-            color="danger"
-          />
-          {match.dnc ? (
-            <button
-              disabled
-              title="Cannot shortlist — Do Not Contact"
-              className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-brand-text-secondary opacity-60"
-            >
-              <Star className="h-3.5 w-3.5" />
-              Shortlist
-            </button>
-          ) : (
-            <button
-              onClick={() => onAction("shortlisted")}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
-                action === "shortlisted"
-                  ? "bg-status-warning text-white hover:bg-status-warning/90"
-                  : "bg-brand-primary text-white hover:bg-brand-primary/90",
-              )}
-            >
-              <Star
-                className={cn("h-3.5 w-3.5", action === "shortlisted" && "fill-current")}
-              />
-              Shortlist
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  };
-  Comp.displayName = "MatchCard";
-  return Object.assign(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (require as any) ? undefined as never : undefined as never,
-  );
-})();
-
-// Replace the IIFE above (it's a placeholder); use forwardRef properly:
-
-import { forwardRef } from "react";
-
-const _MatchCard = forwardRef<HTMLDivElement, MatchCardProps>(function MatchCardImpl(
+const MatchCard = forwardRef<HTMLDivElement, MatchCardProps>(function MatchCardImpl(
   { match, action, override, expanded, focused, onToggle, onAction, onOverride, onFocus },
   ref,
 ) {
@@ -720,10 +442,7 @@ const _MatchCard = forwardRef<HTMLDivElement, MatchCardProps>(function MatchCard
         cardOpacity,
       )}
     >
-      <div
-        className="flex cursor-pointer items-start gap-4"
-        onClick={(e) => onToggle(e.shiftKey)}
-      >
+      <div className="flex cursor-pointer items-start gap-4" onClick={onToggle}>
         <div className="shrink-0">
           <ScoreRing score={displayScore} size="md" />
           {isOverridden && (
@@ -911,9 +630,7 @@ const _MatchCard = forwardRef<HTMLDivElement, MatchCardProps>(function MatchCard
                 : "bg-brand-primary text-white hover:bg-brand-primary/90",
             )}
           >
-            <Star
-              className={cn("h-3.5 w-3.5", action === "shortlisted" && "fill-current")}
-            />
+            <Star className={cn("h-3.5 w-3.5", action === "shortlisted" && "fill-current")} />
             Shortlist
           </button>
         )}
@@ -921,15 +638,6 @@ const _MatchCard = forwardRef<HTMLDivElement, MatchCardProps>(function MatchCard
     </div>
   );
 });
-
-// Override the placeholder export with the real component
-// (the IIFE above produces undefined; this is the actual MatchCard)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const __useMatchCard = MatchCard;
-// @ts-expect-error reassign for export shape
-// eslint-disable-next-line prefer-const, no-var
-var __MatchCard = _MatchCard;
-export { _MatchCard as MatchCardExport };
 
 function BreakdownBar({
   label,
@@ -957,9 +665,7 @@ function BreakdownBar({
           style={{ width: `${value}%` }}
         />
       </div>
-      <div className="w-10 shrink-0 text-right text-[13px] tabular-nums text-brand-text">
-        {value}
-      </div>
+      <div className="w-10 shrink-0 text-right text-[13px] tabular-nums text-brand-text">{value}</div>
     </div>
   );
 }
