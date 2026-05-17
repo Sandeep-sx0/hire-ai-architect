@@ -32,6 +32,7 @@ import {
 import { StatusBadge, EmptyState } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import { projects } from "@/lib/mock-data";
+import { MatchResults } from "@/components/match/MatchResults";
 
 const tabSchema = z.object({
   tab: fallback(
@@ -221,15 +222,7 @@ function ProjectDetail() {
       {/* Tab Content */}
       <div className="mt-6">
         {tab === "brief" && <BriefTab editMode={editMode} setEditMode={setEditMode} />}
-        {tab === "candidates" && (
-          <EmptyState
-            icon={Users}
-            title="Candidate matching"
-            description="Run AI matching to score candidates against this brief, or manually add candidates to this project."
-            actionLabel="Run matching"
-            onAction={() => {}}
-          />
-        )}
+        {tab === "candidates" && <MatchResults projectId={id} />}
         {tab === "outreach" && (
           <EmptyState
             icon={Send}
