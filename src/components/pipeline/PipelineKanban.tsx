@@ -52,6 +52,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScoreRing, SidePanel, StatusBadge } from "@/components/shared";
+import {
+  ScorecardForm,
+  ScorecardsStack,
+  MOCK_RINA_SCORECARD,
+  type SubmittedScorecard,
+} from "./ScorecardForm";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -239,6 +245,10 @@ export function PipelineKanban() {
   const [selected, setSelected] = useState<string | null>(null);
   const [rejectModal, setRejectModal] = useState<RejectModalState | null>(null);
   const [placeModal, setPlaceModal] = useState<PlaceModalState | null>(null);
+  const [scorecardOpen, setScorecardOpen] = useState(false);
+  const [scorecards, setScorecards] = useState<Record<string, SubmittedScorecard[]>>({
+    p1: [MOCK_RINA_SCORECARD],
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -398,6 +408,8 @@ export function PipelineKanban() {
         {selectedCandidate && (
           <StageDetail
             candidate={selectedCandidate}
+            scorecards={scorecards[selectedCandidate.id] ?? []}
+            onAddScorecard={() => setScorecardOpen(true)}
             onToggleChecklist={(idx) => toggleChecklist(selectedCandidate.id, idx)}
             onAdvance={() => {
               const idx = STAGES.findIndex((s) => s.id === selectedCandidate.stage);
@@ -410,6 +422,36 @@ export function PipelineKanban() {
           />
         )}
       </SidePanel>
+
+      {/* Scorecard form */}
+      {selectedCandidate && (
+        <ScorecardForm
+          open={scorecardOpen}
+          onClose={() => setScorecardOpen(false)}
+          candidate={{
+            name: selectedCandidate.name,
+            title: selectedCandidate.title,
+            company: selectedCandidate.company,
+            score: selectedCandidate.score,
+            initials: selectedCandidate.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase(),
+          }}
+          stageLabel={STAGES.find((s) => s.id === selectedCandidate.stage)!.label}
+          projectLabel="CFO Search — Indorama"
+          evaluatorName="Dewi Anggraini"
+          evaluatorInitials="DA"
+          onSubmit={(card) =>
+            setScorecards((prev) => ({
+              ...prev,
+              [selectedCandidate.id]: [...(prev[selectedCandidate.id] ?? []), card],
+            }))
+          }
+        />
+      )}
 
       {/* Rejection dialog */}
       <RejectDialog
@@ -671,11 +713,15 @@ function CardBody({
 
 function StageDetail({
   candidate,
+  scorecards,
+  onAddScorecard,
   onToggleChecklist,
   onAdvance,
   onReject,
 }: {
   candidate: Candidate;
+  scorecards: SubmittedScorecard[];
+  onAddScorecard: () => void;
   onToggleChecklist: (idx: number) => void;
   onAdvance: () => void;
   onReject: () => void;
@@ -741,13 +787,11 @@ function StageDetail({
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-medium text-brand-text">Scorecards</h3>
-          <Button variant="outline" size="sm" onClick={() => toast("Add scorecard")}>
+          <Button variant="outline" size="sm" onClick={onAddScorecard}>
             Add scorecard
           </Button>
         </div>
-        <p className="text-[13px] text-brand-text-secondary">
-          No scorecards submitted yet. Add one to evaluate this candidate.
-        </p>
+        <ScorecardsStack cards={scorecards} />
       </section>
 
       {/* Stage history */}
