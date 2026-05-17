@@ -324,26 +324,13 @@ export function ScorecardForm({
     >
       <DialogContent
         className="flex max-h-[85vh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-[600px]"
-        showCloseButton={false}
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-gray-100 px-6 py-4">
-          <div>
-            <div className="text-[18px] font-semibold text-brand-text">Scorecard</div>
-            <div className="text-[13px] text-brand-text-secondary">
-              {candidate.name} · {projectLabel} · {stageLabel} stage
-            </div>
+        <div className="border-b border-gray-100 px-6 py-4 pr-12">
+          <div className="text-[18px] font-semibold text-brand-text">Scorecard</div>
+          <div className="text-[13px] text-brand-text-secondary">
+            {candidate.name} · {projectLabel} · {stageLabel} stage
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              reset();
-              onClose();
-            }}
-            className="rounded-md p-1 text-brand-text-secondary hover:bg-gray-100"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
 
         {/* Scroll body */}
