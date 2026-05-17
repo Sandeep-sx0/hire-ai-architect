@@ -171,10 +171,10 @@ function PublicFooter() {
   );
 }
 
-export function PublicLayout({ children }: { children: ReactNode }) {
+export function PublicLayout({ children, clientName, portalLabel }: { children: ReactNode; clientName?: string; portalLabel?: string }) {
   return (
     <div className="flex min-h-screen flex-col bg-brand-bg">
-      <PublicHeader />
+      <PublicHeader clientName={clientName} portalLabel={portalLabel} />
       <main className="flex-1">{children}</main>
       <PublicFooter />
     </div>
