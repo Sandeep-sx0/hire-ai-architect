@@ -203,7 +203,7 @@ function DashboardPage() {
     <div>
       <PageHeader
         title="Dashboard"
-        subtitle={`${greetingPrefix()}, ${firstName}`}
+        subtitle={`${greeting}, ${firstName}`}
         actions={
           <Button asChild className="bg-brand-primary text-white hover:bg-brand-primary/90">
             <Link to="/projects">
