@@ -249,6 +249,8 @@ export function PipelineKanban() {
   const [scorecards, setScorecards] = useState<Record<string, SubmittedScorecard[]>>({
     p1: [MOCK_RINA_SCORECARD],
   });
+
+  const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
