@@ -233,15 +233,7 @@ function ProjectDetail() {
             onAction={() => {}}
           />
         )}
-        {tab === "pipeline" && (
-          <EmptyState
-            icon={GitBranch}
-            title="Screening pipeline"
-            description="Candidates who respond or apply will appear here for screening and selection."
-            actionLabel="View pipeline"
-            onAction={() => {}}
-          />
-        )}
+        {tab === "pipeline" && <PipelineKanban />}
         {tab === "activity" && <ActivityTab />}
       </div>
     </div>
