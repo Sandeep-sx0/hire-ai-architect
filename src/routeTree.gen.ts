@@ -24,6 +24,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppClientsRouteImport } from './routes/_app/clients'
 import { Route as AppCandidatesRouteImport } from './routes/_app/candidates'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
+import { Route as JobsTrackTokenRouteImport } from './routes/jobs.track.$token'
 import { Route as AppProjectsIdRouteImport } from './routes/_app/projects.$id'
 import { Route as AppOutreachNewRouteImport } from './routes/_app/outreach.new'
 import { Route as AppOutreachIdRouteImport } from './routes/_app/outreach.$id'
@@ -105,6 +106,11 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
+const JobsTrackTokenRoute = JobsTrackTokenRouteImport.update({
+  id: '/track/$token',
+  path: '/track/$token',
+  getParentRoute: () => JobsRoute,
+} as any)
 const AppProjectsIdRoute = AppProjectsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/outreach/$id': typeof AppOutreachIdRoute
   '/outreach/new': typeof AppOutreachNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/jobs/track/$token': typeof JobsTrackTokenRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRoutesByTo {
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/outreach/$id': typeof AppOutreachIdRoute
   '/outreach/new': typeof AppOutreachNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/jobs/track/$token': typeof JobsTrackTokenRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRoutesById {
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/_app/outreach/$id': typeof AppOutreachIdRoute
   '/_app/outreach/new': typeof AppOutreachNewRoute
   '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/jobs/track/$token': typeof JobsTrackTokenRoute
   '/_app/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRouteTypes {
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/outreach/$id'
     | '/outreach/new'
     | '/projects/$id'
+    | '/jobs/track/$token'
     | '/projects/$id/parse'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/outreach/$id'
     | '/outreach/new'
     | '/projects/$id'
+    | '/jobs/track/$token'
     | '/projects/$id/parse'
   id:
     | '__root__'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/_app/outreach/$id'
     | '/_app/outreach/new'
     | '/_app/projects/$id'
+    | '/jobs/track/$token'
     | '/_app/projects/$id/parse'
   fileRoutesById: FileRoutesById
 }
@@ -389,6 +401,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/analytics'
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/jobs/track/$token': {
+      id: '/jobs/track/$token'
+      path: '/track/$token'
+      fullPath: '/jobs/track/$token'
+      preLoaderRoute: typeof JobsTrackTokenRouteImport
+      parentRoute: typeof JobsRoute
     }
     '/_app/projects/$id': {
       id: '/_app/projects/$id'
@@ -523,10 +542,12 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface JobsRouteChildren {
   JobsIdRoute: typeof JobsIdRoute
+  JobsTrackTokenRoute: typeof JobsTrackTokenRoute
 }
 
 const JobsRouteChildren: JobsRouteChildren = {
   JobsIdRoute: JobsIdRoute,
+  JobsTrackTokenRoute: JobsTrackTokenRoute,
 }
 
 const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
