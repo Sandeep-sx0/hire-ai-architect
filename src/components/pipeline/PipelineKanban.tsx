@@ -713,11 +713,15 @@ function CardBody({
 
 function StageDetail({
   candidate,
+  scorecards,
+  onAddScorecard,
   onToggleChecklist,
   onAdvance,
   onReject,
 }: {
   candidate: Candidate;
+  scorecards: SubmittedScorecard[];
+  onAddScorecard: () => void;
   onToggleChecklist: (idx: number) => void;
   onAdvance: () => void;
   onReject: () => void;
