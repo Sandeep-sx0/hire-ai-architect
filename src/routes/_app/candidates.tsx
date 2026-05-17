@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PageHeader, EmptyState, ScoreRing } from "@/components/shared";
+import { ImportCandidateModal } from "@/components/import/ImportCandidateModal";
 import { cn } from "@/lib/utils";
 
 // ============= Types & mock data ===============================
@@ -212,8 +213,11 @@ function CandidatesPage() {
     setSelected({});
   };
 
+  const [importOpen, setImportOpen] = useState(false);
+
   return (
     <div className="space-y-3">
+      <ImportCandidateModal open={importOpen} onOpenChange={setImportOpen} />
       <PageHeader
         title="Candidates"
         subtitle={`${CANDIDATES.length} candidates in database`}
@@ -225,7 +229,7 @@ function CandidatesPage() {
             </Button>
             <Button
               className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
-              onClick={() => toast("Import modal coming soon")}
+              onClick={() => setImportOpen(true)}
             >
               <Upload className="h-4 w-4" />
               Import candidates
@@ -480,7 +484,7 @@ function CandidatesPage() {
                 title="Your candidate database is empty"
                 description="Import candidates from CVs, LinkedIn profiles, or add them manually to build your talent pool."
                 actionLabel="Import candidates"
-                onAction={() => toast("Import modal coming soon")}
+                onAction={() => setImportOpen(true)}
               />
             )}
           </div>
