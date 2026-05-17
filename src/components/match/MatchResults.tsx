@@ -374,7 +374,7 @@ export function MatchResults({ projectId }: { projectId: string }) {
       {showHint && (
         <div className="fixed bottom-6 right-6 z-30 hidden items-center gap-3 rounded-full bg-brand-text px-4 py-2 text-xs text-white opacity-90 shadow-lg lg:flex">
           <span>
-            <Kbd>A</Kbd> Approve · <Kbd>S</Kbd> Skip · <Kbd>R</Kbd> Reject · <Kbd>L</Kbd> Shortlist · <Kbd>↑↓</Kbd> Nav · <Kbd>E</Kbd> Expand
+            <Kbd>A</Kbd> Approve · <Kbd>S</Kbd> Skip · <Kbd>R</Kbd> Reject · <Kbd>L</Kbd> Shortlist · <Kbd>↑↓</Kbd> Nav · <Kbd>E</Kbd> Expand · <Kbd>F</Kbd> Focus
           </span>
           <button
             onClick={() => setShowHint(false)}
@@ -384,6 +384,16 @@ export function MatchResults({ projectId }: { projectId: string }) {
             <X className="h-3 w-3" />
           </button>
         </div>
+      )}
+
+      {focusOpen && (
+        <FocusMode
+          candidates={FOCUS_DEMO_CANDIDATES}
+          initialActions={actions}
+          initialIndex={focusIdx}
+          onClose={() => setFocusOpen(false)}
+          onCommit={(a) => setActions(a)}
+        />
       )}
     </div>
   );
