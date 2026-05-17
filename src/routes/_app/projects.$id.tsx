@@ -33,6 +33,7 @@ import { StatusBadge, EmptyState } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import { projects } from "@/lib/mock-data";
 import { MatchResults } from "@/components/match/MatchResults";
+import { PipelineKanban } from "@/components/pipeline/PipelineKanban";
 
 const tabSchema = z.object({
   tab: fallback(
@@ -232,15 +233,7 @@ function ProjectDetail() {
             onAction={() => {}}
           />
         )}
-        {tab === "pipeline" && (
-          <EmptyState
-            icon={GitBranch}
-            title="Screening pipeline"
-            description="Candidates who respond or apply will appear here for screening and selection."
-            actionLabel="View pipeline"
-            onAction={() => {}}
-          />
-        )}
+        {tab === "pipeline" && <PipelineKanban />}
         {tab === "activity" && <ActivityTab />}
       </div>
     </div>
