@@ -67,25 +67,16 @@ export function ImportCandidateModal({ open, onOpenChange }: ImportCandidateModa
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        showCloseButton={false}
-        className="max-w-[720px] w-[720px] p-0 gap-0 rounded-2xl overflow-hidden max-h-[85vh] flex flex-col sm:max-w-[720px]"
+        className="max-w-[720px] w-[720px] p-0 gap-0 rounded-2xl overflow-hidden max-h-[85vh] flex flex-col sm:max-w-[720px] [&>button]:top-5 [&>button]:right-5"
       >
         {/* Header */}
-        <DialogHeader className="flex flex-row items-start justify-between border-b border-gray-100 px-6 py-4 space-y-0">
-          <div>
-            <DialogTitle className="text-[18px] font-semibold text-brand-text">
-              Import candidates
-            </DialogTitle>
-            <DialogDescription className="text-[13px] text-brand-text-secondary">
-              Add candidates to your database from any source.
-            </DialogDescription>
-          </div>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="text-brand-text-secondary hover:text-brand-text transition"
-          >
-            <X className="h-5 w-5" />
-          </button>
+        <DialogHeader className="border-b border-gray-100 px-6 py-4 space-y-0">
+          <DialogTitle className="text-[18px] font-semibold text-brand-text">
+            Import candidates
+          </DialogTitle>
+          <DialogDescription className="text-[13px] text-brand-text-secondary">
+            Add candidates to your database from any source.
+          </DialogDescription>
         </DialogHeader>
 
         {/* Tab bar */}
