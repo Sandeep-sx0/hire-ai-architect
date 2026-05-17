@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScoreRing, AIVerdictChip } from "@/components/shared";
 import type { Verdict } from "@/components/shared/AIVerdictChip";
+import { FocusMode, FOCUS_DEMO_CANDIDATES } from "./FocusMode";
 import { cn } from "@/lib/utils";
 
 type Action = "unreviewed" | "approved" | "skipped" | "rejected" | "shortlisted";
