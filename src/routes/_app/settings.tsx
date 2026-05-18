@@ -161,6 +161,7 @@ function SettingsPage() {
           {active === "workspace" && <WorkspaceTab />}
           {active === "integrations" && <IntegrationsTab />}
           {active === "billing" && <BillingTab />}
+          {active === "extension" && <ExtensionTab />}
         </main>
       </div>
     </div>
