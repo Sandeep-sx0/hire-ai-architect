@@ -213,8 +213,30 @@ function CvUploadTab() {
   const [dragOver, setDragOver] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validCount = files.filter((f) => f.status !== "invalid").length;
+
+  const ALLOWED_EXT = ["pdf", "docx", "txt"];
+
+  const addFiles = (incoming: FileList | File[]) => {
+    const arr = Array.from(incoming);
+    const queued: QueuedFile[] = arr.map((file) => {
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+      const sizeMb = file.size / (1024 * 1024);
+      const size =
+        sizeMb >= 1
+          ? `${sizeMb.toFixed(1)} MB`
+          : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+      return {
+        name: file.name,
+        size,
+        ext,
+        status: ALLOWED_EXT.includes(ext) ? "ready" : "invalid",
+      };
+    });
+    setFiles((prev) => [...prev, ...queued]);
+  };
 
   const handleUpload = async () => {
     setProcessing(true);
@@ -234,6 +256,17 @@ function CvUploadTab() {
 
   return (
     <div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept=".pdf,.docx,.txt"
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files) addFiles(e.target.files);
+          e.target.value = "";
+        }}
+      />
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -243,6 +276,7 @@ function CvUploadTab() {
         onDrop={(e) => {
           e.preventDefault();
           setDragOver(false);
+          if (e.dataTransfer.files?.length) addFiles(e.dataTransfer.files);
         }}
         className={cn(
           "flex h-[180px] flex-col items-center justify-center rounded-xl border-2 border-dashed transition",
@@ -261,7 +295,11 @@ function CvUploadTab() {
           Drag and drop CV files here
         </p>
         <p className="text-xs text-brand-text-secondary">or</p>
-        <button className="text-sm font-medium text-brand-primary hover:underline">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="text-sm font-medium text-brand-primary hover:underline"
+        >
           Browse files
         </button>
         <p className="mt-1 text-xs text-brand-text-secondary">
@@ -288,7 +326,7 @@ function CvUploadTab() {
           <div className="rounded-lg border border-gray-100">
             {files.map((f, i) => (
               <FileRow
-                key={f.name}
+                key={`${f.name}-${i}`}
                 file={f}
                 onRemove={() => setFiles((p) => p.filter((_, idx) => idx !== i))}
               />
