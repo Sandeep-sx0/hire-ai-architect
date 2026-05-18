@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { currentUser, projects } from "@/lib/mock-data";
+import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
@@ -183,6 +184,7 @@ function DashboardPage() {
   const [greeting, setGreeting] = useState<string>("Hello");
   useEffect(() => setGreeting(greetingPrefix()), []);
   const [funnelFilter, setFunnelFilter] = useState<string>("all");
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const totalCandidates = funnelStages.reduce((s, x) => s + x.count, 0);
   const activeProjectCount = projects.filter(
@@ -205,14 +207,16 @@ function DashboardPage() {
         title="Dashboard"
         subtitle={`${greeting}, ${firstName}`}
         actions={
-          <Button asChild className="bg-brand-primary text-white hover:bg-brand-primary/90">
-            <Link to="/projects">
-              <Plus className="mr-1.5 h-4 w-4" />
-              Create project
-            </Link>
+          <Button
+            onClick={() => setWizardOpen(true)}
+            className="bg-brand-primary text-white hover:bg-brand-primary/90"
+          >
+            <Plus className="mr-1.5 h-4 w-4" />
+            Create project
           </Button>
         }
       />
+      <CreateProjectWizard open={wizardOpen} onOpenChange={setWizardOpen} />
 
       {/* === Stats row =========================================== */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

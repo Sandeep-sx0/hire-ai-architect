@@ -41,6 +41,7 @@ import {
   type ProjectStatus,
   type SeniorityLevel,
 } from "@/lib/mock-data";
+import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 
 // === Search params ============================================
 const searchSchema = z.object({
@@ -148,6 +149,7 @@ function ProjectsPage() {
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [showClosed, setShowClosed] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const update = (patch: Partial<typeof search>) => {
     navigate({ search: (prev: typeof search) => ({ ...prev, ...patch }) });
@@ -243,16 +245,15 @@ function ProjectsPage() {
         subtitle={`${activeCount} active project${activeCount === 1 ? "" : "s"}`}
         actions={
           <Button
-            asChild
+            onClick={() => setWizardOpen(true)}
             className="bg-brand-primary text-white hover:bg-brand-primary/90"
           >
-            <Link to="/projects">
-              <Plus className="mr-1.5 h-4 w-4" />
-              New project
-            </Link>
+            <Plus className="mr-1.5 h-4 w-4" />
+            New project
           </Button>
         }
       />
+      <CreateProjectWizard open={wizardOpen} onOpenChange={setWizardOpen} />
 
       {/* Filter & view bar */}
       <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card px-4 py-3">
