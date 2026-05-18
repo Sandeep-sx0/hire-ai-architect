@@ -10,7 +10,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
-import { PageHeader, DataTable, StatusBadge } from "@/components/shared";
+import { PageHeader, DataTable, StatusBadge, EmptyState } from "@/components/shared";
 import type { DataTableColumn } from "@/components/shared/DataTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
