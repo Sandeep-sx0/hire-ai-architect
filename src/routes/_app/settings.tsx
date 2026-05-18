@@ -81,6 +81,7 @@ const TABS: TabDef[] = [
   { id: "workspace", label: "Workspace", icon: Palette, access: ["Owner", "Admin"] },
   { id: "integrations", label: "Integrations", icon: LinkIcon, access: ["Owner", "Admin"] },
   { id: "billing", label: "Billing", icon: CreditCard, access: ["Owner"] },
+  { id: "extension", label: "Chrome Extension", icon: Chrome, access: ["Owner", "Admin", "Recruiter", "Sourcer"] },
 ];
 
 // Current user — mock as Owner for prototype
