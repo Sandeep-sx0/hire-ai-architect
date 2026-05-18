@@ -25,23 +25,19 @@ const nav = [
 
 interface AppSidebarProps {
   collapsed: boolean;
+  mobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
-export function AppSidebar({ collapsed }: AppSidebarProps) {
+function SidebarBody({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-
   const isActive = (to: string) => pathname === to || pathname.startsWith(to + "/");
 
   return (
-    <aside
-      className={cn(
-        "hidden h-screen shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 lg:flex",
-        collapsed ? "w-16" : "w-60",
-      )}
-    >
+    <>
       {/* Brand */}
       <div className={cn("flex h-14 items-center border-b border-border", collapsed ? "justify-center px-2" : "px-5")}>
-        <Link to="/dashboard" className="flex items-center gap-2">
+        <Link to="/dashboard" onClick={onNavigate} className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-primary text-white">
             <span className="text-sm font-bold">H</span>
           </div>
@@ -69,6 +65,7 @@ export function AppSidebar({ collapsed }: AppSidebarProps) {
               <li key={item.to}>
                 <Link
                   to={item.to}
+                  onClick={onNavigate}
                   className={cn(
                     "group relative flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-colors",
                     collapsed ? "justify-center px-2" : "px-3",
@@ -99,6 +96,7 @@ export function AppSidebar({ collapsed }: AppSidebarProps) {
       <div className="border-t border-border p-2">
         <Link
           to="/settings"
+          onClick={onNavigate}
           className={cn(
             "flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-colors",
             collapsed ? "justify-center px-2" : "px-3",
@@ -126,6 +124,30 @@ export function AppSidebar({ collapsed }: AppSidebarProps) {
           )}
         </div>
       </div>
-    </aside>
+    </>
+  );
+}
+
+export function AppSidebar({ collapsed, mobileOpen = false, onMobileOpenChange }: AppSidebarProps) {
+  return (
+    <>
+      <aside
+        className={cn(
+          "hidden h-screen shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 lg:flex",
+          collapsed ? "w-16" : "w-60",
+        )}
+      >
+        <SidebarBody collapsed={collapsed} />
+      </aside>
+
+      <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
+        <SheetContent side="left" className="w-64 p-0 bg-sidebar lg:hidden flex flex-col">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Navigation</SheetTitle>
+          </SheetHeader>
+          <SidebarBody collapsed={false} onNavigate={() => onMobileOpenChange?.(false)} />
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }
