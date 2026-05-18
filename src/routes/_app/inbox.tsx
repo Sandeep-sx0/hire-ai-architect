@@ -548,6 +548,19 @@ function InboxPage() {
   const unreadCount = counts.unread ?? 0;
   const accountCount = new Set(threads.map((t) => t.account)).size;
 
+  if (threads.length === 0) {
+    return (
+      <div className="flex h-[calc(100vh-7.5rem)] flex-col">
+        <PageHeader title="Inbox" subtitle="0 messages" />
+        <EmptyState
+          icon={InboxIcon}
+          title="Your inbox is empty"
+          description="Messages will appear here when candidates reply to your outreach campaigns."
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-[calc(100vh-7.5rem)] flex-col">
       <PageHeader
