@@ -107,6 +107,12 @@ const DEFAULT_FILTERS: FiltersState = {
 function JobsPortal() {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
+  const [cvOpen, setCvOpen] = useState(false);
+
+  const openCvDialog = () => {
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    setCvOpen(true);
+  };
 
   const activeCount = useMemo(
     () =>
