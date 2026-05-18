@@ -324,12 +324,13 @@ function ClientDetailPage() {
 
           {/* Actions */}
           <div className="flex shrink-0 items-center gap-2">
-            <Link to="/projects" className="contents">
-              <Button className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90">
-                <Plus className="h-4 w-4" />
-                New project
-              </Button>
-            </Link>
+            <Button
+              onClick={() => setWizardOpen(true)}
+              className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
+            >
+              <Plus className="h-4 w-4" />
+              New project
+            </Button>
             <Button variant="outline" className="gap-2" onClick={copyPortal}>
               <ExternalLink className="h-4 w-4" />
               Portal link
