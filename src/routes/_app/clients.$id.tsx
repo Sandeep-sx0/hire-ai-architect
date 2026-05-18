@@ -277,6 +277,7 @@ function ClientDetailPage() {
   const { tab } = Route.useSearch();
   const navigate = useNavigate();
   const [regenOpen, setRegenOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const portalUrl = `hire.hiresmart.com/portal/${CLIENT.portalToken}`;
 
