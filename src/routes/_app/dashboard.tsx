@@ -317,7 +317,9 @@ function DashboardPage() {
               </div>
 
               <p className="mt-4 text-xs text-brand-text-secondary">
-                {totalCandidates} total candidates across {activeProjectCount} active projects
+                {selectedProject
+                  ? `${totalCandidates} candidates in ${selectedProject.title}`
+                  : `${totalCandidates} total candidates across ${activeProjectCount} active projects`}
               </p>
             </div>
           </section>
