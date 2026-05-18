@@ -419,9 +419,29 @@ function LinkedInTab() {
   const [urls, setUrls] = useState(
     "https://linkedin.com/in/rina-wijaya-cfo\nhttps://linkedin.com/in/budi-santoso-finance",
   );
+  const [dedupStatus, setDedupStatus] = useState<"idle" | "checking" | "found" | "resolved">("idle");
   const lines = useMemo(() => urls.split("\n").filter((l) => l.trim()), [urls]);
   const validRegex = /linkedin\.com\/in\//;
   const valid = lines.filter((l) => validRegex.test(l));
+  const hasDuplicate = urls.includes("rina-wijaya");
+
+  useEffect(() => {
+    if (!hasDuplicate) {
+      setDedupStatus("idle");
+      return;
+    }
+    if (dedupStatus === "resolved") return;
+    setDedupStatus("checking");
+    const t = setTimeout(() => setDedupStatus("found"), 1000);
+    return () => clearTimeout(t);
+  }, [hasDuplicate, urls]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleResolve = (action: "new" | "merge" | "skip") => {
+    setDedupStatus("resolved");
+    if (action === "new") toast.success("Rina Wijaya imported as a new candidate");
+    else if (action === "merge") toast.success("Merged with existing Rina Wijaya record");
+    else toast("Skipped duplicate Rina Wijaya");
+  };
 
   return (
     <div>
@@ -460,7 +480,14 @@ function LinkedInTab() {
         </div>
       )}
 
-      <DedupWarning />
+      {dedupStatus === "checking" && (
+        <div className="mt-4 flex items-center gap-2 rounded-lg border border-gray-200 bg-brand-bg/60 px-3 py-2 text-xs text-brand-text-secondary">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          Checking for duplicates...
+        </div>
+      )}
+      {dedupStatus === "found" && <DedupWarning onResolve={handleResolve} />}
+
       <ProjectLink />
 
       <Button
