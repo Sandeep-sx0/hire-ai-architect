@@ -1,4 +1,4 @@
-import { Bell, ChevronRight, PanelLeft, Search } from "lucide-react";
+import { Bell, ChevronRight, Menu, PanelLeft, Search } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
