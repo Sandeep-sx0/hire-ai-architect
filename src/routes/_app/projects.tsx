@@ -245,16 +245,15 @@ function ProjectsPage() {
         subtitle={`${activeCount} active project${activeCount === 1 ? "" : "s"}`}
         actions={
           <Button
-            asChild
+            onClick={() => setWizardOpen(true)}
             className="bg-brand-primary text-white hover:bg-brand-primary/90"
           >
-            <Link to="/projects">
-              <Plus className="mr-1.5 h-4 w-4" />
-              New project
-            </Link>
+            <Plus className="mr-1.5 h-4 w-4" />
+            New project
           </Button>
         }
       />
+      <CreateProjectWizard open={wizardOpen} onOpenChange={setWizardOpen} />
 
       {/* Filter & view bar */}
       <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card px-4 py-3">
