@@ -251,7 +251,17 @@ function ProjectDetail() {
       {/* Tab Content */}
       <div className="mt-6">
         {tab === "brief" && <BriefTab editMode={editMode} setEditMode={setEditMode} />}
-        {tab === "candidates" && <MatchResults projectId={id} />}
+        {tab === "candidates" && (hasMatched ? (
+          <MatchResults projectId={id} />
+        ) : (
+          <EmptyState
+            icon={Sparkles}
+            title="No match results yet"
+            description="Run AI matching to score candidates against this brief."
+            actionLabel={matching ? "Running..." : "Run matching"}
+            onAction={matching ? undefined : runMatching}
+          />
+        ))}
         {tab === "outreach" && (
           <EmptyState
             icon={Send}
