@@ -313,7 +313,10 @@ function JobsPortal() {
             and our team will reach out when a matching opportunity arises.
           </p>
           <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <Button className="h-12 rounded-xl bg-brand-primary px-6 text-white hover:bg-brand-primary/90">
+            <Button
+              onClick={openCvDialog}
+              className="h-12 rounded-xl bg-brand-primary px-6 text-white hover:bg-brand-primary/90"
+            >
               Submit your CV
             </Button>
             <a
