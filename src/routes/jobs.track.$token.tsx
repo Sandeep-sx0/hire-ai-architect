@@ -1,12 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { Check, MessageCircle } from "lucide-react";
 import { PublicLayout } from "@/components/public/PublicLayout";
 import { cn } from "@/lib/utils";
 
 const STAGES = ["Applied", "Under review", "Shortlisted", "Interview", "Decision"] as const;
-const CURRENT_STAGE_INDEX = 0;
+
+const trackSchema = z.object({
+  stage: fallback(z.coerce.number().int().min(0).max(4), 0).default(0),
+});
+
+// Minimal token → job lookup. Unknown tokens fall back to demo.
+const TOKEN_LOOKUP: Record<string, { title: string; company: string; appliedAt: string }> = {
+  demo: { title: "Chief Financial Officer", company: "Indorama Ventures", appliedAt: "March 17, 2026" },
+  oyo: { title: "VP Operations", company: "OYO Hotels", appliedAt: "March 14, 2026" },
+  kns: { title: "Country Director", company: "KNS Group", appliedAt: "March 9, 2026" },
+};
 
 export const Route = createFileRoute("/jobs/track/$token")({
+  validateSearch: zodValidator(trackSchema),
   head: () => ({
     meta: [
       { title: "Application status — HireSmart" },
@@ -18,6 +31,10 @@ export const Route = createFileRoute("/jobs/track/$token")({
 });
 
 function TrackPage() {
+  const { token } = Route.useParams();
+  const { stage } = Route.useSearch();
+  const info = TOKEN_LOOKUP[token] ?? TOKEN_LOOKUP.demo;
+
   return (
     <PublicLayout>
       <div className="mx-auto max-w-md px-6 py-12 md:py-16">
@@ -25,9 +42,9 @@ function TrackPage() {
           <h1 className="text-xl font-semibold text-brand-text">Application status</h1>
 
           <div className="mt-6 border-b border-gray-100 pb-6">
-            <p className="text-[15px] font-medium text-brand-text">Chief Financial Officer</p>
-            <p className="text-sm text-brand-primary">Indorama Ventures</p>
-            <p className="mt-3 text-xs text-brand-text-secondary">Applied: March 17, 2026</p>
+            <p className="text-[15px] font-medium text-brand-text">{info.title}</p>
+            <p className="text-sm text-brand-primary">{info.company}</p>
+            <p className="mt-3 text-xs text-brand-text-secondary">Applied: {info.appliedAt}</p>
           </div>
 
           <div className="mt-6">
@@ -35,16 +52,15 @@ function TrackPage() {
               Current status
             </p>
             <ol className="space-y-3">
-              {STAGES.map((stage, i) => {
-                const isPast = i < CURRENT_STAGE_INDEX;
-                const isCurrent = i === CURRENT_STAGE_INDEX;
+              {STAGES.map((label, i) => {
+                const isPast = i < stage;
+                const isCurrent = i === stage;
                 return (
-                  <li key={stage} className="flex items-center gap-3">
+                  <li key={label} className="flex items-center gap-3">
                     <span
                       className={cn(
                         "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2",
-                        isCurrent && "border-green-500 bg-green-500",
-                        isPast && "border-green-500 bg-green-500",
+                        (isCurrent || isPast) && "border-green-500 bg-green-500",
                         !isPast && !isCurrent && "border-gray-300 bg-white",
                       )}
                     >
@@ -54,11 +70,10 @@ function TrackPage() {
                       className={cn(
                         "text-sm",
                         isCurrent && "font-semibold text-brand-text",
-                        isPast && "text-brand-text-secondary",
-                        !isPast && !isCurrent && "text-brand-text-secondary",
+                        !isCurrent && "text-brand-text-secondary",
                       )}
                     >
-                      {stage}
+                      {label}
                     </span>
                   </li>
                 );
