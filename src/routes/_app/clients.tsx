@@ -10,7 +10,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
-import { PageHeader, DataTable, StatusBadge } from "@/components/shared";
+import { PageHeader, DataTable, StatusBadge, EmptyState } from "@/components/shared";
 import type { DataTableColumn } from "@/components/shared/DataTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -366,7 +366,17 @@ function ClientsListPage() {
         )}
       </div>
 
-      <DataTable<ClientRow> columns={columnsWithClick} data={filtered} />
+      {CLIENTS.length === 0 ? (
+        <EmptyState
+          icon={Building2}
+          title="No clients yet"
+          description="Add your first hiring client to start building your CRM."
+          actionLabel="Add client"
+          onAction={() => setAddOpen(true)}
+        />
+      ) : (
+        <DataTable<ClientRow> columns={columnsWithClick} data={filtered} />
+      )}
 
       <AddClientDialog
         open={addOpen}

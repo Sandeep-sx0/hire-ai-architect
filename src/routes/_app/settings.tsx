@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   User,
   Users,
@@ -605,9 +605,32 @@ function InviteMemberDialog({
 }
 
 // ---------- Workspace tab ----------
+const DEFAULT_PRIMARY = "#004C66";
+const DEFAULT_ACCENT = "#004703";
+
 function WorkspaceTab() {
-  const [primary, setPrimary] = useState("#004C66");
-  const [accent, setAccent] = useState("#004703");
+  const [primary, setPrimary] = useState(DEFAULT_PRIMARY);
+  const [accent, setAccent] = useState(DEFAULT_ACCENT);
+
+  // Apply colors live to actual CSS vars so users see the impact app-wide.
+  useEffect(() => {
+    document.documentElement.style.setProperty("--brand-primary", primary);
+    document.documentElement.style.setProperty("--brand-accent", accent);
+  }, [primary, accent]);
+
+  // Restore stylesheet defaults when leaving this tab.
+  useEffect(() => {
+    return () => {
+      document.documentElement.style.removeProperty("--brand-primary");
+      document.documentElement.style.removeProperty("--brand-accent");
+    };
+  }, []);
+
+  const resetBranding = () => {
+    setPrimary(DEFAULT_PRIMARY);
+    setAccent(DEFAULT_ACCENT);
+    toast("Branding reset to defaults");
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -659,9 +682,13 @@ function WorkspaceTab() {
               Active
             </span>
           </div>
+          <p className="mt-3 text-[11px] italic text-brand-text-secondary">
+            Changes are reflected app-wide while previewing. Save to keep them.
+          </p>
         </div>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex justify-end gap-2">
+          <Button variant="outline" onClick={resetBranding}>Reset to defaults</Button>
           <Button onClick={() => toast.success("Branding saved")}>Save branding</Button>
         </div>
       </SCard>

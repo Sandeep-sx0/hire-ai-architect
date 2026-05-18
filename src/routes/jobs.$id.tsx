@@ -679,6 +679,7 @@ function SuccessCard({ job, email }: { job: JobDetail; email: string }) {
           <Link
             to="/jobs/track/$token"
             params={{ token: "demo" }}
+            search={{ stage: 0 }}
             className="block w-full rounded-xl bg-brand-primary px-4 py-3 text-sm font-medium text-white hover:bg-brand-primary/90"
           >
             Track your application →
