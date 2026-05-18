@@ -316,7 +316,10 @@ function BriefTab({
               <Button
                 size="sm"
                 className="bg-brand-primary text-white hover:bg-brand-primary/90"
-                onClick={() => setEditMode(false)}
+                onClick={() => {
+                  toast.success("Brief updated");
+                  setEditMode(false);
+                }}
               >
                 Save changes
               </Button>
