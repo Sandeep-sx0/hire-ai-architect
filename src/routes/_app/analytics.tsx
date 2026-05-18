@@ -156,23 +156,27 @@ function Insight({ children }: { children: ReactNode }) {
 interface KPI {
   icon: LucideIcon;
   label: string;
-  value: string;
+  base: number;
+  format: (n: number) => string;
   trend: string;
   direction: "up" | "down" | "flat";
   improvement: "good" | "bad" | "neutral";
   accent?: "green" | "purple";
 }
 
+const fmtInt = (n: number) => `${Math.round(n)}`;
+const fmtPct = (n: number) => `${Math.min(100, n).toFixed(n < 10 ? 1 : 0)}%`;
+
 const KPIS: KPI[] = [
-  { icon: Briefcase, label: "Active projects", value: "7", trend: "+2 vs last period", direction: "up", improvement: "neutral" },
-  { icon: Users, label: "Total candidates", value: "142", trend: "+34 this period", direction: "up", improvement: "neutral" },
-  { icon: Target, label: "Placements (period)", value: "2", trend: "Same as last period", direction: "flat", improvement: "neutral", accent: "green" },
-  { icon: Clock, label: "Avg time-to-fill", value: "6.2 wks", trend: "-0.8 wks improvement", direction: "down", improvement: "good" },
-  { icon: Send, label: "Outreach response rate", value: "17.3%", trend: "+2.1% vs last period", direction: "up", improvement: "good" },
-  { icon: ThumbsUp, label: "AI match accuracy", value: "78%", trend: "+5% vs last period", direction: "up", improvement: "good", accent: "purple" },
+  { icon: Briefcase, label: "Active projects", base: 7, format: fmtInt, trend: "+2 vs last period", direction: "up", improvement: "neutral" },
+  { icon: Users, label: "Total candidates", base: 142, format: fmtInt, trend: "+34 this period", direction: "up", improvement: "neutral" },
+  { icon: Target, label: "Placements (period)", base: 2, format: fmtInt, trend: "Same as last period", direction: "flat", improvement: "neutral", accent: "green" },
+  { icon: Clock, label: "Avg time-to-fill", base: 6.2, format: (n) => `${n.toFixed(1)} wks`, trend: "-0.8 wks improvement", direction: "down", improvement: "good" },
+  { icon: Send, label: "Outreach response rate", base: 17.3, format: fmtPct, trend: "+2.1% vs last period", direction: "up", improvement: "good" },
+  { icon: ThumbsUp, label: "AI match accuracy", base: 78, format: fmtPct, trend: "+5% vs last period", direction: "up", improvement: "good", accent: "purple" },
 ];
 
-function KPIRow() {
+function KPIRow({ factor }: { factor: number }) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
       {KPIS.map((k) => {
@@ -204,7 +208,7 @@ function KPIRow() {
                 <Icon className="h-4 w-4" />
               </div>
             </div>
-            <div className="mt-2 text-2xl font-semibold tabular-nums text-brand-text">{k.value}</div>
+            <div className="mt-2 text-2xl font-semibold tabular-nums text-brand-text">{k.format(k.base * factor)}</div>
             <div className={cn("mt-1.5 inline-flex items-center gap-1 text-[11px] font-medium", trendColor)}>
               <TrendIcon className="h-3 w-3" />
               {k.trend}
