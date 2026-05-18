@@ -115,10 +115,15 @@ function ProjectDetail() {
   const [editMode, setEditMode] = useState(false);
   const [matching, setMatching] = useState(false);
 
+  const project = projects.find((p) => p.id === id) ?? projects[0];
+  const isFreshProject = ["draft", "open"].includes(project.status);
+  const [hasMatched, setHasMatched] = useState(() => !isFreshProject);
+
   const runMatching = async () => {
     setMatching(true);
     await new Promise((r) => setTimeout(r, 2000));
     setMatching(false);
+    setHasMatched(true);
     navigate({ search: { tab: "candidates" } });
     toast.success("Matching complete — 14 candidates scored");
   };
