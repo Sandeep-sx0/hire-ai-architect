@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as MarketingRouteImport } from './routes/marketing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as AppRouteImport } from './routes/_app'
@@ -38,6 +39,11 @@ import { Route as AppProjectsIdParseRouteImport } from './routes/_app/projects.$
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketingRoute = MarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
+  '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
   '/analytics': typeof AppAnalyticsRoute
   '/candidates': typeof AppCandidatesRouteWithChildren
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
+  '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
   '/analytics': typeof AppAnalyticsRoute
   '/candidates': typeof AppCandidatesRouteWithChildren
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
+  '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
   '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/candidates': typeof AppCandidatesRouteWithChildren
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/'
     | '/jobs'
     | '/login'
+    | '/marketing'
     | '/signup'
     | '/analytics'
     | '/candidates'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/'
     | '/jobs'
     | '/login'
+    | '/marketing'
     | '/signup'
     | '/analytics'
     | '/candidates'
@@ -299,6 +310,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/jobs'
     | '/login'
+    | '/marketing'
     | '/signup'
     | '/_app/analytics'
     | '/_app/candidates'
@@ -327,6 +339,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   JobsRoute: typeof JobsRouteWithChildren
   LoginRoute: typeof LoginRoute
+  MarketingRoute: typeof MarketingRoute
   SignupRoute: typeof SignupRoute
   HireTokenRoute: typeof HireTokenRoute
   SiteAboutRoute: typeof SiteAboutRoute
@@ -341,6 +354,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketing': {
+      id: '/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof MarketingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -617,6 +637,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   JobsRoute: JobsRouteWithChildren,
   LoginRoute: LoginRoute,
+  MarketingRoute: MarketingRoute,
   SignupRoute: SignupRoute,
   HireTokenRoute: HireTokenRoute,
   SiteAboutRoute: SiteAboutRoute,
@@ -626,13 +647,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
