@@ -113,6 +113,15 @@ function ProjectDetail() {
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [editMode, setEditMode] = useState(false);
+  const [matching, setMatching] = useState(false);
+
+  const runMatching = async () => {
+    setMatching(true);
+    await new Promise((r) => setTimeout(r, 2000));
+    setMatching(false);
+    navigate({ search: { tab: "candidates" } });
+    toast.success("Matching complete — 14 candidates scored");
+  };
 
   const project = projects.find((p) => p.id === id) ?? projects[0];
   const title = "Chief Financial Officer";
