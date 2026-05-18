@@ -255,6 +255,8 @@ export function PipelineKanban() {
   const [rejectModal, setRejectModal] = useState<RejectModalState | null>(null);
   const [placeModal, setPlaceModal] = useState<PlaceModalState | null>(null);
   const [scorecardOpen, setScorecardOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [addQuery, setAddQuery] = useState("");
   const [scorecards, setScorecards] = useState<Record<string, SubmittedScorecard[]>>({
     p1: [MOCK_RINA_SCORECARD],
   });
