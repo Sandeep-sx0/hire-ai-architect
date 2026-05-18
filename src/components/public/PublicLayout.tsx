@@ -16,8 +16,8 @@ function PublicHeader({ clientName, portalLabel }: { clientName?: string; portal
   const [open, setOpen] = useState(false);
   const navLinks = [
     { to: "/jobs", label: "Open positions" },
-    { to: "/about", label: "About" },
-    { to: "/contact", label: "Contact" },
+    { to: "/site/about", label: "About" },
+    { to: "/site/contact", label: "Contact" },
   ] as const;
 
   const isPortal = Boolean(clientName);
@@ -141,8 +141,8 @@ function PublicFooter() {
           <ul className="mt-4 space-y-2 text-[13px] text-white/70">
             <li><Link to="/jobs" className="hover:text-white">Open positions</Link></li>
             <li><Link to="/hire/$token" params={{ token: "demo" }} className="hover:text-white">For hiring clients</Link></li>
-            <li><a className="hover:text-white" href="#">About</a></li>
-            <li><a className="hover:text-white" href="#">Contact</a></li>
+            <li><Link to="/site/about" className="hover:text-white">About</Link></li>
+            <li><Link to="/site/contact" className="hover:text-white">Contact</Link></li>
             <li><a className="hover:text-white" href="#">Privacy policy</a></li>
           </ul>
         </div>

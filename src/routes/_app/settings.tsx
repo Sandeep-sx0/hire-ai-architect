@@ -16,6 +16,8 @@ import {
   ChevronRight,
   Upload,
   Download,
+  Chrome,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, StatusBadge } from "@/components/shared";
@@ -64,7 +66,7 @@ export const Route = createFileRoute("/_app/settings")({
 
 // ---------- Types & mock data ----------
 type Role = "Owner" | "Admin" | "Recruiter" | "Sourcer";
-type TabId = "profile" | "team" | "workspace" | "integrations" | "billing";
+type TabId = "profile" | "team" | "workspace" | "integrations" | "billing" | "extension";
 
 interface TabDef {
   id: TabId;
@@ -79,6 +81,7 @@ const TABS: TabDef[] = [
   { id: "workspace", label: "Workspace", icon: Palette, access: ["Owner", "Admin"] },
   { id: "integrations", label: "Integrations", icon: LinkIcon, access: ["Owner", "Admin"] },
   { id: "billing", label: "Billing", icon: CreditCard, access: ["Owner"] },
+  { id: "extension", label: "Chrome Extension", icon: Chrome, access: ["Owner", "Admin", "Recruiter", "Sourcer"] },
 ];
 
 // Current user — mock as Owner for prototype
@@ -158,6 +161,7 @@ function SettingsPage() {
           {active === "workspace" && <WorkspaceTab />}
           {active === "integrations" && <IntegrationsTab />}
           {active === "billing" && <BillingTab />}
+          {active === "extension" && <ExtensionTab />}
         </main>
       </div>
     </div>
@@ -960,6 +964,71 @@ function BillingTab() {
         <p className="mt-3 text-[13px]">Estimated total: $55–75/month at current usage</p>
         <p className="mt-1 text-xs italic text-brand-text-secondary">
           These costs are paid directly to each provider, not through HireSmart.
+        </p>
+      </SCard>
+    </div>
+  );
+}
+
+// ---------- Chrome Extension Tab ----------
+function ExtensionTab() {
+  const features = [
+    "One-click save of LinkedIn profiles to your candidate database",
+    "Duplicate detection prevents accidental re-imports",
+    "Assign saved profiles directly to an active project",
+    "Auto-enrichment via Proxycurl (email, phone, work history)",
+  ];
+  return (
+    <div className="space-y-6">
+      <SCard>
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-seafoam/40 text-brand-primary">
+              <Chrome className="h-6 w-6" />
+            </div>
+            <div>
+              <h2 className="text-[18px] font-semibold text-brand-text">Chrome Extension</h2>
+              <p className="mt-1 max-w-md text-sm text-brand-text-secondary">
+                Save LinkedIn profiles to your candidate database with one click.
+              </p>
+            </div>
+          </div>
+          <Button disabled className="shrink-0">
+            <Download className="mr-2 h-4 w-4" />
+            Coming soon
+          </Button>
+        </div>
+      </SCard>
+
+      <SCard title="What it does">
+        <ul className="space-y-3">
+          {features.map((f) => (
+            <li key={f} className="flex items-start gap-3 text-sm text-brand-text">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" />
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+      </SCard>
+
+      <SCard title="Preview">
+        <div className="flex aspect-[16/9] items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-brand-bg">
+          <div className="text-center text-sm text-brand-text-secondary">
+            <Chrome className="mx-auto mb-3 h-8 w-8 opacity-40" />
+            Extension popup preview
+          </div>
+        </div>
+      </SCard>
+
+      <SCard title="Installation">
+        <ol className="space-y-2 text-sm text-brand-text-secondary">
+          <li>1. Download the extension once it becomes available.</li>
+          <li>2. Open <code className="rounded bg-brand-bg px-1.5 py-0.5 text-xs">chrome://extensions</code> and enable Developer mode.</li>
+          <li>3. Click "Load unpacked" and select the HireSmart extension folder.</li>
+          <li>4. Sign in with your HireSmart workspace credentials.</li>
+        </ol>
+        <p className="mt-4 text-xs italic text-brand-text-secondary">
+          Detailed installation instructions will appear here when the extension ships.
         </p>
       </SCard>
     </div>
