@@ -331,6 +331,8 @@ function JobsPortal() {
           </div>
         </div>
       </section>
+
+      <SubmitCvDialog open={cvOpen} onOpenChange={setCvOpen} />
     </PublicLayout>
   );
 }
