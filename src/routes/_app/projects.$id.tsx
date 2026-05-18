@@ -128,7 +128,6 @@ function ProjectDetail() {
     toast.success("Matching complete — 14 candidates scored");
   };
 
-  const project = projects.find((p) => p.id === id) ?? projects[0];
   const title = "Chief Financial Officer";
   const clientName = project.clientName || "Indorama Ventures";
   const clientId = project.clientId || "c1";
