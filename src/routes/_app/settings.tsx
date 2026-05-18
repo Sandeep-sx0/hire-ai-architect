@@ -16,6 +16,8 @@ import {
   ChevronRight,
   Upload,
   Download,
+  Chrome,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, StatusBadge } from "@/components/shared";
