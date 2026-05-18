@@ -186,19 +186,35 @@ function DashboardPage() {
   const [funnelFilter, setFunnelFilter] = useState<string>("all");
   const [wizardOpen, setWizardOpen] = useState(false);
 
-  const totalCandidates = funnelStages.reduce((s, x) => s + x.count, 0);
+  const baseTotal = funnelStages.reduce((s, x) => s + x.count, 0);
   const activeProjectCount = projects.filter(
     (p) => !["closed", "placed", "on_hold", "draft"].includes(p.status),
   ).length;
 
+  const selectedProject =
+    funnelFilter === "all" ? null : projects.find((p) => p.id === funnelFilter) ?? null;
+
+  // Derive scaled funnel: each project shows a funnel sized to its candidate count
+  const scaledStages = useMemo(() => {
+    if (!selectedProject) return funnelStages.map((s) => ({ ...s }));
+    const target = Math.max(selectedProject.candidates, 1);
+    const factor = target / baseTotal;
+    return funnelStages.map((s) => ({
+      ...s,
+      count: Math.max(s.count > 0 ? 1 : 0, Math.round(s.count * factor)),
+    }));
+  }, [selectedProject, baseTotal]);
+
+  const totalCandidates = scaledStages.reduce((s, x) => s + x.count, 0);
+
   const segments = useMemo(
     () =>
-      funnelStages.map((s, i) => ({
+      scaledStages.map((s, i) => ({
         ...s,
-        pct: (s.count / totalCandidates) * 100,
+        pct: totalCandidates > 0 ? (s.count / totalCandidates) * 100 : 0,
         color: funnelShades[i],
       })),
-    [totalCandidates],
+    [scaledStages, totalCandidates],
   );
 
   return (
