@@ -378,6 +378,11 @@ function ClientDetailPage() {
       {tab === "notes" && <NotesTab />}
 
       <RegenerateDialog open={regenOpen} onOpenChange={setRegenOpen} />
+      <CreateProjectWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        defaultClientId={id}
+      />
     </div>
   );
 }
