@@ -152,9 +152,22 @@ function ProjectDetail() {
             </Link>
           </div>
           <div className="flex items-center gap-2">
-            <Button className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90">
-              <Sparkles className="h-4 w-4" />
-              Run matching
+            <Button
+              onClick={runMatching}
+              disabled={matching}
+              className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
+            >
+              {matching ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Running...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Run matching
+                </>
+              )}
             </Button>
             <Button
               variant="outline"
