@@ -493,6 +493,70 @@ export function PipelineKanban() {
           setPlaceModal(null);
         }}
       />
+
+      {/* Add candidate dialog */}
+      <Dialog open={addOpen} onOpenChange={(o) => { setAddOpen(o); if (!o) setAddQuery(""); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add candidate to pipeline</DialogTitle>
+            <DialogDescription>Select a candidate to add to the Applied stage.</DialogDescription>
+          </DialogHeader>
+          <Input
+            autoFocus
+            placeholder="Search candidates..."
+            value={addQuery}
+            onChange={(e) => setAddQuery(e.target.value)}
+          />
+          <div className="max-h-72 overflow-y-auto rounded-md border border-border">
+            {(() => {
+              const existingIds = new Set(cards.map((c) => c.id));
+              const q = addQuery.trim().toLowerCase();
+              const list = CANDIDATES_POOL.filter((c) => !existingIds.has(c.id)).filter(
+                (c) =>
+                  !q ||
+                  c.name.toLowerCase().includes(q) ||
+                  c.company.toLowerCase().includes(q) ||
+                  c.title.toLowerCase().includes(q),
+              );
+              if (list.length === 0) {
+                return (
+                  <div className="p-4 text-center text-sm text-brand-text-secondary">
+                    No candidates available
+                  </div>
+                );
+              }
+              return list.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    setCards((prev) => [
+                      ...prev,
+                      {
+                        ...c,
+                        stage: "applied",
+                        daysInStage: 0,
+                        checklist: [],
+                      },
+                    ]);
+                    toast.success(`${c.name} added to Applied`);
+                    setAddOpen(false);
+                    setAddQuery("");
+                  }}
+                  className="flex w-full items-center justify-between gap-3 border-b border-border px-3 py-2 text-left last:border-0 hover:bg-brand-mint/10"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-brand-text">{c.name}</div>
+                    <div className="truncate text-xs text-brand-text-secondary">
+                      {c.title} · {c.company}
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-xs font-semibold text-brand-primary">{c.score}</span>
+                </button>
+              ));
+            })()}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
