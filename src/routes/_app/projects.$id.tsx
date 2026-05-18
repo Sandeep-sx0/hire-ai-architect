@@ -254,7 +254,7 @@ function ProjectDetail() {
             title="Outreach campaigns"
             description="Create a LinkedIn outreach campaign to reach shortlisted candidates."
             actionLabel="Create campaign"
-            onAction={() => {}}
+            onAction={() => navigate({ to: "/outreach/new" })}
           />
         )}
         {tab === "pipeline" && <PipelineKanban />}
