@@ -366,7 +366,17 @@ function ClientsListPage() {
         )}
       </div>
 
-      <DataTable<ClientRow> columns={columnsWithClick} data={filtered} />
+      {CLIENTS.length === 0 ? (
+        <EmptyState
+          icon={Building2}
+          title="No clients yet"
+          description="Add your first hiring client to start building your CRM."
+          actionLabel="Add client"
+          onAction={() => setAddOpen(true)}
+        />
+      ) : (
+        <DataTable<ClientRow> columns={columnsWithClick} data={filtered} />
+      )}
 
       <AddClientDialog
         open={addOpen}
