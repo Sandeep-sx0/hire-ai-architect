@@ -41,6 +41,7 @@ import {
   type ProjectStatus,
   type SeniorityLevel,
 } from "@/lib/mock-data";
+import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 
 // === Search params ============================================
 const searchSchema = z.object({
