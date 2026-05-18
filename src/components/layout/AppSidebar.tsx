@@ -9,6 +9,7 @@ import {
   Settings,
 } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { currentUser, unreadInboxCount } from "@/lib/mock-data";
 
