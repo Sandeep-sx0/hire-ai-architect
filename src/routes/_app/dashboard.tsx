@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { currentUser, projects } from "@/lib/mock-data";
+import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
