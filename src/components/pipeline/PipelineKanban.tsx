@@ -228,6 +228,15 @@ const INITIAL: Candidate[] = [
   },
 ];
 
+const CANDIDATES_POOL: Omit<Candidate, "stage" | "daysInStage" | "checklist">[] = [
+  { id: "pool1", name: "Mei Tan", title: "CFO", company: "Singtel", score: 81, skills: ["IFRS", "FP&A"], assigned: "Amarsh" },
+  { id: "pool2", name: "Arjun Mehta", title: "VP Finance", company: "Reliance", score: 74, skills: ["M&A", "Treasury"], assigned: "Dewi" },
+  { id: "pool3", name: "Linh Nguyen", title: "Finance Director", company: "VinGroup", score: 78, skills: ["Tax", "FP&A"], assigned: "Amarsh" },
+  { id: "pool4", name: "Hiroshi Tanaka", title: "Group CFO", company: "Sony Music", score: 86, skills: ["IPO", "Board"], assigned: "Amarsh" },
+  { id: "pool5", name: "Aisha Rahman", title: "Head of Finance", company: "Grab", score: 72, skills: ["FP&A", "ESG"], assigned: "Dewi" },
+  { id: "pool6", name: "Carlos Mendez", title: "CFO", company: "Mercado Libre", score: 79, skills: ["M&A", "IFRS"], assigned: "Amarsh" },
+];
+
 interface RejectModalState {
   candidate: Candidate;
   from: StageId;
