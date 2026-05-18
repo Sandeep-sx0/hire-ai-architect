@@ -56,6 +56,9 @@ const FACTORS: Record<Preset, number> = {
   "All time": 12,
 };
 
+// Flip to false to preview the empty state for a fresh workspace
+const HAS_ANALYTICS_DATA = true;
+
 function AnalyticsPage() {
   const [preset, setPreset] = useState<Preset>("Last 30 days");
   const [open, setOpen] = useState(false);
