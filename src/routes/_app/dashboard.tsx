@@ -184,6 +184,7 @@ function DashboardPage() {
   const [greeting, setGreeting] = useState<string>("Hello");
   useEffect(() => setGreeting(greetingPrefix()), []);
   const [funnelFilter, setFunnelFilter] = useState<string>("all");
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const totalCandidates = funnelStages.reduce((s, x) => s + x.count, 0);
   const activeProjectCount = projects.filter(
