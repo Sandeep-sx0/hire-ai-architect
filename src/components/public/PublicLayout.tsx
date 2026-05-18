@@ -16,8 +16,8 @@ function PublicHeader({ clientName, portalLabel }: { clientName?: string; portal
   const [open, setOpen] = useState(false);
   const navLinks = [
     { to: "/jobs", label: "Open positions" },
-    { to: "/about", label: "About" },
-    { to: "/contact", label: "Contact" },
+    { to: "/site/about", label: "About" },
+    { to: "/site/contact", label: "Contact" },
   ] as const;
 
   const isPortal = Boolean(clientName);
