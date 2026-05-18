@@ -149,6 +149,7 @@ function ProjectsPage() {
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [showClosed, setShowClosed] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const update = (patch: Partial<typeof search>) => {
     navigate({ search: (prev: typeof search) => ({ ...prev, ...patch }) });
