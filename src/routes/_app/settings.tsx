@@ -66,7 +66,7 @@ export const Route = createFileRoute("/_app/settings")({
 
 // ---------- Types & mock data ----------
 type Role = "Owner" | "Admin" | "Recruiter" | "Sourcer";
-type TabId = "profile" | "team" | "workspace" | "integrations" | "billing";
+type TabId = "profile" | "team" | "workspace" | "integrations" | "billing" | "extension";
 
 interface TabDef {
   id: TabId;
