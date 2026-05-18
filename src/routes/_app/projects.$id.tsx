@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
+import { toast } from "sonner";
 import {
   Award,
   Building,
@@ -12,6 +13,7 @@ import {
   DollarSign,
   FileText,
   GitBranch,
+  Loader2,
   MapPin,
   MoreHorizontal,
   Pencil,
@@ -111,6 +113,15 @@ function ProjectDetail() {
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [editMode, setEditMode] = useState(false);
+  const [matching, setMatching] = useState(false);
+
+  const runMatching = async () => {
+    setMatching(true);
+    await new Promise((r) => setTimeout(r, 2000));
+    setMatching(false);
+    navigate({ search: { tab: "candidates" } });
+    toast.success("Matching complete — 14 candidates scored");
+  };
 
   const project = projects.find((p) => p.id === id) ?? projects[0];
   const title = "Chief Financial Officer";
@@ -141,9 +152,22 @@ function ProjectDetail() {
             </Link>
           </div>
           <div className="flex items-center gap-2">
-            <Button className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90">
-              <Sparkles className="h-4 w-4" />
-              Run matching
+            <Button
+              onClick={runMatching}
+              disabled={matching}
+              className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
+            >
+              {matching ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Running...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Run matching
+                </>
+              )}
             </Button>
             <Button
               variant="outline"
@@ -230,7 +254,7 @@ function ProjectDetail() {
             title="Outreach campaigns"
             description="Create a LinkedIn outreach campaign to reach shortlisted candidates."
             actionLabel="Create campaign"
-            onAction={() => {}}
+            onAction={() => navigate({ to: "/outreach/new" })}
           />
         )}
         {tab === "pipeline" && <PipelineKanban />}
@@ -292,7 +316,10 @@ function BriefTab({
               <Button
                 size="sm"
                 className="bg-brand-primary text-white hover:bg-brand-primary/90"
-                onClick={() => setEditMode(false)}
+                onClick={() => {
+                  toast.success("Brief updated");
+                  setEditMode(false);
+                }}
               >
                 Save changes
               </Button>

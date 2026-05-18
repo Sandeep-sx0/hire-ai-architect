@@ -228,6 +228,15 @@ const INITIAL: Candidate[] = [
   },
 ];
 
+const CANDIDATES_POOL: Omit<Candidate, "stage" | "daysInStage" | "checklist">[] = [
+  { id: "pool1", name: "Mei Tan", title: "CFO", company: "Singtel", score: 81, skills: ["IFRS", "FP&A"], assigned: "Amarsh" },
+  { id: "pool2", name: "Arjun Mehta", title: "VP Finance", company: "Reliance", score: 74, skills: ["M&A", "Treasury"], assigned: "Dewi" },
+  { id: "pool3", name: "Linh Nguyen", title: "Finance Director", company: "VinGroup", score: 78, skills: ["Tax", "FP&A"], assigned: "Amarsh" },
+  { id: "pool4", name: "Hiroshi Tanaka", title: "Group CFO", company: "Sony Music", score: 86, skills: ["IPO", "Board"], assigned: "Amarsh" },
+  { id: "pool5", name: "Aisha Rahman", title: "Head of Finance", company: "Grab", score: 72, skills: ["FP&A", "ESG"], assigned: "Dewi" },
+  { id: "pool6", name: "Carlos Mendez", title: "CFO", company: "Mercado Libre", score: 79, skills: ["M&A", "IFRS"], assigned: "Amarsh" },
+];
+
 interface RejectModalState {
   candidate: Candidate;
   from: StageId;
@@ -246,6 +255,8 @@ export function PipelineKanban() {
   const [rejectModal, setRejectModal] = useState<RejectModalState | null>(null);
   const [placeModal, setPlaceModal] = useState<PlaceModalState | null>(null);
   const [scorecardOpen, setScorecardOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [addQuery, setAddQuery] = useState("");
   const [scorecards, setScorecards] = useState<Record<string, SubmittedScorecard[]>>({
     p1: [MOCK_RINA_SCORECARD],
   });
@@ -367,7 +378,7 @@ export function PipelineKanban() {
             <SettingsIcon className="h-3.5 w-3.5" />
             Customize stages
           </button>
-          <Button variant="outline" size="sm" onClick={() => toast("Open candidate picker")}>
+          <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             Add candidate
           </Button>
@@ -482,6 +493,70 @@ export function PipelineKanban() {
           setPlaceModal(null);
         }}
       />
+
+      {/* Add candidate dialog */}
+      <Dialog open={addOpen} onOpenChange={(o) => { setAddOpen(o); if (!o) setAddQuery(""); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add candidate to pipeline</DialogTitle>
+            <DialogDescription>Select a candidate to add to the Applied stage.</DialogDescription>
+          </DialogHeader>
+          <Input
+            autoFocus
+            placeholder="Search candidates..."
+            value={addQuery}
+            onChange={(e) => setAddQuery(e.target.value)}
+          />
+          <div className="max-h-72 overflow-y-auto rounded-md border border-border">
+            {(() => {
+              const existingIds = new Set(cards.map((c) => c.id));
+              const q = addQuery.trim().toLowerCase();
+              const list = CANDIDATES_POOL.filter((c) => !existingIds.has(c.id)).filter(
+                (c) =>
+                  !q ||
+                  c.name.toLowerCase().includes(q) ||
+                  c.company.toLowerCase().includes(q) ||
+                  c.title.toLowerCase().includes(q),
+              );
+              if (list.length === 0) {
+                return (
+                  <div className="p-4 text-center text-sm text-brand-text-secondary">
+                    No candidates available
+                  </div>
+                );
+              }
+              return list.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    setCards((prev) => [
+                      ...prev,
+                      {
+                        ...c,
+                        stage: "applied",
+                        daysInStage: 0,
+                        checklist: [],
+                      },
+                    ]);
+                    toast.success(`${c.name} added to Applied`);
+                    setAddOpen(false);
+                    setAddQuery("");
+                  }}
+                  className="flex w-full items-center justify-between gap-3 border-b border-border px-3 py-2 text-left last:border-0 hover:bg-brand-mint/10"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-brand-text">{c.name}</div>
+                    <div className="truncate text-xs text-brand-text-secondary">
+                      {c.title} · {c.company}
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-xs font-semibold text-brand-primary">{c.score}</span>
+                </button>
+              ));
+            })()}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

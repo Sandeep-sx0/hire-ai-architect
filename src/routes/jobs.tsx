@@ -7,10 +7,19 @@ import {
   MessageCircle,
   SlidersHorizontal,
   X,
+  CheckCircle2,
 } from "lucide-react";
 import { PublicLayout } from "@/components/public/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -98,6 +107,12 @@ const DEFAULT_FILTERS: FiltersState = {
 function JobsPortal() {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
+  const [cvOpen, setCvOpen] = useState(false);
+
+  const openCvDialog = () => {
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    setCvOpen(true);
+  };
 
   const activeCount = useMemo(
     () =>
@@ -298,7 +313,10 @@ function JobsPortal() {
             and our team will reach out when a matching opportunity arises.
           </p>
           <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <Button className="h-12 rounded-xl bg-brand-primary px-6 text-white hover:bg-brand-primary/90">
+            <Button
+              onClick={openCvDialog}
+              className="h-12 rounded-xl bg-brand-primary px-6 text-white hover:bg-brand-primary/90"
+            >
               Submit your CV
             </Button>
             <a
@@ -313,6 +331,8 @@ function JobsPortal() {
           </div>
         </div>
       </section>
+
+      <SubmitCvDialog open={cvOpen} onOpenChange={setCvOpen} />
     </PublicLayout>
   );
 }
@@ -406,5 +426,104 @@ function JobCard({ job }: { job: PublicJob }) {
         <span className="text-sm font-medium text-brand-primary">Apply →</span>
       </div>
     </Link>
+  );
+}
+
+function SubmitCvDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [submitted, setSubmitted] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  const handleClose = (next: boolean) => {
+    onOpenChange(next);
+    if (!next) {
+      setTimeout(() => {
+        setSubmitted(false);
+        setFileName(null);
+      }, 200);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md">
+        {submitted ? (
+          <div className="py-6 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-status-success/15 text-status-success">
+              <CheckCircle2 className="h-6 w-6" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold text-brand-text">CV received</h3>
+            <p className="mt-2 text-sm text-brand-text-secondary">
+              Thanks for sharing your profile. Our team will reach out when a matching
+              confidential mandate arises.
+            </p>
+            <Button className="mt-6 w-full" onClick={() => handleClose(false)}>
+              Close
+            </Button>
+          </div>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle>Submit your CV</DialogTitle>
+              <DialogDescription>
+                Share your details and we'll be in touch about confidential roles.
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              className="space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSubmitted(true);
+              }}
+            >
+              <div className="space-y-1.5">
+                <Label htmlFor="cv-name">Full name</Label>
+                <Input id="cv-name" required placeholder="Jane Doe" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cv-email">Email</Label>
+                <Input id="cv-email" type="email" required placeholder="jane@example.com" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cv-phone">Phone</Label>
+                <Input id="cv-phone" type="tel" placeholder="+62 812 3456 7890" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cv-linkedin">LinkedIn URL</Label>
+                <Input
+                  id="cv-linkedin"
+                  type="url"
+                  placeholder="https://linkedin.com/in/your-profile"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cv-file">CV upload</Label>
+                <Input
+                  id="cv-file"
+                  type="file"
+                  accept=".pdf,.docx,.txt"
+                  required
+                  onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+                />
+                {fileName && (
+                  <p className="text-xs text-brand-text-secondary">{fileName}</p>
+                )}
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-brand-primary text-white hover:bg-brand-primary/90"
+              >
+                Submit CV
+              </Button>
+            </form>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
