@@ -36,6 +36,7 @@ import {
   DataTable,
   StatusBadge,
 } from "@/components/shared";
+import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 import type { DataTableColumn } from "@/components/shared/DataTable";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
