@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   Inbox as InboxIcon,
 } from "lucide-react";
-import { PageHeader } from "@/components/shared";
+import { PageHeader, EmptyState } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
