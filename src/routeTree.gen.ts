@@ -14,6 +14,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SiteHomeRouteImport } from './routes/site.home'
+import { Route as SiteAboutRouteImport } from './routes/site.about'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as HireTokenRouteImport } from './routes/hire.$token'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
@@ -54,6 +56,16 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SiteHomeRoute = SiteHomeRouteImport.update({
+  id: '/site/home',
+  path: '/site/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SiteAboutRoute = SiteAboutRouteImport.update({
+  id: '/site/about',
+  path: '/site/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsIdRoute = JobsIdRouteImport.update({
@@ -157,6 +169,8 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/hire/$token': typeof HireTokenRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/site/about': typeof SiteAboutRoute
+  '/site/home': typeof SiteHomeRoute
   '/candidates/$id': typeof AppCandidatesIdRoute
   '/clients/$id': typeof AppClientsIdRoute
   '/outreach/$id': typeof AppOutreachIdRoute
@@ -180,6 +194,8 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/hire/$token': typeof HireTokenRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/site/about': typeof SiteAboutRoute
+  '/site/home': typeof SiteHomeRoute
   '/candidates/$id': typeof AppCandidatesIdRoute
   '/clients/$id': typeof AppClientsIdRoute
   '/outreach/$id': typeof AppOutreachIdRoute
@@ -205,6 +221,8 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/hire/$token': typeof HireTokenRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/site/about': typeof SiteAboutRoute
+  '/site/home': typeof SiteHomeRoute
   '/_app/candidates/$id': typeof AppCandidatesIdRoute
   '/_app/clients/$id': typeof AppClientsIdRoute
   '/_app/outreach/$id': typeof AppOutreachIdRoute
@@ -230,6 +248,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/hire/$token'
     | '/jobs/$id'
+    | '/site/about'
+    | '/site/home'
     | '/candidates/$id'
     | '/clients/$id'
     | '/outreach/$id'
@@ -253,6 +273,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/hire/$token'
     | '/jobs/$id'
+    | '/site/about'
+    | '/site/home'
     | '/candidates/$id'
     | '/clients/$id'
     | '/outreach/$id'
@@ -277,6 +299,8 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/hire/$token'
     | '/jobs/$id'
+    | '/site/about'
+    | '/site/home'
     | '/_app/candidates/$id'
     | '/_app/clients/$id'
     | '/_app/outreach/$id'
@@ -293,6 +317,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   HireTokenRoute: typeof HireTokenRoute
+  SiteAboutRoute: typeof SiteAboutRoute
+  SiteHomeRoute: typeof SiteHomeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -330,6 +356,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/site/home': {
+      id: '/site/home'
+      path: '/site/home'
+      fullPath: '/site/home'
+      preLoaderRoute: typeof SiteHomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/site/about': {
+      id: '/site/about'
+      path: '/site/about'
+      fullPath: '/site/about'
+      preLoaderRoute: typeof SiteAboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs/$id': {
@@ -559,7 +599,19 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   HireTokenRoute: HireTokenRoute,
+  SiteAboutRoute: SiteAboutRoute,
+  SiteHomeRoute: SiteHomeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
