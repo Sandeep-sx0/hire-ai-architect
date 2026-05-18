@@ -207,14 +207,16 @@ function DashboardPage() {
         title="Dashboard"
         subtitle={`${greeting}, ${firstName}`}
         actions={
-          <Button asChild className="bg-brand-primary text-white hover:bg-brand-primary/90">
-            <Link to="/projects">
-              <Plus className="mr-1.5 h-4 w-4" />
-              Create project
-            </Link>
+          <Button
+            onClick={() => setWizardOpen(true)}
+            className="bg-brand-primary text-white hover:bg-brand-primary/90"
+          >
+            <Plus className="mr-1.5 h-4 w-4" />
+            Create project
           </Button>
         }
       />
+      <CreateProjectWizard open={wizardOpen} onOpenChange={setWizardOpen} />
 
       {/* === Stats row =========================================== */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
