@@ -109,26 +109,36 @@ function AnalyticsPage() {
         }
       />
 
-      <div className={cn("transition-opacity", loading && "animate-pulse opacity-50")}>
-        <KPIRow factor={factor} />
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <FunnelCard />
-          <SourceCard />
+      {!HAS_ANALYTICS_DATA ? (
+        <div className="mt-6">
+          <EmptyState
+            icon={Briefcase}
+            title="Not enough data yet"
+            description="Analytics will populate as you run searches and campaigns."
+          />
         </div>
+      ) : (
+        <div className={cn("transition-opacity", loading && "animate-pulse opacity-50")}>
+          <KPIRow factor={factor} />
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <RecruiterCard />
-          <OutreachCard />
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <FunnelCard />
+            <SourceCard />
+          </div>
+
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <RecruiterCard />
+            <OutreachCard />
+          </div>
+
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <RejectionCard />
+            <TimeCard />
+          </div>
+
+          <PlacementsCard />
         </div>
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <RejectionCard />
-          <TimeCard />
-        </div>
-
-        <PlacementsCard />
-      </div>
+      )}
     </div>
   );
 }
