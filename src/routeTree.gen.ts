@@ -15,6 +15,7 @@ import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SiteHomeRouteImport } from './routes/site.home'
+import { Route as SiteContactRouteImport } from './routes/site.contact'
 import { Route as SiteAboutRouteImport } from './routes/site.about'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as HireTokenRouteImport } from './routes/hire.$token'
@@ -61,6 +62,11 @@ const IndexRoute = IndexRouteImport.update({
 const SiteHomeRoute = SiteHomeRouteImport.update({
   id: '/site/home',
   path: '/site/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SiteContactRoute = SiteContactRouteImport.update({
+  id: '/site/contact',
+  path: '/site/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SiteAboutRoute = SiteAboutRouteImport.update({
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/hire/$token': typeof HireTokenRoute
   '/jobs/$id': typeof JobsIdRoute
   '/site/about': typeof SiteAboutRoute
+  '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
   '/candidates/$id': typeof AppCandidatesIdRoute
   '/clients/$id': typeof AppClientsIdRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/hire/$token': typeof HireTokenRoute
   '/jobs/$id': typeof JobsIdRoute
   '/site/about': typeof SiteAboutRoute
+  '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
   '/candidates/$id': typeof AppCandidatesIdRoute
   '/clients/$id': typeof AppClientsIdRoute
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/hire/$token': typeof HireTokenRoute
   '/jobs/$id': typeof JobsIdRoute
   '/site/about': typeof SiteAboutRoute
+  '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
   '/_app/candidates/$id': typeof AppCandidatesIdRoute
   '/_app/clients/$id': typeof AppClientsIdRoute
@@ -249,6 +258,7 @@ export interface FileRouteTypes {
     | '/hire/$token'
     | '/jobs/$id'
     | '/site/about'
+    | '/site/contact'
     | '/site/home'
     | '/candidates/$id'
     | '/clients/$id'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/hire/$token'
     | '/jobs/$id'
     | '/site/about'
+    | '/site/contact'
     | '/site/home'
     | '/candidates/$id'
     | '/clients/$id'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/hire/$token'
     | '/jobs/$id'
     | '/site/about'
+    | '/site/contact'
     | '/site/home'
     | '/_app/candidates/$id'
     | '/_app/clients/$id'
@@ -318,6 +330,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   HireTokenRoute: typeof HireTokenRoute
   SiteAboutRoute: typeof SiteAboutRoute
+  SiteContactRoute: typeof SiteContactRoute
   SiteHomeRoute: typeof SiteHomeRoute
 }
 
@@ -363,6 +376,13 @@ declare module '@tanstack/react-router' {
       path: '/site/home'
       fullPath: '/site/home'
       preLoaderRoute: typeof SiteHomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/site/contact': {
+      id: '/site/contact'
+      path: '/site/contact'
+      fullPath: '/site/contact'
+      preLoaderRoute: typeof SiteContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/site/about': {
@@ -600,6 +620,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   HireTokenRoute: HireTokenRoute,
   SiteAboutRoute: SiteAboutRoute,
+  SiteContactRoute: SiteContactRoute,
   SiteHomeRoute: SiteHomeRoute,
 }
 export const routeTree = rootRouteImport
