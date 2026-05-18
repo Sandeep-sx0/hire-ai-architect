@@ -47,15 +47,33 @@ const RANGE_LABEL: Record<Preset, string> = {
   "All time": "All time",
 };
 
+const FACTORS: Record<Preset, number> = {
+  "Last 7 days": 0.3,
+  "Last 30 days": 1,
+  "Last 90 days": 2.5,
+  "This quarter": 2.5,
+  "This year": 6,
+  "All time": 12,
+};
+
 function AnalyticsPage() {
   const [preset, setPreset] = useState<Preset>("Last 30 days");
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const factor = FACTORS[preset];
+
+  const handlePresetChange = (p: Preset) => {
+    setPreset(p);
+    setOpen(false);
+    setLoading(true);
+    setTimeout(() => setLoading(false), 200);
+  };
 
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
       <PageHeader
         title="Analytics"
-        subtitle="Workspace performance overview"
+        subtitle={`Workspace performance · ${preset} · ${RANGE_LABEL[preset]}`}
         actions={
           <>
             <Popover open={open} onOpenChange={setOpen}>
@@ -68,10 +86,7 @@ function AnalyticsPage() {
                 {PRESETS.map((p) => (
                   <button
                     key={p}
-                    onClick={() => {
-                      setPreset(p);
-                      setOpen(false);
-                    }}
+                    onClick={() => handlePresetChange(p)}
                     className={cn(
                       "block w-full rounded-md px-3 py-2 text-left text-sm",
                       p === preset
@@ -91,24 +106,26 @@ function AnalyticsPage() {
         }
       />
 
-      <KPIRow />
+      <div className={cn("transition-opacity", loading && "animate-pulse opacity-50")}>
+        <KPIRow factor={factor} />
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <FunnelCard />
-        <SourceCard />
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <FunnelCard />
+          <SourceCard />
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <RecruiterCard />
+          <OutreachCard />
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <RejectionCard />
+          <TimeCard />
+        </div>
+
+        <PlacementsCard />
       </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <RecruiterCard />
-        <OutreachCard />
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <RejectionCard />
-        <TimeCard />
-      </div>
-
-      <PlacementsCard />
     </div>
   );
 }
