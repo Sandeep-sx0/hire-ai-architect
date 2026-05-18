@@ -30,15 +30,19 @@ function prettify(seg: string) {
 
 interface AppTopbarProps {
   onToggleSidebar: () => void;
+  onToggleMobileSidebar?: () => void;
 }
 
-export function AppTopbar({ onToggleSidebar }: AppTopbarProps) {
+export function AppTopbar({ onToggleSidebar, onToggleMobileSidebar }: AppTopbarProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const segments = pathname.split("/").filter(Boolean);
 
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-card px-4">
       <div className="flex min-w-0 items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={onToggleMobileSidebar} className="lg:hidden">
+          <Menu className="h-4 w-4" />
+        </Button>
         <Button variant="ghost" size="icon" onClick={onToggleSidebar} className="hidden lg:flex">
           <PanelLeft className="h-4 w-4" />
         </Button>
