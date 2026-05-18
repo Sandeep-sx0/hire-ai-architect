@@ -149,7 +149,7 @@ function ProjectLink() {
   );
 }
 
-function DedupWarning() {
+function DedupWarning({ onResolve }: { onResolve: (action: "new" | "merge" | "skip") => void }) {
   return (
     <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
       <div className="flex items-center gap-2 text-sm font-medium text-amber-900">
@@ -162,9 +162,9 @@ function DedupWarning() {
         <DedupCard label="Existing" name="Rina Wijaya" existing />
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <Button size="sm" variant="outline">Import as new</Button>
-        <Button size="sm" variant="outline">Merge with existing</Button>
-        <Button size="sm" variant="ghost">Skip</Button>
+        <Button size="sm" variant="outline" onClick={() => onResolve("new")}>Import as new</Button>
+        <Button size="sm" variant="outline" onClick={() => onResolve("merge")}>Merge with existing</Button>
+        <Button size="sm" variant="ghost" onClick={() => onResolve("skip")}>Skip</Button>
       </div>
     </div>
   );
