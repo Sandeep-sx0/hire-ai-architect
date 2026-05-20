@@ -33,15 +33,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge, EmptyState } from "@/components/shared";
 import { cn } from "@/lib/utils";
-import { projects } from "@/lib/mock-data";
+import { projects, getJobsByProject } from "@/lib/mock-data";
 import { MatchResults } from "@/components/match/MatchResults";
 import { PipelineKanban } from "@/components/pipeline/PipelineKanban";
+import { Briefcase, Plus } from "lucide-react";
 
 const tabSchema = z.object({
   tab: fallback(
-    z.enum(["brief", "candidates", "outreach", "pipeline", "activity"]),
-    "brief",
-  ).default("brief"),
+    z.enum(["jobs", "brief", "candidates", "outreach", "pipeline", "activity"]),
+    "jobs",
+  ).default("jobs"),
 });
 
 export const Route = createFileRoute("/_app/projects/$id")({
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/_app/projects/$id")({
 });
 
 const TABS = [
+  { id: "jobs" as const, label: "Jobs", icon: Briefcase, badge: null },
   { id: "brief" as const, label: "Brief", icon: FileText, badge: null },
   { id: "candidates" as const, label: "Candidates", icon: Users, badge: "14" },
   { id: "outreach" as const, label: "Outreach", icon: Send, badge: "2 campaigns" },
@@ -250,6 +252,7 @@ function ProjectDetail() {
 
       {/* Tab Content */}
       <div className="mt-6">
+        {tab === "jobs" && <JobsTab projectId={id} />}
         {tab === "brief" && <BriefTab editMode={editMode} setEditMode={setEditMode} />}
         {tab === "candidates" && (hasMatched ? (
           <MatchResults projectId={id} />
@@ -618,6 +621,127 @@ function ActivityTab() {
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function JobsTab({ projectId }: { projectId: string }) {
+  const navigate = useNavigate();
+  const jobs = getJobsByProject(projectId);
+
+  if (jobs.length === 0) {
+    return (
+      <EmptyState
+        icon={Briefcase}
+        title="No jobs yet"
+        description="Create your first job to start sourcing candidates for this project."
+        actionLabel="Add job"
+        onAction={() => navigate({ to: "/jobs/new", search: { projectId } })}
+      />
+    );
+  }
+
+  const senLabel: Record<string, string> = {
+    c_suite: "C-Suite",
+    vp: "VP",
+    director: "Director",
+    senior_manager: "Senior Manager",
+    manager: "Manager",
+    senior: "Senior",
+    mid: "Mid",
+    junior: "Junior",
+  };
+
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm text-brand-text-secondary">
+          {jobs.length} {jobs.length === 1 ? "position" : "positions"} in this engagement
+        </p>
+        <Button
+          className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
+          onClick={() => navigate({ to: "/jobs/new", search: { projectId } })}
+        >
+          <Plus className="h-4 w-4" />
+          Add job
+        </Button>
+      </div>
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50 text-xs uppercase tracking-wide text-brand-text-secondary">
+            <tr>
+              <th className="px-4 py-3 text-left font-semibold">Job</th>
+              <th className="px-4 py-3 text-left font-semibold">Seniority</th>
+              <th className="px-4 py-3 text-left font-semibold">Location</th>
+              <th className="px-4 py-3 text-left font-semibold">Status</th>
+              <th className="px-4 py-3 text-left font-semibold">Headcount</th>
+              <th className="px-4 py-3 text-left font-semibold">Candidates</th>
+              <th className="px-4 py-3 text-left font-semibold">Campaigns</th>
+              <th className="px-4 py-3 text-left font-semibold">Days open</th>
+              <th className="px-4 py-3 text-left font-semibold">Owner</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobs.map((j) => {
+              const pct = j.headcount ? (j.positionsFilled / j.headcount) * 100 : 0;
+              return (
+                <tr
+                  key={j.id}
+                  className="cursor-pointer border-t border-border hover:bg-brand-bg/40"
+                  onClick={() => navigate({ to: "/jobs/$id", params: { id: j.id } })}
+                >
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-brand-primary">{j.jobTitle}</div>
+                    <div className="text-xs text-brand-text-secondary">{j.jobCode}</div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-full bg-status-ai/15 px-2 py-0.5 text-[11px] font-medium text-status-ai">
+                      {senLabel[j.seniorityLevel]}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-brand-text-secondary">{j.location}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={j.status} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="text-xs text-brand-text-secondary">
+                      {j.positionsFilled} of {j.headcount}
+                    </div>
+                    <div className="mt-1 h-1 w-20 overflow-hidden rounded-full bg-gray-100">
+                      <div className="h-full bg-status-success" style={{ width: `${pct}%` }} />
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 tabular-nums">{j.candidatesCount}</td>
+                  <td className="px-4 py-3">
+                    {j.activeCampaigns > 0 ? (
+                      <span className="text-status-success">{j.activeCampaigns} active</span>
+                    ) : (
+                      <span className="text-brand-text-secondary">—</span>
+                    )}
+                  </td>
+                  <td
+                    className={cn(
+                      "px-4 py-3 tabular-nums",
+                      j.daysOpen > 60 && "text-status-danger",
+                      j.daysOpen > 30 && j.daysOpen <= 60 && "text-status-warning",
+                    )}
+                  >
+                    {j.daysOpen}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-seafoam text-[10px] font-semibold text-brand-primary">
+                        {j.assignedInitials}
+                      </span>
+                      <span className="text-xs text-brand-text">{j.assignedTo}</span>
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

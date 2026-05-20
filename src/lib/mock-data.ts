@@ -642,3 +642,408 @@ export const pipelineEntries: PipelineEntry[] = [
 ];
 
 export const unreadInboxCount = inboxMessages.filter((m) => m.unread).length;
+
+// ============================================================
+// MODULE 3B — JOBS
+// ============================================================
+
+export type JobStatus =
+  | "draft"
+  | "open"
+  | "sourcing"
+  | "shortlisted"
+  | "interviewing"
+  | "offer"
+  | "placed"
+  | "closed"
+  | "on_hold";
+
+export type JobSeniority =
+  | "c_suite"
+  | "vp"
+  | "director"
+  | "senior_manager"
+  | "manager"
+  | "senior"
+  | "mid"
+  | "junior";
+
+export type WorkModel = "onsite" | "hybrid" | "remote";
+
+export interface Job {
+  id: string;
+  projectId: string;
+  jobTitle: string;
+  jobCode: string;
+  seniorityLevel: JobSeniority;
+  department: string;
+  location: string;
+  workModel: WorkModel;
+  status: JobStatus;
+  headcount: number;
+  positionsFilled: number;
+  skillsRequired: string[];
+  skillsNiceToHave: string[];
+  experienceMin: number;
+  experienceMax: number;
+  education: string;
+  salaryMin: number;
+  salaryMax: number;
+  salaryCurrency: string;
+  responsibilities: string[];
+  languageRequirements: string[];
+  rawJdText: string;
+  assignedTo: string;
+  assignedInitials: string;
+  createdAt: string;
+  candidatesCount: number;
+  inPipeline: number;
+  shortlistedCount: number;
+  activeCampaigns: number;
+  responseRate: number;
+  daysOpen: number;
+  avgMatchScore: number;
+  isPublished: boolean;
+}
+
+const INDORAMA_JD = `CHIEF FINANCIAL OFFICER — INDORAMA VENTURES
+
+Indorama Ventures is seeking a Group Chief Financial Officer based in Bangkok, Thailand, leading the finance function across our regional petrochemical operations. Reporting directly to the Group CEO, the CFO will own strategy, capital allocation, M&A execution, and investor relations.
+
+About the role
+The Group CFO will lead a team of 50+ across finance, treasury, tax, and IR. The role anchors our next phase of regional consolidation, including 2-3 strategic acquisitions over the next 24 months.
+
+Key responsibilities
+- Lead financial strategy, planning, budgeting, and forecasting across 4 business units
+- Drive M&A evaluation, due diligence, and post-merger integration for SEA acquisitions
+- Ensure compliance with IFRS, Thai SET listing rules, and regional tax frameworks
+- Present quarterly financial reports to the Board of Directors and investor community
+- Manage banking relationships and optimize working capital across $2B in revenue
+- Partner with the CEO on the 5-year strategic growth plan and capital structure
+
+Requirements
+- 15-25 years of progressive finance experience, with 5+ years as CFO of a listed company
+- MBA, CPA, or CFA strongly preferred
+- Proven M&A track record (deals > $100M)
+- Manufacturing, petrochemical, or industrial conglomerate experience required
+- Fluent English; Thai or Bahasa Indonesia a strong advantage
+
+Compensation
+Base salary IDR 150M - 250M / month equivalent, plus performance bonus 30-40%, long-term incentive plan, company car, comprehensive benefits.`;
+
+export const jobs: Job[] = [
+  {
+    id: "j1",
+    projectId: "p1",
+    jobTitle: "Chief Financial Officer",
+    jobCode: "NVX-2026-042",
+    seniorityLevel: "c_suite",
+    department: "Finance",
+    location: "Bangkok, Thailand",
+    workModel: "hybrid",
+    status: "sourcing",
+    headcount: 1,
+    positionsFilled: 0,
+    skillsRequired: [
+      "Financial Planning & Analysis",
+      "M&A Due Diligence",
+      "IFRS Compliance",
+      "Treasury Management",
+      "Team Leadership",
+      "Board Reporting",
+    ],
+    skillsNiceToHave: ["Manufacturing Industry", "IPO Experience", "Bahasa Indonesia"],
+    experienceMin: 15,
+    experienceMax: 25,
+    education: "MBA, CPA, or CFA preferred",
+    salaryMin: 150_000_000,
+    salaryMax: 250_000_000,
+    salaryCurrency: "IDR",
+    responsibilities: [
+      "Lead financial strategy, planning, budgeting, and forecasting across 4 business units",
+      "Drive M&A evaluation, due diligence, and post-merger integration for SEA acquisitions",
+      "Ensure compliance with IFRS, Thai SET listing rules, and regional tax frameworks",
+      "Present quarterly financial reports to the Board of Directors and investor community",
+      "Manage banking relationships and optimize working capital across $2B in revenue",
+      "Partner with the CEO on the 5-year strategic growth plan and capital structure",
+    ],
+    languageRequirements: ["English (fluent)", "Bahasa Indonesia (business)"],
+    rawJdText: INDORAMA_JD,
+    assignedTo: "Priya Sharma",
+    assignedInitials: "PS",
+    createdAt: "May 12, 2026",
+    candidatesCount: 47,
+    inPipeline: 12,
+    shortlistedCount: 2,
+    activeCampaigns: 1,
+    responseRate: 18,
+    daysOpen: 14,
+    avgMatchScore: 76,
+    isPublished: true,
+  },
+  {
+    id: "j2",
+    projectId: "p1",
+    jobTitle: "VP Operations",
+    jobCode: "NVX-2026-043",
+    seniorityLevel: "vp",
+    department: "Operations",
+    location: "Bangkok, Thailand",
+    workModel: "onsite",
+    status: "shortlisted",
+    headcount: 1,
+    positionsFilled: 0,
+    skillsRequired: ["Plant Operations", "Lean Manufacturing", "P&L Ownership", "Safety Management"],
+    skillsNiceToHave: ["Petrochemical Industry", "Six Sigma"],
+    experienceMin: 12,
+    experienceMax: 20,
+    education: "Engineering degree; MBA a plus",
+    salaryMin: 90_000_000,
+    salaryMax: 140_000_000,
+    salaryCurrency: "IDR",
+    responsibilities: [
+      "Lead end-to-end plant operations across 6 facilities",
+      "Drive operational excellence and lean transformation initiatives",
+      "Own P&L for the regional manufacturing segment",
+    ],
+    languageRequirements: ["English (fluent)", "Thai (business)"],
+    rawJdText: "VP Operations job description — petrochemical manufacturing leadership role...",
+    assignedTo: "Daniel Wirawan",
+    assignedInitials: "DW",
+    createdAt: "May 8, 2026",
+    candidatesCount: 63,
+    inPipeline: 18,
+    shortlistedCount: 5,
+    activeCampaigns: 2,
+    responseRate: 22,
+    daysOpen: 18,
+    avgMatchScore: 72,
+    isPublished: true,
+  },
+  {
+    id: "j3",
+    projectId: "p1",
+    jobTitle: "Head of Supply Chain",
+    jobCode: "NVX-2026-044",
+    seniorityLevel: "director",
+    department: "Supply Chain",
+    location: "Jakarta, Indonesia",
+    workModel: "hybrid",
+    status: "open",
+    headcount: 1,
+    positionsFilled: 0,
+    skillsRequired: ["S&OP", "Procurement", "Logistics Optimization", "ERP (SAP)"],
+    skillsNiceToHave: ["APICS Certification", "Regional SEA Experience"],
+    experienceMin: 10,
+    experienceMax: 18,
+    education: "Bachelor's in Supply Chain or Engineering",
+    salaryMin: 60_000_000,
+    salaryMax: 95_000_000,
+    salaryCurrency: "IDR",
+    responsibilities: [
+      "Own regional supply chain strategy and execution",
+      "Lead S&OP cycle across 4 business units",
+      "Optimize logistics and procurement spend",
+    ],
+    languageRequirements: ["English (fluent)"],
+    rawJdText: "Head of Supply Chain — regional supply chain leadership role...",
+    assignedTo: "Aisha Rahman",
+    assignedInitials: "AR",
+    createdAt: "May 14, 2026",
+    candidatesCount: 0,
+    inPipeline: 0,
+    shortlistedCount: 0,
+    activeCampaigns: 0,
+    responseRate: 0,
+    daysOpen: 4,
+    avgMatchScore: 0,
+    isPublished: false,
+  },
+  {
+    id: "j4",
+    projectId: "p1",
+    jobTitle: "Regional Director, APAC",
+    jobCode: "NVX-2026-045",
+    seniorityLevel: "director",
+    department: "Commercial",
+    location: "Singapore",
+    workModel: "hybrid",
+    status: "interviewing",
+    headcount: 1,
+    positionsFilled: 0,
+    skillsRequired: ["B2B Sales Leadership", "APAC Market Knowledge", "Key Account Management"],
+    skillsNiceToHave: ["Mandarin", "Petrochemical Industry"],
+    experienceMin: 12,
+    experienceMax: 20,
+    education: "Bachelor's; MBA preferred",
+    salaryMin: 200_000,
+    salaryMax: 320_000,
+    salaryCurrency: "SGD",
+    responsibilities: [
+      "Lead commercial strategy across APAC region",
+      "Manage key strategic accounts > $50M each",
+    ],
+    languageRequirements: ["English (fluent)", "Mandarin (preferred)"],
+    rawJdText: "Regional Director APAC commercial leadership role...",
+    assignedTo: "Priya Sharma",
+    assignedInitials: "PS",
+    createdAt: "Apr 22, 2026",
+    candidatesCount: 38,
+    inPipeline: 6,
+    shortlistedCount: 3,
+    activeCampaigns: 1,
+    responseRate: 26,
+    daysOpen: 34,
+    avgMatchScore: 81,
+    isPublished: true,
+  },
+  {
+    id: "j5",
+    projectId: "p1",
+    jobTitle: "Senior Manager, Corporate Finance",
+    jobCode: "NVX-2026-046",
+    seniorityLevel: "senior_manager",
+    department: "Finance",
+    location: "Bangkok, Thailand",
+    workModel: "onsite",
+    status: "draft",
+    headcount: 2,
+    positionsFilled: 0,
+    skillsRequired: ["Corporate Finance", "Financial Modeling", "Capital Markets"],
+    skillsNiceToHave: ["CFA", "Investment Banking Background"],
+    experienceMin: 7,
+    experienceMax: 12,
+    education: "Bachelor's in Finance; CFA preferred",
+    salaryMin: 40_000_000,
+    salaryMax: 65_000_000,
+    salaryCurrency: "IDR",
+    responsibilities: ["Support M&A and capital markets initiatives"],
+    languageRequirements: ["English (fluent)"],
+    rawJdText: "Senior Manager corporate finance role supporting CFO and treasury...",
+    assignedTo: "Priya Sharma",
+    assignedInitials: "PS",
+    createdAt: "May 18, 2026",
+    candidatesCount: 0,
+    inPipeline: 0,
+    shortlistedCount: 0,
+    activeCampaigns: 0,
+    responseRate: 0,
+    daysOpen: 0,
+    avgMatchScore: 0,
+    isPublished: false,
+  },
+  {
+    id: "j6",
+    projectId: "p2",
+    jobTitle: "VP Operations, Southeast Asia",
+    jobCode: "OYO-2026-011",
+    seniorityLevel: "vp",
+    department: "Operations",
+    location: "Jakarta, Indonesia",
+    workModel: "hybrid",
+    status: "interviewing",
+    headcount: 1,
+    positionsFilled: 0,
+    skillsRequired: ["Hospitality Operations", "Multi-Country P&L", "Tech-Enabled Ops"],
+    skillsNiceToHave: ["Hotel Chain Background"],
+    experienceMin: 12,
+    experienceMax: 18,
+    education: "Bachelor's; MBA preferred",
+    salaryMin: 80_000_000,
+    salaryMax: 130_000_000,
+    salaryCurrency: "IDR",
+    responsibilities: ["Lead SEA operations across 8 markets"],
+    languageRequirements: ["English (fluent)"],
+    rawJdText: "VP Operations Southeast Asia for hospitality platform...",
+    assignedTo: "Daniel Wirawan",
+    assignedInitials: "DW",
+    createdAt: "Apr 5, 2026",
+    candidatesCount: 67,
+    inPipeline: 14,
+    shortlistedCount: 4,
+    activeCampaigns: 1,
+    responseRate: 20,
+    daysOpen: 41,
+    avgMatchScore: 74,
+    isPublished: true,
+  },
+  {
+    id: "j7",
+    projectId: "p3",
+    jobTitle: "Country Director, Indonesia",
+    jobCode: "KNS-2026-003",
+    seniorityLevel: "c_suite",
+    department: "Executive",
+    location: "Jakarta, Indonesia",
+    workModel: "onsite",
+    status: "sourcing",
+    headcount: 1,
+    positionsFilled: 0,
+    skillsRequired: ["Country General Management", "P&L Leadership", "Government Relations"],
+    skillsNiceToHave: ["Manufacturing Industry"],
+    experienceMin: 15,
+    experienceMax: 25,
+    education: "MBA preferred",
+    salaryMin: 110_000_000,
+    salaryMax: 180_000_000,
+    salaryCurrency: "IDR",
+    responsibilities: ["Lead Indonesia P&L, ~$300M revenue"],
+    languageRequirements: ["English (fluent)", "Bahasa Indonesia (native)"],
+    rawJdText: "Country Director Indonesia for KNS manufacturing group...",
+    assignedTo: "Priya Sharma",
+    assignedInitials: "PS",
+    createdAt: "May 6, 2026",
+    candidatesCount: 23,
+    inPipeline: 4,
+    shortlistedCount: 2,
+    activeCampaigns: 1,
+    responseRate: 15,
+    daysOpen: 12,
+    avgMatchScore: 70,
+    isPublished: true,
+  },
+  {
+    id: "j8",
+    projectId: "p4",
+    jobTitle: "Head of Digital Transformation",
+    jobCode: "OAS-2026-007",
+    seniorityLevel: "director",
+    department: "Technology",
+    location: "Dubai, UAE",
+    workModel: "hybrid",
+    status: "open",
+    headcount: 1,
+    positionsFilled: 0,
+    skillsRequired: ["Digital Strategy", "ERP Transformation", "Change Management"],
+    skillsNiceToHave: ["Consumer Goods Industry"],
+    experienceMin: 10,
+    experienceMax: 18,
+    education: "Bachelor's; MBA preferred",
+    salaryMin: 250_000,
+    salaryMax: 400_000,
+    salaryCurrency: "AED",
+    responsibilities: ["Lead enterprise digital transformation roadmap"],
+    languageRequirements: ["English (fluent)"],
+    rawJdText: "Head of Digital Transformation for consumer goods group in Dubai...",
+    assignedTo: "Aisha Rahman",
+    assignedInitials: "AR",
+    createdAt: "May 1, 2026",
+    candidatesCount: 31,
+    inPipeline: 7,
+    shortlistedCount: 3,
+    activeCampaigns: 0,
+    responseRate: 0,
+    daysOpen: 19,
+    avgMatchScore: 68,
+    isPublished: true,
+  },
+];
+
+export function getJobsByProject(projectId: string): Job[] {
+  return jobs.filter((j) => j.projectId === projectId);
+}
+
+export function getJob(id: string): Job | undefined {
+  return jobs.find((j) => j.id === id);
+}
+

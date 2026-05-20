@@ -1,81 +1,73 @@
-## HireSmart Scaffold Plan
+# Module 3B — Jobs (Position Management)
 
-Adapt the spec to this project's TanStack Start + Vite + Tailwind v4 + shadcn/ui stack. No Next.js. DM Sans everywhere. Detail-page tabs deferred — every route gets a single "Under construction" placeholder.
+Introduce a `Job` entity between `Project` and downstream (campaigns, matching, pipeline, applications). Frontend-only with mock data.
 
----
+## 1. Mock data (`src/lib/mock-data.ts`)
 
-### 1. Design system (white-label tokens)
+Add types and seed data:
+- `JobStatus = 'draft' | 'open' | 'sourcing' | 'shortlisted' | 'interviewing' | 'offer' | 'placed' | 'closed' | 'on_hold'`
+- `SeniorityLevel` (extend if needed: c_suite, vp, director, senior_manager, manager, senior, mid, junior)
+- `WorkModel = 'onsite' | 'hybrid' | 'remote'`
+- `Job` interface: id, projectId, jobTitle, jobCode, seniorityLevel, department, location, workModel, status, headcount, positionsFilled, skillsRequired[], skillsNiceToHave[], experienceMin/Max, education, salaryMin/Max/Currency, responsibilities[], languageRequirements[], rawJdText, assignedTo, createdAt, candidatesCount, inPipeline, activeCampaigns, responseRate, daysOpen, avgMatchScore, isPublished
+- Seed: ~8 jobs across 3-4 existing projects. For Indorama project: CFO, VP Operations, Head of Supply Chain, Regional Director APAC, Senior Manager Corporate Finance. Realistic data.
+- Add `projectId → jobs[]` helper.
 
-Update `src/styles.css`:
-- Add `@import` for DM Sans (Google Fonts) at the top.
-- Define the 9 HireSmart brand CSS variables on `:root` (`--brand-primary`, `--brand-accent`, `--brand-mint`, `--brand-seafoam`, `--brand-pink`, `--brand-magenta`, `--brand-bg`, `--brand-text`, `--brand-text-secondary`) — converted to `oklch()` per the template's color rules, with hex preserved in a comment so tenants can swap easily.
-- Define the 6 semantic status colors (`--status-success`, `--status-warning`, `--status-danger`, `--status-neutral`, `--status-info`, `--status-ai`) the same way.
-- Wire them into the existing `@theme inline` block so Tailwind utilities like `bg-brand-primary`, `text-brand-magenta`, `bg-status-success` work everywhere.
-- Override the shadcn semantic tokens (`--background`, `--primary`, `--foreground`, etc.) to map onto the brand palette so existing shadcn components inherit the brand automatically.
-- Set `body { font-family: 'DM Sans', system-ui, sans-serif; }` and add font-size utility defaults matching the typography scale.
-- No dark-mode overrides for v1 (light mode only).
+Don't remove existing project fields (would break too much). Just add jobs alongside.
 
-### 2. App layout shell
+## 2. New routes
 
-- `src/routes/__root.tsx` — keep current shell; just ensure `<Outlet />`, providers, and head metadata stay intact.
-- Create a pathless layout `src/routes/_app.tsx` that renders the sidebar + topbar frame around `<Outlet />`. All authenticated routes move under `_app/`.
-- `src/components/layout/AppSidebar.tsx` — 240px sidebar, collapsible to 64px icon mode, built on shadcn `Sidebar` primitives. HireSmart wordmark, 8 nav items with Lucide icons (Dashboard, Projects, Candidates, Clients, Outreach, Inbox, Analytics, Settings) + bottom user block. Active state: `bg-brand-mint/20`, 2px left border in `--brand-primary`. Inbox item shows an unread-count badge.
-- `src/components/layout/AppTopbar.tsx` — 56px bar with breadcrumb (derived from `useRouterState` pathname), search icon button, notification bell with dot, and user avatar dropdown.
-- Mobile: sidebar collapses to overlay via shadcn `Sheet` triggered by hamburger.
+```
+src/routes/_app/jobs.$id.tsx            — Job detail (tabbed: Brief, Candidates, Matching, Pipeline, Outreach, Activity)
+src/routes/_app/jobs.new.tsx            — Job creation wizard (4 steps)
+src/routes/_app/jobs.$id.parse.tsx      — JD parsing review (standalone)
+```
 
-### 3. Shared components (`src/components/shared/`)
+Reuse `/projects/$id` tab "Jobs" for the job-list-within-project (Prompt #1) — added as a new tab.
 
-All ten, built on shadcn primitives, exported from an `index.ts` barrel:
-1. `StatusBadge` — pill with semantic-status color mapping.
-2. `ScoreRing` — SVG ring, color thresholds (red <50, amber 50–74, green ≥75), sizes sm/md/lg.
-3. `AIVerdictChip` — verdict pill, optionally expandable to strengths/gaps/concerns tags.
-4. `DataTable` — wraps shadcn `Table`: sortable headers, optional select column + bulk-action bar, sticky header, alternating rows, hover state, pagination footer, empty-state slot.
-5. `PageHeader` — title (24/600), optional subtitle, right-aligned actions slot, 24px bottom margin.
-6. `StatCard` — icon-in-tinted-circle, label, large value, optional trend indicator, `rounded-xl` white card with hairline border.
-7. `EmptyState` — Lucide icon (48px, muted) + title + description + optional action button. No illustrations.
-8. `FilterBar` — search input + filter dropdowns + view toggle (table/kanban/grid) using shadcn `Input`, `Select`, `ToggleGroup`.
-9. `KanbanColumn` — header with title, count badge, colored 4px top border; scrollable card area.
-10. `SidePanel` — wraps shadcn `Sheet`, right-side slide-over, widths md (480) / lg (640).
+## 3. Project Detail update (`src/routes/_app/projects.$id.tsx`)
 
-### 4. Mock data (`src/lib/mock-data.ts`)
+Add a "Jobs" tab (make it default). Renders table view of jobs for this project with columns from Prompt #1: title+code, seniority, location, status, headcount progress, candidates, campaigns, days open, assigned. "Add Job" button → `/jobs/new?projectId=...`. Click row → `/jobs/$id`. Skip kanban view for v1 (toggle present but disabled with tooltip "coming soon") to keep scope reasonable. Filter/sort dropdowns wired client-side.
 
-All TypeScript types from the prompt (`UserRole`, `ProjectStatus`, `CandidateSource`, `SeniorityLevel`, `CampaignStatus`, `InboxClassification`, `PipelineStage`) plus entity interfaces. Realistic SEA executive-search data: 5 clients (Indorama Ventures, OYO Hotels, KNS Group, Oasis Water, Stylo International), 8 projects, 15 candidates (mixed Indonesian/Indian/Australian/Singaporean names), 3 campaigns, 10 inbox messages, 20 pipeline entries.
+## 4. Job Detail (`/jobs/$id`) — Prompt #3
 
-### 5. Routing (TanStack Start flat-file convention)
+Sticky header: breadcrumb, title, seniority/location/work-model/headcount badges, status, action buttons (Edit, Run Matching, Launch Campaign, dropdown). Stat bar: Candidates, In Pipeline, Active Campaigns, Response Rate, Days Open.
 
-Public routes (no shell):
-- `src/routes/index.tsx` — redirects to `/dashboard` via `<Navigate />`.
-- `src/routes/login.tsx`, `src/routes/signup.tsx` — placeholder pages.
-- `src/routes/jobs.tsx`, `src/routes/jobs.$id.tsx` — candidate jobs portal (own minimal header).
-- `src/routes/hire.$token.tsx` — employer portal.
+6 tabs:
+- **Brief** (default): two-column — structured fields left, raw JD right
+- **Candidates**: reuse DataTable with candidates linked to job (filter mock candidates by jobId)
+- **Matching**: "Run Matching" CTA, then reuse `MatchResults` component
+- **Pipeline**: reuse `PipelineKanban` component scoped to job
+- **Outreach**: campaigns filtered by jobId, with launch CTA
+- **Activity**: chronological mock feed
 
-Authenticated routes under the `_app` layout (sidebar + topbar):
-- `_app/dashboard.tsx`
-- `_app/projects.tsx`, `_app/projects.$id.tsx`, `_app/projects.$id.parse.tsx`
-- `_app/candidates.tsx`, `_app/candidates.$id.tsx`
-- `_app/clients.tsx`, `_app/clients.$id.tsx`
-- `_app/outreach.tsx`, `_app/outreach.new.tsx`, `_app/outreach.$id.tsx`
-- `_app/inbox.tsx`
-- `_app/analytics.tsx`
-- `_app/settings.tsx`
+## 5. Job Creation Wizard (`/jobs/new`) — Prompt #2
 
-Each authenticated route renders `<PageHeader>` with the correct title/subtitle + `<EmptyState icon={Hammer} title="Under construction" …/>`. Each route also sets its own `head()` metadata (title + description).
+4 steps in a single page with step indicator:
+1. Project & basics (project dropdown prefilled from `?projectId=`, title, dept, headcount, assignee)
+2. JD Input: 3 tabs (Paste / Upload / Manual). "Parse with AI" simulates 2s loading → step 3
+3. AI Review: side-by-side raw JD ↔ editable extracted fields (reuse field set). Pre-fill with CFO mock data
+4. Confirm & create: summary + two checkboxes → toast → navigate to `/jobs/$id`
 
-### 6. Quality bar / what's intentionally omitted
+## 6. JD Parsing Review (`/jobs/$id/parse`) — Prompt #4
 
-- Generous spacing, hairline borders (no drop shadows), brand colors visibly applied to nav active state + status badges.
-- No purple gradients, no cartoon empty-state art, no Lorem ipsum.
-- No Lovable Cloud / Supabase / auth wiring yet — `/login` and `/signup` are visual placeholders, route guards deferred.
-- No dark mode, no real API calls.
+Standalone two-column page. Left: raw JD. Right: editable extracted fields with confidence dots (green/amber/red). Sticky bottom bar: Re-parse / Discard / Approve & Create. Staggered fade-in animation on load.
 
----
+## 7. Campaign Builder update (`/outreach/new`) — Prompt #5
 
-### Technical notes
+Currently 4 steps; add job selector to Step 1:
+- Project dropdown → reveals job cards (radio-select)
+- Each card: title, seniority, location, status, shortlisted count, warning if 0
+- "Next" disabled until both selected
+- Step 2 candidate list filtered to job
 
-- TanStack Start uses flat dot-separated route files (`projects.$id.parse.tsx`), not folder nesting. `routeTree.gen.ts` is auto-generated — never hand-edited.
-- The `_app.tsx` pathless layout file gives every child route the sidebar+topbar without adding `/app` to URLs.
-- shadcn `Sidebar`, `Sheet`, `Table`, `Select`, `Input`, `ToggleGroup`, `DropdownMenu`, `Avatar`, `Badge`, `Button`, `Tabs` are already available via `src/components/ui/*`; we'll add any missing ones with the shadcn CLI if needed.
-- Tailwind v4 reads tokens from `@theme inline` in `src/styles.css` — no `tailwind.config.ts` edits needed for the brand color utilities.
-- Brand hex → oklch conversion preserves the exact visual hex in a CSS comment so tenants can swap by replacing 9 variables.
+## 8. Navigation
 
-After approval I'll build it in one pass: tokens → shell → shared components → mock data → routes.
+Add sidebar nav item "Jobs" (optional — could also just be nested under projects). Decision: keep it nested only (access via project detail) to avoid sidebar bloat; Job Detail still has its own URL.
+
+## Notes / scope cuts
+
+- No drag-and-drop kanban for jobs (table view only for v1)
+- No real AI; all "parse" actions are 2s simulated delays with hard-coded mock extraction
+- Existing project fields stay; jobs are additive
+- Activity feed is static mock
+- Confidence indicators are hardcoded per field
