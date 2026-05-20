@@ -33,15 +33,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge, EmptyState } from "@/components/shared";
 import { cn } from "@/lib/utils";
-import { projects } from "@/lib/mock-data";
+import { projects, getJobsByProject } from "@/lib/mock-data";
 import { MatchResults } from "@/components/match/MatchResults";
 import { PipelineKanban } from "@/components/pipeline/PipelineKanban";
+import { Briefcase, Plus } from "lucide-react";
 
 const tabSchema = z.object({
   tab: fallback(
-    z.enum(["brief", "candidates", "outreach", "pipeline", "activity"]),
-    "brief",
-  ).default("brief"),
+    z.enum(["jobs", "brief", "candidates", "outreach", "pipeline", "activity"]),
+    "jobs",
+  ).default("jobs"),
 });
 
 export const Route = createFileRoute("/_app/projects/$id")({
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/_app/projects/$id")({
 });
 
 const TABS = [
+  { id: "jobs" as const, label: "Jobs", icon: Briefcase, badge: null },
   { id: "brief" as const, label: "Brief", icon: FileText, badge: null },
   { id: "candidates" as const, label: "Candidates", icon: Users, badge: "14" },
   { id: "outreach" as const, label: "Outreach", icon: Send, badge: "2 campaigns" },
