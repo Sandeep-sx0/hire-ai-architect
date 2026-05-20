@@ -252,6 +252,7 @@ function ProjectDetail() {
 
       {/* Tab Content */}
       <div className="mt-6">
+        {tab === "jobs" && <JobsTab projectId={id} />}
         {tab === "brief" && <BriefTab editMode={editMode} setEditMode={setEditMode} />}
         {tab === "candidates" && (hasMatched ? (
           <MatchResults projectId={id} />
