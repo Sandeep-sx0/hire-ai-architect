@@ -33,9 +33,11 @@ import { Route as AppProjectsIdRouteImport } from './routes/_app/projects.$id'
 import { Route as AppOutreachNewRouteImport } from './routes/_app/outreach.new'
 import { Route as AppOutreachIdRouteImport } from './routes/_app/outreach.$id'
 import { Route as AppJobsNewRouteImport } from './routes/_app/jobs.new'
+import { Route as AppJobsIdRouteImport } from './routes/_app/jobs.$id'
 import { Route as AppClientsIdRouteImport } from './routes/_app/clients.$id'
 import { Route as AppCandidatesIdRouteImport } from './routes/_app/candidates.$id'
 import { Route as AppProjectsIdParseRouteImport } from './routes/_app/projects.$id.parse'
+import { Route as AppJobsIdParseRouteImport } from './routes/_app/jobs.$id.parse'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -156,6 +158,11 @@ const AppJobsNewRoute = AppJobsNewRouteImport.update({
   path: '/jobs/new',
   getParentRoute: () => AppRoute,
 } as any)
+const AppJobsIdRoute = AppJobsIdRouteImport.update({
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppClientsIdRoute = AppClientsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -170,6 +177,11 @@ const AppProjectsIdParseRoute = AppProjectsIdParseRouteImport.update({
   id: '/parse',
   path: '/parse',
   getParentRoute: () => AppProjectsIdRoute,
+} as any)
+const AppJobsIdParseRoute = AppJobsIdParseRouteImport.update({
+  id: '/parse',
+  path: '/parse',
+  getParentRoute: () => AppJobsIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -187,7 +199,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof AppProjectsRouteWithChildren
   '/settings': typeof AppSettingsRoute
   '/hire/$token': typeof HireTokenRoute
-  '/jobs/$id': typeof JobsIdRoute
+  '/jobs/$id': typeof AppJobsIdRouteWithChildren
   '/site/about': typeof SiteAboutRoute
   '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
@@ -198,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/outreach/new': typeof AppOutreachNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/jobs/track/$token': typeof JobsTrackTokenRoute
+  '/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRoutesByTo {
@@ -215,7 +228,7 @@ export interface FileRoutesByTo {
   '/projects': typeof AppProjectsRouteWithChildren
   '/settings': typeof AppSettingsRoute
   '/hire/$token': typeof HireTokenRoute
-  '/jobs/$id': typeof JobsIdRoute
+  '/jobs/$id': typeof AppJobsIdRouteWithChildren
   '/site/about': typeof SiteAboutRoute
   '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
@@ -226,6 +239,7 @@ export interface FileRoutesByTo {
   '/outreach/new': typeof AppOutreachNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/jobs/track/$token': typeof JobsTrackTokenRoute
+  '/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRoutesById {
@@ -251,11 +265,13 @@ export interface FileRoutesById {
   '/site/home': typeof SiteHomeRoute
   '/_app/candidates/$id': typeof AppCandidatesIdRoute
   '/_app/clients/$id': typeof AppClientsIdRoute
+  '/_app/jobs/$id': typeof AppJobsIdRouteWithChildren
   '/_app/jobs/new': typeof AppJobsNewRoute
   '/_app/outreach/$id': typeof AppOutreachIdRoute
   '/_app/outreach/new': typeof AppOutreachNewRoute
   '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/jobs/track/$token': typeof JobsTrackTokenRoute
+  '/_app/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/_app/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRouteTypes {
@@ -286,6 +302,7 @@ export interface FileRouteTypes {
     | '/outreach/new'
     | '/projects/$id'
     | '/jobs/track/$token'
+    | '/jobs/$id/parse'
     | '/projects/$id/parse'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -314,6 +331,7 @@ export interface FileRouteTypes {
     | '/outreach/new'
     | '/projects/$id'
     | '/jobs/track/$token'
+    | '/jobs/$id/parse'
     | '/projects/$id/parse'
   id:
     | '__root__'
@@ -338,11 +356,13 @@ export interface FileRouteTypes {
     | '/site/home'
     | '/_app/candidates/$id'
     | '/_app/clients/$id'
+    | '/_app/jobs/$id'
     | '/_app/jobs/new'
     | '/_app/outreach/$id'
     | '/_app/outreach/new'
     | '/_app/projects/$id'
     | '/jobs/track/$token'
+    | '/_app/jobs/$id/parse'
     | '/_app/projects/$id/parse'
   fileRoutesById: FileRoutesById
 }
@@ -529,6 +549,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppJobsNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/jobs/$id': {
+      id: '/_app/jobs/$id'
+      path: '/jobs/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof AppJobsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/clients/$id': {
       id: '/_app/clients/$id'
       path: '/$id'
@@ -549,6 +576,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/projects/$id/parse'
       preLoaderRoute: typeof AppProjectsIdParseRouteImport
       parentRoute: typeof AppProjectsIdRoute
+    }
+    '/_app/jobs/$id/parse': {
+      id: '/_app/jobs/$id/parse'
+      path: '/parse'
+      fullPath: '/jobs/$id/parse'
+      preLoaderRoute: typeof AppJobsIdParseRouteImport
+      parentRoute: typeof AppJobsIdRoute
     }
   }
 }
@@ -615,6 +649,18 @@ const AppProjectsRouteWithChildren = AppProjectsRoute._addFileChildren(
   AppProjectsRouteChildren,
 )
 
+interface AppJobsIdRouteChildren {
+  AppJobsIdParseRoute: typeof AppJobsIdParseRoute
+}
+
+const AppJobsIdRouteChildren: AppJobsIdRouteChildren = {
+  AppJobsIdParseRoute: AppJobsIdParseRoute,
+}
+
+const AppJobsIdRouteWithChildren = AppJobsIdRoute._addFileChildren(
+  AppJobsIdRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppCandidatesRoute: typeof AppCandidatesRouteWithChildren
@@ -624,6 +670,7 @@ interface AppRouteChildren {
   AppOutreachRoute: typeof AppOutreachRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
+  AppJobsIdRoute: typeof AppJobsIdRouteWithChildren
   AppJobsNewRoute: typeof AppJobsNewRoute
 }
 
@@ -636,6 +683,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppOutreachRoute: AppOutreachRouteWithChildren,
   AppProjectsRoute: AppProjectsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
+  AppJobsIdRoute: AppJobsIdRouteWithChildren,
   AppJobsNewRoute: AppJobsNewRoute,
 }
 
