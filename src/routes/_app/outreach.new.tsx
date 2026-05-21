@@ -35,6 +35,10 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/outreach/new")({
   head: () => ({ meta: [{ title: "New Campaign — HireSmart" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    projectId: typeof s.projectId === "string" ? s.projectId : undefined,
+    jobId: typeof s.jobId === "string" ? s.jobId : undefined,
+  }),
   component: CampaignBuilder,
 });
 
