@@ -194,6 +194,9 @@ function CampaignBuilder() {
           <Step1
             project={project}
             setProject={setProject}
+            jobs={jobsForProject}
+            jobId={jobId}
+            setJobId={setJobId}
             selected={selected}
             setSelected={setSelected}
           />
