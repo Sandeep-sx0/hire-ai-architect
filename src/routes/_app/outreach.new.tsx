@@ -207,7 +207,7 @@ function CampaignBuilder() {
         {step === 3 && (
           <Step3
             campaignName={campaignName}
-            setCampaignName={setCampaignName}
+            setCampaignName={handleSetCampaignName}
             linkedInAccount={linkedInAccount}
             setLinkedInAccount={setLinkedInAccount}
             tone={tone}
