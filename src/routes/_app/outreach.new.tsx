@@ -337,11 +337,17 @@ function StepIndicator({ current }: { current: number }) {
 function Step1({
   project,
   setProject,
+  jobs,
+  jobId,
+  setJobId,
   selected,
   setSelected,
 }: {
   project: string;
   setProject: (v: string) => void;
+  jobs: Job[];
+  jobId: string;
+  setJobId: (v: string) => void;
   selected: Set<string>;
   setSelected: (s: Set<string>) => void;
 }) {
@@ -363,26 +369,97 @@ function Step1({
 
   return (
     <section>
-      <h2 className="mb-1 text-lg font-semibold text-brand-text">Select candidates</h2>
+      <h2 className="mb-1 text-lg font-semibold text-brand-text">Select project, job & candidates</h2>
       <p className="mb-6 text-sm text-brand-text-secondary">
-        Choose which shortlisted candidates to include in this campaign.
+        Campaigns target a single open job. Pick the job, then choose its shortlisted candidates.
       </p>
 
-      <div className="mb-6">
-        <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
-          Project
-        </label>
-        <Select value={project} onValueChange={setProject}>
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="indorama-cfo">CFO Search — Indorama Ventures</SelectItem>
-            <SelectItem value="oyo-coo">COO Search — OYO Hotels</SelectItem>
-            <SelectItem value="kns-cto">CTO Search — KNS Group</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="mb-6 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
+            Project
+          </label>
+          <Select value={project} onValueChange={setProject}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {projects.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.clientName} — {p.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
+            Open jobs in this project
+          </label>
+          <div className="text-sm text-brand-text-secondary">
+            {jobs.length === 0
+              ? "No jobs yet — create one from the project page."
+              : `${jobs.length} job${jobs.length === 1 ? "" : "s"} available`}
+          </div>
+        </div>
       </div>
+
+      {jobs.length === 0 ? (
+        <div className="mb-6 rounded-xl border border-dashed border-border bg-card p-6 text-center text-sm text-brand-text-secondary">
+          This project has no jobs yet. Add a job before launching a campaign.
+        </div>
+      ) : (
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          {jobs.map((j) => {
+            const active = j.id === jobId;
+            const noShortlist = j.shortlistedCount === 0;
+            return (
+              <button
+                key={j.id}
+                type="button"
+                onClick={() => setJobId(j.id)}
+                className={cn(
+                  "rounded-xl border bg-card p-4 text-left transition-all",
+                  active
+                    ? "border-brand-primary ring-2 ring-brand-mint/40"
+                    : "border-border hover:border-brand-primary/50",
+                )}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="text-sm font-semibold text-brand-text">{j.jobTitle}</div>
+                    <div className="text-[12px] font-mono text-brand-text-secondary">{j.jobCode}</div>
+                  </div>
+                  {active ? (
+                    <CheckCircle2 className="h-4 w-4 text-brand-primary" />
+                  ) : (
+                    <Circle className="h-4 w-4 text-brand-text-secondary/50" />
+                  )}
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-brand-text-secondary">
+                  <span className="capitalize">{j.seniorityLevel.replace(/_/g, " ")}</span>
+                  <span>·</span>
+                  <span>{j.location}</span>
+                  <span>·</span>
+                  <StatusBadge status={j.status} />
+                </div>
+                <div className="mt-2 text-[12px]">
+                  <span className={cn("font-medium", noShortlist ? "text-amber-600" : "text-brand-text")}>
+                    {j.shortlistedCount} shortlisted
+                  </span>
+                  {noShortlist && (
+                    <span className="ml-2 inline-flex items-center gap-1 text-amber-600">
+                      <AlertTriangle className="h-3 w-3" />
+                      No shortlisted candidates
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
