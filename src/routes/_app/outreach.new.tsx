@@ -173,9 +173,12 @@ function CampaignBuilder() {
   const canLaunch = reviewedCount === totalMessages;
 
   const launch = () => {
-    toast.success(`Campaign launched! ${selectedCandidates.length} connection requests queued.`);
+    const suffix = selectedJob ? ` for ${selectedJob.jobCode}` : "";
+    toast.success(`Campaign launched${suffix}! ${selectedCandidates.length} connection requests queued.`);
     navigate({ to: "/outreach/$id", params: { id: "new-1" } });
   };
+
+  const canContinueStep1 = !!jobId && selected.size > 0;
 
   return (
     <div className="mx-auto w-full max-w-[1000px]">
