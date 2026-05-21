@@ -272,7 +272,7 @@ function CampaignBuilder() {
           </div>
 
           {step < 4 && (
-            <Button onClick={goNext}>
+            <Button onClick={goNext} disabled={step === 1 && !canContinueStep1}>
               {step === 3 ? "Generate messages" : "Continue"}
             </Button>
           )}
