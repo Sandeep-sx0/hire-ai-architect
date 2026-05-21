@@ -92,10 +92,32 @@ const TONE_DESC: Record<string, string> = {
 
 function CampaignBuilder() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/_app/outreach/new" });
   const [step, setStep] = useState(1);
 
   // Step 1
-  const [project, setProject] = useState("indorama-cfo");
+  const initialProject = search.projectId && projects.some((p) => p.id === search.projectId)
+    ? search.projectId
+    : projects[0]?.id ?? "";
+  const [project, setProject] = useState(initialProject);
+  const jobsForProject = useMemo(() => getJobsByProject(project), [project]);
+  const initialJob = search.jobId && jobsForProject.some((j) => j.id === search.jobId)
+    ? search.jobId
+    : jobsForProject[0]?.id ?? "";
+  const [jobId, setJobId] = useState(initialJob);
+
+  // When project changes, reset job to first available
+  useEffect(() => {
+    if (!jobsForProject.some((j) => j.id === jobId)) {
+      setJobId(jobsForProject[0]?.id ?? "");
+    }
+  }, [project, jobsForProject, jobId]);
+
+  const selectedJob = useMemo(
+    () => jobsForProject.find((j) => j.id === jobId),
+    [jobsForProject, jobId],
+  );
+
   const [selected, setSelected] = useState<Set<string>>(
     new Set(CANDIDATES.filter((c) => c.eligibility === "ok").slice(0, 5).map((c) => c.id)),
   );
@@ -105,7 +127,19 @@ function CampaignBuilder() {
   const [waits, setWaits] = useState<number[]>([...PRESETS.standard.waits]);
 
   // Step 3
-  const [campaignName, setCampaignName] = useState("CFO Search — Indorama · Outreach 1");
+  const projectObj = projects.find((p) => p.id === project);
+  const defaultName = selectedJob
+    ? `${selectedJob.jobTitle} — ${projectObj?.clientName ?? ""} · Outreach 1`
+    : "New campaign · Outreach 1";
+  const [campaignName, setCampaignName] = useState(defaultName);
+  const [userEditedName, setUserEditedName] = useState(false);
+  useEffect(() => {
+    if (!userEditedName) setCampaignName(defaultName);
+  }, [defaultName, userEditedName]);
+  const handleSetCampaignName = (v: string) => {
+    setUserEditedName(true);
+    setCampaignName(v);
+  };
   const [linkedInAccount, setLinkedInAccount] = useState("amarsh");
   const [tone, setTone] = useState("Executive");
   const [startHour, setStartHour] = useState("08:00");
