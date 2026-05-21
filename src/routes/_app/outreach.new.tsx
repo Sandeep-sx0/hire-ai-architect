@@ -1,5 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { projects, getJobsByProject, type Job } from "@/lib/mock-data";
 import {
   Users,
   GitBranch,
@@ -34,6 +35,10 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/outreach/new")({
   head: () => ({ meta: [{ title: "New Campaign — HireSmart" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    projectId: typeof s.projectId === "string" ? s.projectId : undefined,
+    jobId: typeof s.jobId === "string" ? s.jobId : undefined,
+  }),
   component: CampaignBuilder,
 });
 
@@ -87,10 +92,32 @@ const TONE_DESC: Record<string, string> = {
 
 function CampaignBuilder() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/_app/outreach/new" });
   const [step, setStep] = useState(1);
 
   // Step 1
-  const [project, setProject] = useState("indorama-cfo");
+  const initialProject = search.projectId && projects.some((p) => p.id === search.projectId)
+    ? search.projectId
+    : projects[0]?.id ?? "";
+  const [project, setProject] = useState(initialProject);
+  const jobsForProject = useMemo(() => getJobsByProject(project), [project]);
+  const initialJob = search.jobId && jobsForProject.some((j) => j.id === search.jobId)
+    ? search.jobId
+    : jobsForProject[0]?.id ?? "";
+  const [jobId, setJobId] = useState(initialJob);
+
+  // When project changes, reset job to first available
+  useEffect(() => {
+    if (!jobsForProject.some((j) => j.id === jobId)) {
+      setJobId(jobsForProject[0]?.id ?? "");
+    }
+  }, [project, jobsForProject, jobId]);
+
+  const selectedJob = useMemo(
+    () => jobsForProject.find((j) => j.id === jobId),
+    [jobsForProject, jobId],
+  );
+
   const [selected, setSelected] = useState<Set<string>>(
     new Set(CANDIDATES.filter((c) => c.eligibility === "ok").slice(0, 5).map((c) => c.id)),
   );
@@ -100,7 +127,19 @@ function CampaignBuilder() {
   const [waits, setWaits] = useState<number[]>([...PRESETS.standard.waits]);
 
   // Step 3
-  const [campaignName, setCampaignName] = useState("CFO Search — Indorama · Outreach 1");
+  const projectObj = projects.find((p) => p.id === project);
+  const defaultName = selectedJob
+    ? `${selectedJob.jobTitle} — ${projectObj?.clientName ?? ""} · Outreach 1`
+    : "New campaign · Outreach 1";
+  const [campaignName, setCampaignName] = useState(defaultName);
+  const [userEditedName, setUserEditedName] = useState(false);
+  useEffect(() => {
+    if (!userEditedName) setCampaignName(defaultName);
+  }, [defaultName, userEditedName]);
+  const handleSetCampaignName = (v: string) => {
+    setUserEditedName(true);
+    setCampaignName(v);
+  };
   const [linkedInAccount, setLinkedInAccount] = useState("amarsh");
   const [tone, setTone] = useState("Executive");
   const [startHour, setStartHour] = useState("08:00");
@@ -134,9 +173,12 @@ function CampaignBuilder() {
   const canLaunch = reviewedCount === totalMessages;
 
   const launch = () => {
-    toast.success(`Campaign launched! ${selectedCandidates.length} connection requests queued.`);
+    const suffix = selectedJob ? ` for ${selectedJob.jobCode}` : "";
+    toast.success(`Campaign launched${suffix}! ${selectedCandidates.length} connection requests queued.`);
     navigate({ to: "/outreach/$id", params: { id: "new-1" } });
   };
+
+  const canContinueStep1 = !!jobId && selected.size > 0;
 
   return (
     <div className="mx-auto w-full max-w-[1000px]">
@@ -152,6 +194,9 @@ function CampaignBuilder() {
           <Step1
             project={project}
             setProject={setProject}
+            jobs={jobsForProject}
+            jobId={jobId}
+            setJobId={setJobId}
             selected={selected}
             setSelected={setSelected}
           />
@@ -162,7 +207,7 @@ function CampaignBuilder() {
         {step === 3 && (
           <Step3
             campaignName={campaignName}
-            setCampaignName={setCampaignName}
+            setCampaignName={handleSetCampaignName}
             linkedInAccount={linkedInAccount}
             setLinkedInAccount={setLinkedInAccount}
             tone={tone}
@@ -227,7 +272,7 @@ function CampaignBuilder() {
           </div>
 
           {step < 4 && (
-            <Button onClick={goNext}>
+            <Button onClick={goNext} disabled={step === 1 && !canContinueStep1}>
               {step === 3 ? "Generate messages" : "Continue"}
             </Button>
           )}
@@ -292,11 +337,17 @@ function StepIndicator({ current }: { current: number }) {
 function Step1({
   project,
   setProject,
+  jobs,
+  jobId,
+  setJobId,
   selected,
   setSelected,
 }: {
   project: string;
   setProject: (v: string) => void;
+  jobs: Job[];
+  jobId: string;
+  setJobId: (v: string) => void;
   selected: Set<string>;
   setSelected: (s: Set<string>) => void;
 }) {
@@ -318,26 +369,97 @@ function Step1({
 
   return (
     <section>
-      <h2 className="mb-1 text-lg font-semibold text-brand-text">Select candidates</h2>
+      <h2 className="mb-1 text-lg font-semibold text-brand-text">Select project, job & candidates</h2>
       <p className="mb-6 text-sm text-brand-text-secondary">
-        Choose which shortlisted candidates to include in this campaign.
+        Campaigns target a single open job. Pick the job, then choose its shortlisted candidates.
       </p>
 
-      <div className="mb-6">
-        <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
-          Project
-        </label>
-        <Select value={project} onValueChange={setProject}>
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="indorama-cfo">CFO Search — Indorama Ventures</SelectItem>
-            <SelectItem value="oyo-coo">COO Search — OYO Hotels</SelectItem>
-            <SelectItem value="kns-cto">CTO Search — KNS Group</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="mb-6 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
+            Project
+          </label>
+          <Select value={project} onValueChange={setProject}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {projects.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.clientName} — {p.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
+            Open jobs in this project
+          </label>
+          <div className="text-sm text-brand-text-secondary">
+            {jobs.length === 0
+              ? "No jobs yet — create one from the project page."
+              : `${jobs.length} job${jobs.length === 1 ? "" : "s"} available`}
+          </div>
+        </div>
       </div>
+
+      {jobs.length === 0 ? (
+        <div className="mb-6 rounded-xl border border-dashed border-border bg-card p-6 text-center text-sm text-brand-text-secondary">
+          This project has no jobs yet. Add a job before launching a campaign.
+        </div>
+      ) : (
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          {jobs.map((j) => {
+            const active = j.id === jobId;
+            const noShortlist = j.shortlistedCount === 0;
+            return (
+              <button
+                key={j.id}
+                type="button"
+                onClick={() => setJobId(j.id)}
+                className={cn(
+                  "rounded-xl border bg-card p-4 text-left transition-all",
+                  active
+                    ? "border-brand-primary ring-2 ring-brand-mint/40"
+                    : "border-border hover:border-brand-primary/50",
+                )}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="text-sm font-semibold text-brand-text">{j.jobTitle}</div>
+                    <div className="text-[12px] font-mono text-brand-text-secondary">{j.jobCode}</div>
+                  </div>
+                  {active ? (
+                    <CheckCircle2 className="h-4 w-4 text-brand-primary" />
+                  ) : (
+                    <Circle className="h-4 w-4 text-brand-text-secondary/50" />
+                  )}
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-brand-text-secondary">
+                  <span className="capitalize">{j.seniorityLevel.replace(/_/g, " ")}</span>
+                  <span>·</span>
+                  <span>{j.location}</span>
+                  <span>·</span>
+                  <StatusBadge status={j.status} />
+                </div>
+                <div className="mt-2 text-[12px]">
+                  <span className={cn("font-medium", noShortlist ? "text-amber-600" : "text-brand-text")}>
+                    {j.shortlistedCount} shortlisted
+                  </span>
+                  {noShortlist && (
+                    <span className="ml-2 inline-flex items-center gap-1 text-amber-600">
+                      <AlertTriangle className="h-3 w-3" />
+                      No shortlisted candidates
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
