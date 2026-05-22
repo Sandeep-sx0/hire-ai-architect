@@ -126,7 +126,7 @@ function ProjectDetail() {
   const { id } = Route.useParams();
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const [editMode, setEditMode] = useState(false);
+  
   const [matching, setMatching] = useState(false);
 
   const project = projects.find((p) => p.id === id) ?? projects[0];
