@@ -142,9 +142,19 @@ function ProjectDetail() {
     toast.success("Matching complete — 14 candidates scored");
   };
 
-  const title = "Chief Financial Officer";
-  const clientName = project.clientName || "Indorama Ventures";
-  const clientId = project.clientId || "c1";
+  const title = project.title;
+  const clientName = project.clientName;
+  const clientId = project.clientId;
+  const jobs = getJobsByProject(project.id);
+  const activeCampaigns = jobs.reduce((sum, j) => sum + (j.activeCampaigns || 0), 0);
+
+  const TABS = [
+    { id: "jobs" as const, label: "Jobs", icon: Briefcase, badge: jobs.length > 0 ? `${jobs.length} ${jobs.length === 1 ? "job" : "jobs"}` : null },
+    { id: "candidates" as const, label: "Candidates", icon: Users, badge: project.candidates > 0 ? String(project.candidates) : null },
+    { id: "outreach" as const, label: "Outreach", icon: Send, badge: activeCampaigns > 0 ? `${activeCampaigns} active` : null },
+    { id: "pipeline" as const, label: "Pipeline", icon: GitBranch, badge: project.shortlisted > 0 ? `${project.shortlisted} shortlisted` : null },
+    { id: "activity" as const, label: "Activity", icon: Clock, badge: null },
+  ];
 
   const setTab = (next: typeof tab) => {
     navigate({ search: { tab: next } });
@@ -187,14 +197,6 @@ function ProjectDetail() {
                 </>
               )}
             </Button>
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => setEditMode((v) => !v)}
-            >
-              <Pencil className="h-4 w-4" />
-              {editMode ? "Exit edit" : "Edit brief"}
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="More actions">
@@ -215,21 +217,20 @@ function ProjectDetail() {
         {/* Row 2 - metadata pills */}
         <div className="mt-4 flex items-center gap-0 overflow-x-auto">
           <MetaPill>
-            <StatusBadge status="shortlisted" />
+            <StatusBadge status={project.status} />
           </MetaPill>
-          <MetaPill icon={Award}>C-Suite</MetaPill>
-          <MetaPill icon={MapPin}>Jakarta, Indonesia</MetaPill>
-          <MetaPill icon={Building}>Hybrid</MetaPill>
-          <MetaPill icon={Clock}>15+ years</MetaPill>
-          <MetaPill icon={DollarSign}>$180K – $250K USD</MetaPill>
+          <MetaPill icon={Award}>{SENIORITY_LABEL[project.seniority] ?? project.seniority}</MetaPill>
+          <MetaPill icon={MapPin}>{project.location}</MetaPill>
+          <MetaPill icon={Users}>{project.candidates} candidates</MetaPill>
+          <MetaPill icon={Sparkles}>{project.shortlisted} shortlisted</MetaPill>
           <MetaPill icon={Calendar} muted>
-            Mar 12, 2026
+            {project.daysOpen} days open
           </MetaPill>
           <MetaPill last>
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-seafoam text-[11px] font-semibold text-brand-primary">
-              AM
+              {initialsOf(project.owner)}
             </span>
-            <span className="text-[13px] text-brand-text">Amarsh</span>
+            <span className="text-[13px] text-brand-text">{project.owner}</span>
           </MetaPill>
         </div>
       </div>
@@ -265,7 +266,6 @@ function ProjectDetail() {
       {/* Tab Content */}
       <div className="mt-6">
         {tab === "jobs" && <JobsTab projectId={id} />}
-        {tab === "brief" && <BriefTab editMode={editMode} setEditMode={setEditMode} />}
         {tab === "candidates" && (hasMatched ? (
           <MatchResults projectId={id} />
         ) : (
@@ -287,7 +287,7 @@ function ProjectDetail() {
           />
         )}
         {tab === "pipeline" && <PipelineKanban />}
-        {tab === "activity" && <ActivityTab />}
+        {tab === "activity" && <ActivityTab project={project} />}
       </div>
     </div>
   );
