@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import {
   projects as allProjects,
   clients as allClients,
+  getJobsByProject,
   type Project,
   type ProjectStatus,
   type SeniorityLevel,
@@ -480,6 +481,9 @@ function TableView({
                 dir={dir}
                 onClick={() => toggleSort("title")}
               />
+              <th className="px-3 py-3 text-left text-[12px] font-semibold uppercase tracking-wide text-brand-text-secondary w-[90px]">
+                Jobs
+              </th>
               <SortHeader
                 label="Status"
                 k="status"
@@ -549,6 +553,22 @@ function TableView({
                   <div className="text-[13px] text-brand-text-secondary">
                     {p.clientName}
                   </div>
+                </td>
+                <td className="px-3 align-middle text-sm" onClick={(e) => e.stopPropagation()}>
+                  {(() => {
+                    const count = getJobsByProject(p.id).length;
+                    if (count === 0) return <span className="text-brand-text-secondary/60">—</span>;
+                    return (
+                      <Link
+                        to="/projects/$id"
+                        params={{ id: p.id }}
+                        search={{ tab: "jobs" } as never}
+                        className="font-medium text-brand-primary hover:underline"
+                      >
+                        {count} {count === 1 ? "job" : "jobs"}
+                      </Link>
+                    );
+                  })()}
                 </td>
                 <td className="px-3 align-middle">
                   <StatusBadge status={p.status} />
@@ -766,9 +786,12 @@ function KanbanCard({ project }: { project: Project }) {
         <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-brand-text-secondary">
           {seniorityLabel[project.seniority]}
         </span>
-        <span className="text-[11px] text-brand-text-secondary">
-          {relativeCreated(project.daysOpen)}
+        <span className="text-[11px] font-medium text-brand-primary">
+          {getJobsByProject(project.id).length} jobs
         </span>
+      </div>
+      <div className="mt-1.5 text-right text-[11px] text-brand-text-secondary">
+        {relativeCreated(project.daysOpen)}
       </div>
     </Link>
   );
