@@ -48,7 +48,7 @@ function HomePage() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/jobs">I'm a candidate</Link>
+              <Link to="/careers">I'm a candidate</Link>
             </Button>
           </div>
         </div>
@@ -105,7 +105,7 @@ function HomePage() {
               <Link to="/site/contact">Looking to hire</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/jobs">I'm a candidate</Link>
+              <Link to="/careers">I'm a candidate</Link>
             </Button>
           </div>
         </div>

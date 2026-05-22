@@ -59,7 +59,7 @@ const jobPostingLd = (j: PublicJob) => ({
   datePosted: j.datePosted,
 });
 
-export const Route = createFileRoute("/jobs")({
+export const Route = createFileRoute("/careers")({
   head: () => ({
     meta: [
       { title: "Open Positions — HireSmart | Executive Recruitment" },
@@ -74,9 +74,9 @@ export const Route = createFileRoute("/jobs")({
         content: "AI-powered recruitment made smart, fast, and human.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "/jobs" },
+      { property: "og:url", content: "/careers" },
     ],
-    links: [{ rel: "canonical", href: "/jobs" }],
+    links: [{ rel: "canonical", href: "/careers" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -379,7 +379,7 @@ function FilterSelect({
 function JobCard({ job }: { job: PublicJob }) {
   return (
     <Link
-      to="/jobs/$id"
+      to="/careers/$id"
       params={{ id: job.id }}
       className="group block rounded-xl border border-gray-100 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-mint hover:shadow-sm md:p-6"
     >

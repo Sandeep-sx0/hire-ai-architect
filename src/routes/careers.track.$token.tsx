@@ -18,7 +18,7 @@ const TOKEN_LOOKUP: Record<string, { title: string; company: string; appliedAt: 
   kns: { title: "Country Director", company: "KNS Group", appliedAt: "March 9, 2026" },
 };
 
-export const Route = createFileRoute("/jobs/track/$token")({
+export const Route = createFileRoute("/careers/track/$token")({
   validateSearch: zodValidator(trackSchema),
   head: () => ({
     meta: [
@@ -95,7 +95,7 @@ function TrackPage() {
           </div>
 
           <Link
-            to="/jobs"
+            to="/careers"
             className="mt-6 block text-center text-sm font-medium text-brand-primary hover:underline"
           >
             ← Browse more positions

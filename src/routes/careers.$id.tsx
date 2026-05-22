@@ -107,7 +107,7 @@ function getJob(id: string): JobDetail {
   };
 }
 
-export const Route = createFileRoute("/jobs/$id")({
+export const Route = createFileRoute("/careers/$id")({
   loader: ({ params }) => {
     const job = getJob(params.id);
     if (!job) throw notFound();
@@ -124,9 +124,9 @@ export const Route = createFileRoute("/jobs/$id")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `/jobs/${params.id}` },
+        { property: "og:url", content: `/careers/${params.id}` },
       ],
-      links: [{ rel: "canonical", href: `/jobs/${params.id}` }],
+      links: [{ rel: "canonical", href: `/careers/${params.id}` }],
       scripts: [
         {
           type: "application/ld+json",
@@ -174,7 +174,7 @@ function JobDetailPage() {
       <div className="mx-auto max-w-5xl px-6 py-8 md:py-12">
         {/* Breadcrumb */}
         <nav className="mb-4 flex items-center gap-1 text-[13px]">
-          <Link to="/jobs" className="text-brand-primary hover:underline">
+          <Link to="/careers" className="text-brand-primary hover:underline">
             Open positions
           </Link>
           <ChevronRight className="h-3 w-3 text-brand-text-secondary" />
@@ -677,7 +677,7 @@ function SuccessCard({ job, email }: { job: JobDetail; email: string }) {
 
         <div className="mt-6 w-full space-y-2">
           <Link
-            to="/jobs/track/$token"
+            to="/careers/track/$token"
             params={{ token: "demo" }}
             search={{ stage: 0 }}
             className="block w-full rounded-xl bg-brand-primary px-4 py-3 text-sm font-medium text-white hover:bg-brand-primary/90"
@@ -685,7 +685,7 @@ function SuccessCard({ job, email }: { job: JobDetail; email: string }) {
             Track your application →
           </Link>
           <Link
-            to="/jobs"
+            to="/careers"
             className="block w-full rounded-xl border border-brand-primary px-4 py-3 text-sm font-medium text-brand-primary hover:bg-brand-primary/5"
           >
             Browse more positions
