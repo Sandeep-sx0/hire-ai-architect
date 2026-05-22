@@ -40,7 +40,7 @@ import { Briefcase, Plus } from "lucide-react";
 
 const tabSchema = z.object({
   tab: fallback(
-    z.enum(["jobs", "brief", "candidates", "outreach", "pipeline", "activity"]),
+    z.enum(["jobs", "candidates", "outreach", "pipeline", "activity"]),
     "jobs",
   ).default("jobs"),
 });
@@ -51,14 +51,26 @@ export const Route = createFileRoute("/_app/projects/$id")({
   component: ProjectDetail,
 });
 
-const TABS = [
-  { id: "jobs" as const, label: "Jobs", icon: Briefcase, badge: null },
-  { id: "brief" as const, label: "Brief", icon: FileText, badge: null },
-  { id: "candidates" as const, label: "Candidates", icon: Users, badge: "14" },
-  { id: "outreach" as const, label: "Outreach", icon: Send, badge: "2 campaigns" },
-  { id: "pipeline" as const, label: "Pipeline", icon: GitBranch, badge: "8 in pipeline" },
-  { id: "activity" as const, label: "Activity", icon: Clock, badge: null },
-];
+const SENIORITY_LABEL: Record<string, string> = {
+  c_suite: "C-Suite",
+  vp: "VP",
+  director: "Director",
+  senior_manager: "Senior Manager",
+  manager: "Manager",
+  senior: "Senior",
+  mid: "Mid",
+  junior: "Junior",
+};
+
+function initialsOf(name: string) {
+  return name
+    .split(/\s+/)
+    .map((p) => p[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
 
 const requiredSkills = [
   "Financial Planning & Analysis",
