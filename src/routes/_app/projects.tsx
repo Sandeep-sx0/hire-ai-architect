@@ -481,6 +481,9 @@ function TableView({
                 dir={dir}
                 onClick={() => toggleSort("title")}
               />
+              <th className="px-3 py-3 text-left text-[12px] font-semibold uppercase tracking-wide text-brand-text-secondary w-[90px]">
+                Jobs
+              </th>
               <SortHeader
                 label="Status"
                 k="status"
