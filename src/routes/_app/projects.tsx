@@ -786,9 +786,12 @@ function KanbanCard({ project }: { project: Project }) {
         <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-brand-text-secondary">
           {seniorityLabel[project.seniority]}
         </span>
-        <span className="text-[11px] text-brand-text-secondary">
-          {relativeCreated(project.daysOpen)}
+        <span className="text-[11px] font-medium text-brand-primary">
+          {getJobsByProject(project.id).length} jobs
         </span>
+      </div>
+      <div className="mt-1.5 text-right text-[11px] text-brand-text-secondary">
+        {relativeCreated(project.daysOpen)}
       </div>
     </Link>
   );
