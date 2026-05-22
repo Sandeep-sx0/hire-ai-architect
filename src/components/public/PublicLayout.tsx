@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 function Wordmark({ className }: { className?: string }) {
   return (
-    <Link to="/jobs" className={cn("text-lg leading-none", className)}>
+    <Link to="/careers" className={cn("text-lg leading-none", className)}>
       <span className="font-normal">Hire</span>
       <span className="font-semibold">Smart</span>
     </Link>
@@ -15,7 +15,7 @@ function Wordmark({ className }: { className?: string }) {
 function PublicHeader({ clientName, portalLabel }: { clientName?: string; portalLabel?: string }) {
   const [open, setOpen] = useState(false);
   const navLinks = [
-    { to: "/jobs", label: "Open positions" },
+    { to: "/careers", label: "Open positions" },
     { to: "/site/about", label: "About" },
     { to: "/site/contact", label: "Contact" },
   ] as const;
@@ -139,7 +139,7 @@ function PublicFooter() {
         <div>
           <h3 className="text-sm font-medium text-white">Explore</h3>
           <ul className="mt-4 space-y-2 text-[13px] text-white/70">
-            <li><Link to="/jobs" className="hover:text-white">Open positions</Link></li>
+            <li><Link to="/careers" className="hover:text-white">Open positions</Link></li>
             <li><Link to="/hire/$token" params={{ token: "demo" }} className="hover:text-white">For hiring clients</Link></li>
             <li><Link to="/site/about" className="hover:text-white">About</Link></li>
             <li><Link to="/site/contact" className="hover:text-white">Contact</Link></li>
