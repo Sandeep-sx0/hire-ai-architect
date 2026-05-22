@@ -12,14 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as MarketingRouteImport } from './routes/marketing'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SiteHomeRouteImport } from './routes/site.home'
 import { Route as SiteContactRouteImport } from './routes/site.contact'
 import { Route as SiteAboutRouteImport } from './routes/site.about'
-import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as HireTokenRouteImport } from './routes/hire.$token'
+import { Route as CareersIdRouteImport } from './routes/careers.$id'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppProjectsRouteImport } from './routes/_app/projects'
 import { Route as AppOutreachRouteImport } from './routes/_app/outreach'
@@ -29,7 +29,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppClientsRouteImport } from './routes/_app/clients'
 import { Route as AppCandidatesRouteImport } from './routes/_app/candidates'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
-import { Route as JobsTrackTokenRouteImport } from './routes/jobs.track.$token'
+import { Route as CareersTrackTokenRouteImport } from './routes/careers.track.$token'
 import { Route as AppProjectsIdRouteImport } from './routes/_app/projects.$id'
 import { Route as AppOutreachNewRouteImport } from './routes/_app/outreach.new'
 import { Route as AppOutreachIdRouteImport } from './routes/_app/outreach.$id'
@@ -55,9 +55,9 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const JobsRoute = JobsRouteImport.update({
-  id: '/jobs',
-  path: '/jobs',
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -84,15 +84,15 @@ const SiteAboutRoute = SiteAboutRouteImport.update({
   path: '/site/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const JobsIdRoute = JobsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => JobsRoute,
-} as any)
 const HireTokenRoute = HireTokenRouteImport.update({
   id: '/hire/$token',
   path: '/hire/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CareersIdRoute = CareersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => CareersRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
@@ -139,10 +139,10 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
-const JobsTrackTokenRoute = JobsTrackTokenRouteImport.update({
+const CareersTrackTokenRoute = CareersTrackTokenRouteImport.update({
   id: '/track/$token',
   path: '/track/$token',
-  getParentRoute: () => JobsRoute,
+  getParentRoute: () => CareersRoute,
 } as any)
 const AppProjectsIdRoute = AppProjectsIdRouteImport.update({
   id: '/$id',
@@ -192,7 +192,7 @@ const AppJobsIdParseRoute = AppJobsIdParseRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/jobs': typeof AppJobsRouteWithChildren
+  '/careers': typeof CareersRouteWithChildren
   '/login': typeof LoginRoute
   '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
@@ -201,27 +201,29 @@ export interface FileRoutesByFullPath {
   '/clients': typeof AppClientsRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/inbox': typeof AppInboxRoute
+  '/jobs': typeof AppJobsRouteWithChildren
   '/outreach': typeof AppOutreachRouteWithChildren
   '/projects': typeof AppProjectsRouteWithChildren
   '/settings': typeof AppSettingsRoute
+  '/careers/$id': typeof CareersIdRoute
   '/hire/$token': typeof HireTokenRoute
-  '/jobs/$id': typeof AppJobsIdRouteWithChildren
   '/site/about': typeof SiteAboutRoute
   '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
   '/candidates/$id': typeof AppCandidatesIdRoute
   '/clients/$id': typeof AppClientsIdRoute
+  '/jobs/$id': typeof AppJobsIdRouteWithChildren
   '/jobs/new': typeof AppJobsNewRoute
   '/outreach/$id': typeof AppOutreachIdRoute
   '/outreach/new': typeof AppOutreachNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
-  '/jobs/track/$token': typeof JobsTrackTokenRoute
+  '/careers/track/$token': typeof CareersTrackTokenRoute
   '/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/jobs': typeof AppJobsRouteWithChildren
+  '/careers': typeof CareersRouteWithChildren
   '/login': typeof LoginRoute
   '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
@@ -230,21 +232,23 @@ export interface FileRoutesByTo {
   '/clients': typeof AppClientsRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/inbox': typeof AppInboxRoute
+  '/jobs': typeof AppJobsRouteWithChildren
   '/outreach': typeof AppOutreachRouteWithChildren
   '/projects': typeof AppProjectsRouteWithChildren
   '/settings': typeof AppSettingsRoute
+  '/careers/$id': typeof CareersIdRoute
   '/hire/$token': typeof HireTokenRoute
-  '/jobs/$id': typeof AppJobsIdRouteWithChildren
   '/site/about': typeof SiteAboutRoute
   '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
   '/candidates/$id': typeof AppCandidatesIdRoute
   '/clients/$id': typeof AppClientsIdRoute
+  '/jobs/$id': typeof AppJobsIdRouteWithChildren
   '/jobs/new': typeof AppJobsNewRoute
   '/outreach/$id': typeof AppOutreachIdRoute
   '/outreach/new': typeof AppOutreachNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
-  '/jobs/track/$token': typeof JobsTrackTokenRoute
+  '/careers/track/$token': typeof CareersTrackTokenRoute
   '/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
@@ -252,7 +256,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
-  '/jobs': typeof JobsRouteWithChildren
+  '/careers': typeof CareersRouteWithChildren
   '/login': typeof LoginRoute
   '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
@@ -265,8 +269,8 @@ export interface FileRoutesById {
   '/_app/outreach': typeof AppOutreachRouteWithChildren
   '/_app/projects': typeof AppProjectsRouteWithChildren
   '/_app/settings': typeof AppSettingsRoute
+  '/careers/$id': typeof CareersIdRoute
   '/hire/$token': typeof HireTokenRoute
-  '/jobs/$id': typeof JobsIdRoute
   '/site/about': typeof SiteAboutRoute
   '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
@@ -277,7 +281,7 @@ export interface FileRoutesById {
   '/_app/outreach/$id': typeof AppOutreachIdRoute
   '/_app/outreach/new': typeof AppOutreachNewRoute
   '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
-  '/jobs/track/$token': typeof JobsTrackTokenRoute
+  '/careers/track/$token': typeof CareersTrackTokenRoute
   '/_app/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/_app/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
@@ -285,7 +289,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/jobs'
+    | '/careers'
     | '/login'
     | '/marketing'
     | '/signup'
@@ -294,27 +298,29 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/inbox'
+    | '/jobs'
     | '/outreach'
     | '/projects'
     | '/settings'
+    | '/careers/$id'
     | '/hire/$token'
-    | '/jobs/$id'
     | '/site/about'
     | '/site/contact'
     | '/site/home'
     | '/candidates/$id'
     | '/clients/$id'
+    | '/jobs/$id'
     | '/jobs/new'
     | '/outreach/$id'
     | '/outreach/new'
     | '/projects/$id'
-    | '/jobs/track/$token'
+    | '/careers/track/$token'
     | '/jobs/$id/parse'
     | '/projects/$id/parse'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/jobs'
+    | '/careers'
     | '/login'
     | '/marketing'
     | '/signup'
@@ -323,28 +329,30 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/inbox'
+    | '/jobs'
     | '/outreach'
     | '/projects'
     | '/settings'
+    | '/careers/$id'
     | '/hire/$token'
-    | '/jobs/$id'
     | '/site/about'
     | '/site/contact'
     | '/site/home'
     | '/candidates/$id'
     | '/clients/$id'
+    | '/jobs/$id'
     | '/jobs/new'
     | '/outreach/$id'
     | '/outreach/new'
     | '/projects/$id'
-    | '/jobs/track/$token'
+    | '/careers/track/$token'
     | '/jobs/$id/parse'
     | '/projects/$id/parse'
   id:
     | '__root__'
     | '/'
     | '/_app'
-    | '/jobs'
+    | '/careers'
     | '/login'
     | '/marketing'
     | '/signup'
@@ -357,8 +365,8 @@ export interface FileRouteTypes {
     | '/_app/outreach'
     | '/_app/projects'
     | '/_app/settings'
+    | '/careers/$id'
     | '/hire/$token'
-    | '/jobs/$id'
     | '/site/about'
     | '/site/contact'
     | '/site/home'
@@ -369,7 +377,7 @@ export interface FileRouteTypes {
     | '/_app/outreach/$id'
     | '/_app/outreach/new'
     | '/_app/projects/$id'
-    | '/jobs/track/$token'
+    | '/careers/track/$token'
     | '/_app/jobs/$id/parse'
     | '/_app/projects/$id/parse'
   fileRoutesById: FileRoutesById
@@ -377,7 +385,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
-  JobsRoute: typeof JobsRouteWithChildren
+  CareersRoute: typeof CareersRouteWithChildren
   LoginRoute: typeof LoginRoute
   MarketingRoute: typeof MarketingRoute
   SignupRoute: typeof SignupRoute
@@ -410,11 +418,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/jobs': {
-      id: '/jobs'
-      path: '/jobs'
-      fullPath: '/jobs'
-      preLoaderRoute: typeof JobsRouteImport
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -452,19 +460,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteAboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/jobs/$id': {
-      id: '/jobs/$id'
-      path: '/$id'
-      fullPath: '/jobs/$id'
-      preLoaderRoute: typeof JobsIdRouteImport
-      parentRoute: typeof JobsRoute
-    }
     '/hire/$token': {
       id: '/hire/$token'
       path: '/hire/$token'
       fullPath: '/hire/$token'
       preLoaderRoute: typeof HireTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/careers/$id': {
+      id: '/careers/$id'
+      path: '/$id'
+      fullPath: '/careers/$id'
+      preLoaderRoute: typeof CareersIdRouteImport
+      parentRoute: typeof CareersRoute
     }
     '/_app/settings': {
       id: '/_app/settings'
@@ -529,12 +537,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/jobs/track/$token': {
-      id: '/jobs/track/$token'
+    '/careers/track/$token': {
+      id: '/careers/track/$token'
       path: '/track/$token'
-      fullPath: '/jobs/track/$token'
-      preLoaderRoute: typeof JobsTrackTokenRouteImport
-      parentRoute: typeof JobsRoute
+      fullPath: '/careers/track/$token'
+      preLoaderRoute: typeof CareersTrackTokenRouteImport
+      parentRoute: typeof CareersRoute
     }
     '/_app/projects/$id': {
       id: '/_app/projects/$id'
@@ -715,22 +723,23 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
-interface JobsRouteChildren {
-  JobsIdRoute: typeof JobsIdRoute
-  JobsTrackTokenRoute: typeof JobsTrackTokenRoute
+interface CareersRouteChildren {
+  CareersIdRoute: typeof CareersIdRoute
+  CareersTrackTokenRoute: typeof CareersTrackTokenRoute
 }
 
-const JobsRouteChildren: JobsRouteChildren = {
-  JobsIdRoute: JobsIdRoute,
-  JobsTrackTokenRoute: JobsTrackTokenRoute,
+const CareersRouteChildren: CareersRouteChildren = {
+  CareersIdRoute: CareersIdRoute,
+  CareersTrackTokenRoute: CareersTrackTokenRoute,
 }
 
-const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
+const CareersRouteWithChildren =
+  CareersRoute._addFileChildren(CareersRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
-  JobsRoute: JobsRouteWithChildren,
+  CareersRoute: CareersRouteWithChildren,
   LoginRoute: LoginRoute,
   MarketingRoute: MarketingRoute,
   SignupRoute: SignupRoute,
@@ -742,3 +751,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
