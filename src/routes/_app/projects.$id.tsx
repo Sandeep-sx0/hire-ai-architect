@@ -610,11 +610,20 @@ function SkillPill({
   );
 }
 
-function ActivityTab() {
+function ActivityTab({ project }: { project: { id: string; title: string; clientName: string; owner: string } }) {
+  const ownerFirst = project.owner.split(" ")[0];
+  const activity = [
+    { who: ownerFirst, text: `ran AI matching for ${project.title} — candidates scored`, when: "1 day ago" },
+    { who: ownerFirst, text: `shortlisted candidates for ${project.title}`, when: "1 day ago" },
+    { who: "Dewi", text: `uploaded CVs to the ${project.clientName} candidate pool`, when: "2 days ago" },
+    { who: "AI", text: `parsed job description for ${project.title}`, when: "3 days ago" },
+    { who: ownerFirst, text: `linked engagement to client: ${project.clientName}`, when: "3 days ago" },
+    { who: ownerFirst, text: `created project: ${project.title}`, when: "3 days ago" },
+  ];
   return (
     <div className="rounded-xl border border-gray-100 bg-white p-6">
       <ul className="space-y-4">
-        {projectActivity.map((a, i) => (
+        {activity.map((a, i) => (
           <li key={i} className="flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-seafoam text-[11px] font-semibold text-brand-primary">
               {a.who === "AI" ? (
