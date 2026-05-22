@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import {
   projects as allProjects,
   clients as allClients,
+  getJobsByProject,
   type Project,
   type ProjectStatus,
   type SeniorityLevel,
