@@ -554,6 +554,22 @@ function TableView({
                     {p.clientName}
                   </div>
                 </td>
+                <td className="px-3 align-middle text-sm" onClick={(e) => e.stopPropagation()}>
+                  {(() => {
+                    const count = getJobsByProject(p.id).length;
+                    if (count === 0) return <span className="text-brand-text-secondary/60">—</span>;
+                    return (
+                      <Link
+                        to="/projects/$id"
+                        params={{ id: p.id }}
+                        search={{ tab: "jobs" } as never}
+                        className="font-medium text-brand-primary hover:underline"
+                      >
+                        {count} {count === 1 ? "job" : "jobs"}
+                      </Link>
+                    );
+                  })()}
+                </td>
                 <td className="px-3 align-middle">
                   <StatusBadge status={p.status} />
                 </td>
