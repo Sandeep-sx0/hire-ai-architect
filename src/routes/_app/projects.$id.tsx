@@ -40,7 +40,7 @@ import { Briefcase, Plus } from "lucide-react";
 
 const tabSchema = z.object({
   tab: fallback(
-    z.enum(["jobs", "brief", "candidates", "outreach", "pipeline", "activity"]),
+    z.enum(["jobs", "candidates", "outreach", "pipeline", "activity"]),
     "jobs",
   ).default("jobs"),
 });
@@ -51,14 +51,26 @@ export const Route = createFileRoute("/_app/projects/$id")({
   component: ProjectDetail,
 });
 
-const TABS = [
-  { id: "jobs" as const, label: "Jobs", icon: Briefcase, badge: null },
-  { id: "brief" as const, label: "Brief", icon: FileText, badge: null },
-  { id: "candidates" as const, label: "Candidates", icon: Users, badge: "14" },
-  { id: "outreach" as const, label: "Outreach", icon: Send, badge: "2 campaigns" },
-  { id: "pipeline" as const, label: "Pipeline", icon: GitBranch, badge: "8 in pipeline" },
-  { id: "activity" as const, label: "Activity", icon: Clock, badge: null },
-];
+const SENIORITY_LABEL: Record<string, string> = {
+  c_suite: "C-Suite",
+  vp: "VP",
+  director: "Director",
+  senior_manager: "Senior Manager",
+  manager: "Manager",
+  senior: "Senior",
+  mid: "Mid",
+  junior: "Junior",
+};
+
+function initialsOf(name: string) {
+  return name
+    .split(/\s+/)
+    .map((p) => p[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
 
 const requiredSkills = [
   "Financial Planning & Analysis",
@@ -114,7 +126,7 @@ function ProjectDetail() {
   const { id } = Route.useParams();
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const [editMode, setEditMode] = useState(false);
+  
   const [matching, setMatching] = useState(false);
 
   const project = projects.find((p) => p.id === id) ?? projects[0];
@@ -130,9 +142,19 @@ function ProjectDetail() {
     toast.success("Matching complete — 14 candidates scored");
   };
 
-  const title = "Chief Financial Officer";
-  const clientName = project.clientName || "Indorama Ventures";
-  const clientId = project.clientId || "c1";
+  const title = project.title;
+  const clientName = project.clientName;
+  const clientId = project.clientId;
+  const jobs = getJobsByProject(project.id);
+  const activeCampaigns = jobs.reduce((sum, j) => sum + (j.activeCampaigns || 0), 0);
+
+  const TABS = [
+    { id: "jobs" as const, label: "Jobs", icon: Briefcase, badge: jobs.length > 0 ? `${jobs.length} ${jobs.length === 1 ? "job" : "jobs"}` : null },
+    { id: "candidates" as const, label: "Candidates", icon: Users, badge: project.candidates > 0 ? String(project.candidates) : null },
+    { id: "outreach" as const, label: "Outreach", icon: Send, badge: activeCampaigns > 0 ? `${activeCampaigns} active` : null },
+    { id: "pipeline" as const, label: "Pipeline", icon: GitBranch, badge: project.shortlisted > 0 ? `${project.shortlisted} shortlisted` : null },
+    { id: "activity" as const, label: "Activity", icon: Clock, badge: null },
+  ];
 
   const setTab = (next: typeof tab) => {
     navigate({ search: { tab: next } });
@@ -175,14 +197,6 @@ function ProjectDetail() {
                 </>
               )}
             </Button>
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => setEditMode((v) => !v)}
-            >
-              <Pencil className="h-4 w-4" />
-              {editMode ? "Exit edit" : "Edit brief"}
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="More actions">
@@ -203,21 +217,20 @@ function ProjectDetail() {
         {/* Row 2 - metadata pills */}
         <div className="mt-4 flex items-center gap-0 overflow-x-auto">
           <MetaPill>
-            <StatusBadge status="shortlisted" />
+            <StatusBadge status={project.status} />
           </MetaPill>
-          <MetaPill icon={Award}>C-Suite</MetaPill>
-          <MetaPill icon={MapPin}>Jakarta, Indonesia</MetaPill>
-          <MetaPill icon={Building}>Hybrid</MetaPill>
-          <MetaPill icon={Clock}>15+ years</MetaPill>
-          <MetaPill icon={DollarSign}>$180K – $250K USD</MetaPill>
+          <MetaPill icon={Award}>{SENIORITY_LABEL[project.seniority] ?? project.seniority}</MetaPill>
+          <MetaPill icon={MapPin}>{project.location}</MetaPill>
+          <MetaPill icon={Users}>{project.candidates} candidates</MetaPill>
+          <MetaPill icon={Sparkles}>{project.shortlisted} shortlisted</MetaPill>
           <MetaPill icon={Calendar} muted>
-            Mar 12, 2026
+            {project.daysOpen} days open
           </MetaPill>
           <MetaPill last>
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-seafoam text-[11px] font-semibold text-brand-primary">
-              AM
+              {initialsOf(project.owner)}
             </span>
-            <span className="text-[13px] text-brand-text">Amarsh</span>
+            <span className="text-[13px] text-brand-text">{project.owner}</span>
           </MetaPill>
         </div>
       </div>
@@ -253,7 +266,6 @@ function ProjectDetail() {
       {/* Tab Content */}
       <div className="mt-6">
         {tab === "jobs" && <JobsTab projectId={id} />}
-        {tab === "brief" && <BriefTab editMode={editMode} setEditMode={setEditMode} />}
         {tab === "candidates" && (hasMatched ? (
           <MatchResults projectId={id} />
         ) : (
@@ -275,7 +287,7 @@ function ProjectDetail() {
           />
         )}
         {tab === "pipeline" && <PipelineKanban />}
-        {tab === "activity" && <ActivityTab />}
+        {tab === "activity" && <ActivityTab project={project} />}
       </div>
     </div>
   );
@@ -598,11 +610,20 @@ function SkillPill({
   );
 }
 
-function ActivityTab() {
+function ActivityTab({ project }: { project: { id: string; title: string; clientName: string; owner: string } }) {
+  const ownerFirst = project.owner.split(" ")[0];
+  const activity = [
+    { who: ownerFirst, text: `ran AI matching for ${project.title} — candidates scored`, when: "1 day ago" },
+    { who: ownerFirst, text: `shortlisted candidates for ${project.title}`, when: "1 day ago" },
+    { who: "Dewi", text: `uploaded CVs to the ${project.clientName} candidate pool`, when: "2 days ago" },
+    { who: "AI", text: `parsed job description for ${project.title}`, when: "3 days ago" },
+    { who: ownerFirst, text: `linked engagement to client: ${project.clientName}`, when: "3 days ago" },
+    { who: ownerFirst, text: `created project: ${project.title}`, when: "3 days ago" },
+  ];
   return (
     <div className="rounded-xl border border-gray-100 bg-white p-6">
       <ul className="space-y-4">
-        {projectActivity.map((a, i) => (
+        {activity.map((a, i) => (
           <li key={i} className="flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-seafoam text-[11px] font-semibold text-brand-primary">
               {a.who === "AI" ? (
