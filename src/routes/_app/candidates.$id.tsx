@@ -62,9 +62,12 @@ const SENIORITY_LABEL: Record<SeniorityLevel, string> = {
   c_suite: "C-Suite",
   vp: "VP",
   director: "Director",
-  senior_manager: "Senior Manager",
   manager: "Manager",
+  senior: "Senior",
+  mid: "Mid-level",
+  junior: "Junior",
 };
+
 
 const SOURCE_LABEL: Record<string, string> = {
   linkedin: "LinkedIn",
