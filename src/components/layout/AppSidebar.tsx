@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Briefcase,
+  ClipboardList,
   Users,
   Building2,
   Send,
@@ -16,6 +17,7 @@ import { currentUser, unreadInboxCount } from "@/lib/mock-data";
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/projects", label: "Projects", icon: Briefcase },
+  { to: "/jobs", label: "Jobs", icon: ClipboardList },
   { to: "/candidates", label: "Candidates", icon: Users },
   { to: "/clients", label: "Clients", icon: Building2 },
   { to: "/outreach", label: "Outreach", icon: Send },
