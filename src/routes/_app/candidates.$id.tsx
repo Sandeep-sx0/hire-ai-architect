@@ -25,6 +25,7 @@ import {
   Sparkles,
   StickyNote,
   Target,
+  Trash2,
   Upload,
   User,
 } from "lucide-react";
@@ -183,7 +184,7 @@ function buildProfile(c: Candidate) {
           direction: "out" as const,
           channel: "LinkedIn",
           campaign: `${projectSample[0].title} — Outreach`,
-          sender: projectSample[0].owner.name,
+          sender: projectSample[0].owner,
           date: "Mar 14, 2026 at 10:23 AM",
           status: "submitted",
           content: `Hi ${c.name.split(" ")[0]}, I'm working on a ${projectSample[0].title} mandate for ${projectSample[0].clientName}. Given your background at ${c.currentCompany}, I thought this could be a compelling fit. Open to a quick conversation?`,
@@ -203,7 +204,7 @@ function buildProfile(c: Candidate) {
 
   const notes = [
     {
-      author: projectSample[0]?.owner.name ?? "System",
+      author: projectSample[0]?.owner ?? "System",
       date: "2 days ago",
       private: false,
       system: false,
@@ -223,7 +224,7 @@ function buildProfile(c: Candidate) {
       name: `${c.name.replace(/ /g, "_")}_CV.pdf`,
       type: "CV",
       size: "2.4 MB",
-      uploader: projectSample[0]?.owner.name ?? "System",
+      uploader: projectSample[0]?.owner ?? "System",
       date: "1 week ago",
     },
   ];
