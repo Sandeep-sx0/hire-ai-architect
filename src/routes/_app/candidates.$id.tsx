@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
@@ -25,7 +25,6 @@ import {
   Sparkles,
   StickyNote,
   Target,
-  Trash2,
   Upload,
   User,
 } from "lucide-react";
@@ -44,6 +43,7 @@ import {
 import { ScoreRing, StatusBadge, EmptyState } from "@/components/shared";
 import { AIVerdictChip } from "@/components/shared/AIVerdictChip";
 import { cn } from "@/lib/utils";
+import { candidates, projects, type Candidate, type SeniorityLevel } from "@/lib/mock-data";
 
 const tabSchema = z.object({
   tab: fallback(
@@ -53,244 +53,32 @@ const tabSchema = z.object({
 });
 
 export const Route = createFileRoute("/_app/candidates/$id")({
-  head: () => ({ meta: [{ title: "Rina Wijaya — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Candidate — HireSmart" }] }),
   validateSearch: zodValidator(tabSchema),
   component: CandidateDetail,
 });
 
-// ---------- Mock candidate ----------
-const candidate = {
-  id: "rina-wijaya",
-  name: "Rina Wijaya",
-  title: "Chief Financial Officer",
-  company: "PT Telkom Indonesia",
-  location: "Jakarta, Indonesia",
-  experience: 18,
-  source: "LinkedIn",
-  availability: "Available — 2 month notice",
-  email: "rina.wijaya@telkom.co.id",
-  phone: "+62 812 3456 7890",
-  whatsapp: "628123456890",
-  linkedin: "linkedin.com/in/rina-wijaya",
-  dnc: false,
-  summary:
-    "Seasoned Chief Financial Officer with 18 years of progressive experience in corporate finance, treasury, and strategic planning across Indonesia's telecommunications and technology sectors. Currently leading a 45-person finance team at PT Telkom Indonesia, managing a $2.1B revenue operation. Proven track record in M&A execution, IFRS compliance, and board-level financial reporting. Fluent in English and Bahasa Indonesia.",
-  skills: [
-    "Financial Planning & Analysis",
-    "IFRS Compliance",
-    "M&A Due Diligence",
-    "Treasury Management",
-    "Board Reporting",
-    "Team Leadership",
-    "SAP FICO",
-    "Budgeting & Forecasting",
-    "Capital Markets",
-  ],
-  languages: ["English (Fluent)", "Bahasa Indonesia (Native)", "Mandarin (Basic)"],
-  tags: ["Executive", "Finance", "Jakarta", "Indorama shortlist", "Priority"],
+const SENIORITY_LABEL: Record<SeniorityLevel, string> = {
+  c_suite: "C-Suite",
+  vp: "VP",
+  director: "Director",
+  senior_manager: "Senior Manager",
+  manager: "Manager",
 };
 
-const education = [
-  { degree: "MBA, Finance", school: "University of Melbourne", year: "2008 – 2010" },
-  { degree: "B.Comm, Accounting", school: "Universitas Indonesia", year: "2003 – 2007" },
-  {
-    degree: "CPA (Certified Public Accountant)",
-    school: "Indonesian Institute of CPAs",
-    year: "2009",
-  },
-];
-
-const additionalDetails: Array<[string, string]> = [
-  ["Salary expectation", "$200,000 – $250,000 USD per annum"],
-  ["Notice period", "2 months"],
-  ["Willing to relocate", "Singapore, Bangkok (open to discussion)"],
-  ["Certifications", "CPA, IFRS Certificate (ACCA)"],
-];
-
-const matchHistory = [
-  {
-    project: "CFO — Indorama Ventures",
-    score: 88,
-    verdict: "strong_match" as const,
-    date: "2 days ago",
-    strengths: ["18 yrs experience", "Telkom multi-BU scope", "M&A track record"],
-    gaps: ["No petrochemical exposure"],
-    concerns: [],
-  },
-  {
-    project: "VP Finance — OYO Hotels",
-    score: 62,
-    verdict: "possible_match" as const,
-    date: "1 week ago",
-    strengths: ["Strong CFO profile"],
-    gaps: ["Senior to role", "No hospitality background"],
-    concerns: ["Possible salary mismatch"],
-  },
-  {
-    project: "Country Director — KNS Group",
-    score: 34,
-    verdict: "weak_match" as const,
-    date: "2 weeks ago",
-    strengths: ["Indonesia market knowledge"],
-    gaps: ["Finance background, not GM"],
-    concerns: ["Role scope mismatch"],
-  },
-];
-
-const workHistory = [
-  {
-    role: "Chief Financial Officer",
-    company: "PT Telkom Indonesia",
-    period: "Jan 2020 – Present · 6 years",
-    current: true,
-    description:
-      "Leading 45-person finance team managing $2.1B revenue across fixed-line, mobile, and digital business units. Oversaw successful $340M bond issuance in 2022. Implemented new ERP across 4 subsidiaries.",
-  },
-  {
-    role: "VP Corporate Finance",
-    company: "Indosat Ooredoo",
-    period: "Mar 2016 – Dec 2019 · 3 years 10 months",
-    current: false,
-    description:
-      "Managed treasury, capital markets, and investor relations. Led two M&A transactions totaling $180M. Drove IFRS 16 implementation.",
-  },
-  {
-    role: "Finance Director — Southeast Asia",
-    company: "Procter & Gamble",
-    period: "Jun 2012 – Feb 2016 · 3 years 9 months",
-    current: false,
-    description:
-      "Regional finance lead for 6 ASEAN markets. Managed $400M P&L, FX hedging, and supply chain costing.",
-  },
-  {
-    role: "Senior Financial Analyst",
-    company: "Deloitte Indonesia",
-    period: "Jul 2007 – May 2012 · 4 years 11 months",
-    current: false,
-    description:
-      "Audit and advisory engagements for major Indonesian corporates including Astra, Indofood, and Bank Mandiri.",
-  },
-];
-
-const jobsData = [
-  {
-    project: "CFO — Indorama Ventures",
-    client: "Indorama Ventures",
-    score: 88,
-    stage: "shortlisted",
-    method: "AI matched",
-    date: "2 days ago",
-  },
-  {
-    project: "VP Finance — OYO Hotels",
-    client: "OYO Hotels",
-    score: 62,
-    stage: "screening",
-    method: "AI matched",
-    date: "1 week ago",
-  },
-  {
-    project: "Country Director — KNS Group",
-    client: "KNS Group",
-    score: 34,
-    stage: "rejected",
-    method: "AI matched",
-    date: "2 weeks ago",
-  },
-];
-
-const outreach = [
-  {
-    id: "m1",
-    direction: "out" as const,
-    channel: "LinkedIn",
-    campaign: "CFO Search — Indorama",
-    sender: "Amarsh Jain",
-    date: "Mar 14, 2026 at 10:23 AM",
-    status: "submitted",
-    content:
-      "Hi Rina, I'm working with a leading petrochemical company in Jakarta searching for their next CFO. Given your impressive track record at Telkom, I thought this could be a compelling opportunity. Would you be open to a confidential conversation?",
-  },
-  {
-    id: "m2",
-    direction: "in" as const,
-    channel: "LinkedIn",
-    sender: "Rina Wijaya",
-    date: "Mar 15, 2026 at 2:47 PM",
-    status: "interested",
-    content:
-      "Hi Amarsh, thank you for reaching out. I'd definitely be interested in learning more about the opportunity. Would next Tuesday work for a brief call?",
-    classification: "Interested",
-  },
-];
-
-const notes = [
-  {
-    author: "Amarsh Jain",
-    date: "2 days ago",
-    private: false,
-    system: false,
-    content:
-      "Strong candidate for Indorama CFO role. 18 years experience aligns perfectly with the 15-20 year requirement. Her Telkom background in managing multiple business units is directly relevant to Indorama's 4-unit structure. Recommend moving to shortlist.",
-  },
-  {
-    author: "Dewi Putri",
-    date: "5 days ago",
-    private: false,
-    system: false,
-    content:
-      "Spoke with Rina over WhatsApp. She's open to opportunities but has a 2-month notice period at Telkom. Salary expectation is $200-250K which is within the Indorama band.",
-  },
-  {
-    author: "Amarsh Jain",
-    date: "1 week ago",
-    private: false,
-    system: false,
-    content:
-      "LinkedIn profile reviewed. Impressive career trajectory: Deloitte → P&G → Indosat → Telkom. Each move was a step up in scope. Classic CFO career path.",
-  },
-  {
-    author: "System",
-    date: "1 week ago",
-    private: false,
-    system: true,
-    content: "Profile enriched via Proxycurl. 23 data fields updated.",
-  },
-  {
-    author: "Amarsh Jain",
-    date: "2 weeks ago",
-    private: true,
-    system: false,
-    content:
-      "Initial flag: potential match for the Indorama CFO mandate. Adding to watch list.",
-  },
-];
-
-const files = [
-  {
-    name: "Rina_Wijaya_CV_2026.pdf",
-    type: "CV",
-    size: "2.4 MB",
-    uploader: "Dewi Putri",
-    date: "1 week ago",
-  },
-  {
-    name: "Rina_Wijaya_CPA_Certificate.pdf",
-    type: "Certificate",
-    size: "890 KB",
-    uploader: "Amarsh Jain",
-    date: "2 weeks ago",
-  },
-];
-
-const activeProjects = [
-  "CFO — Indorama Ventures",
-  "VP Finance — OYO Hotels",
-  "Head of Strategy — Astra",
-  "CTO — Tokopedia",
-];
+const SOURCE_LABEL: Record<string, string> = {
+  linkedin: "LinkedIn",
+  chrome_extension: "Chrome Extension",
+  referral: "Referral",
+  manual: "Manual",
+  import: "CSV Import",
+};
 
 const pipelineStages = ["Sourced", "Contacted", "Screening", "Shortlisted", "Client", "Offer"];
+
+function slug(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 
 function initials(name: string) {
   return name
@@ -301,9 +89,170 @@ function initials(name: string) {
     .toUpperCase();
 }
 
+// ---------- Per-candidate derived profile ----------
+function buildProfile(c: Candidate) {
+  const years = Math.max(8, Math.min(22, Math.round(c.matchScore / 5)));
+  const handle = slug(c.name);
+  const phone = "+62 812 " + (1000 + (c.matchScore * 7) % 9000) + " " + (1000 + (c.matchScore * 13) % 9000);
+  const whatsapp = phone.replace(/\D/g, "");
+
+  const profile = {
+    ...c,
+    title: c.currentTitle,
+    company: c.currentCompany,
+    experience: years,
+    availability: "Contact for details",
+    phone,
+    whatsapp,
+    linkedin: `linkedin.com/in/${handle}`,
+    dnc: false,
+    summary: `${SENIORITY_LABEL[c.seniority]} leader with ~${years} years of progressive experience, currently ${c.currentTitle} at ${c.currentCompany}. Based in ${c.location}. Sourced via ${SOURCE_LABEL[c.source] ?? c.source}.`,
+    skills: [
+      "Leadership",
+      "Strategy",
+      "Stakeholder Management",
+      "Team Building",
+      "P&L Management",
+    ],
+    languages: ["English (Fluent)"],
+    tags: [SENIORITY_LABEL[c.seniority], c.location.split(",")[0], SOURCE_LABEL[c.source] ?? c.source],
+  };
+
+  const education = [
+    { degree: "MBA", school: "INSEAD", year: "—" },
+    { degree: "Bachelor's Degree", school: "—", year: "—" },
+  ];
+
+  const additionalDetails: Array<[string, string]> = [
+    ["Salary expectation", "Contact for details"],
+    ["Notice period", "—"],
+    ["Willing to relocate", "—"],
+    ["Source", SOURCE_LABEL[c.source] ?? c.source],
+  ];
+
+  // Build match history from real projects (top 3)
+  const projectSample = projects.slice(0, 3);
+  const matchHistory = projectSample.map((p, i) => {
+    const score = Math.max(20, Math.min(95, c.matchScore - i * 18));
+    const verdict =
+      score >= 75 ? ("strong_match" as const) : score >= 50 ? ("possible_match" as const) : ("weak_match" as const);
+    return {
+      project: `${p.title} — ${p.clientName}`,
+      score,
+      verdict,
+      date: i === 0 ? "2 days ago" : i === 1 ? "1 week ago" : "2 weeks ago",
+      strengths: [`${years} yrs experience`, `${c.currentCompany} background`],
+      gaps: i === 0 ? ["Industry adjacency"] : ["Limited domain overlap"],
+      concerns: i === 2 ? ["Role scope mismatch"] : [],
+    };
+  });
+
+  const workHistory = [
+    {
+      role: c.currentTitle,
+      company: c.currentCompany,
+      period: `Jan ${2026 - Math.min(years, 6)} – Present`,
+      current: true,
+      description: `Currently leading ${c.currentTitle.toLowerCase()} function at ${c.currentCompany}, based in ${c.location}.`,
+    },
+    {
+      role: `Senior ${c.currentTitle.replace(/^(Chief |Head of |VP |Director of )/i, "")}`,
+      company: "Previous Employer",
+      period: `${2026 - years} – ${2026 - Math.min(years, 6)}`,
+      current: false,
+      description: `Progressive leadership roles culminating in current position at ${c.currentCompany}.`,
+    },
+  ];
+
+  const jobsData = projectSample.map((p, i) => ({
+    project: `${p.title} — ${p.clientName}`,
+    client: p.clientName,
+    score: matchHistory[i].score,
+    stage: i === 0 ? "shortlisted" : i === 1 ? "screening" : "rejected",
+    method: "AI matched",
+    date: matchHistory[i].date,
+  }));
+
+  const outreach = projectSample[0]
+    ? [
+        {
+          id: "m1",
+          direction: "out" as const,
+          channel: "LinkedIn",
+          campaign: `${projectSample[0].title} — Outreach`,
+          sender: projectSample[0].owner.name,
+          date: "Mar 14, 2026 at 10:23 AM",
+          status: "submitted",
+          content: `Hi ${c.name.split(" ")[0]}, I'm working on a ${projectSample[0].title} mandate for ${projectSample[0].clientName}. Given your background at ${c.currentCompany}, I thought this could be a compelling fit. Open to a quick conversation?`,
+        },
+        {
+          id: "m2",
+          direction: "in" as const,
+          channel: "LinkedIn",
+          sender: c.name,
+          date: "Mar 15, 2026 at 2:47 PM",
+          status: "interested",
+          content: `Thanks for reaching out — happy to learn more about the ${projectSample[0].title} role. Could we schedule a call next week?`,
+          classification: "Interested",
+        },
+      ]
+    : [];
+
+  const notes = [
+    {
+      author: projectSample[0]?.owner.name ?? "System",
+      date: "2 days ago",
+      private: false,
+      system: false,
+      content: `Strong candidate. ${years} years of experience aligns with senior ${SENIORITY_LABEL[c.seniority]} mandates. Current role at ${c.currentCompany} provides relevant scope.`,
+    },
+    {
+      author: "System",
+      date: "1 week ago",
+      private: false,
+      system: true,
+      content: `Profile enriched via ${SOURCE_LABEL[c.source] ?? c.source}.`,
+    },
+  ];
+
+  const files = [
+    {
+      name: `${c.name.replace(/ /g, "_")}_CV.pdf`,
+      type: "CV",
+      size: "2.4 MB",
+      uploader: projectSample[0]?.owner.name ?? "System",
+      date: "1 week ago",
+    },
+  ];
+
+  const activeProjects = projects.slice(0, 4).map((p) => `${p.title} — ${p.clientName}`);
+
+  return {
+    candidate: profile,
+    education,
+    additionalDetails,
+    matchHistory,
+    workHistory,
+    jobsData,
+    outreach,
+    notes,
+    files,
+    activeProjects,
+    currentProject: projectSample[0] ? `${projectSample[0].title} — ${projectSample[0].clientName}` : "—",
+  };
+}
+
+type Profile = ReturnType<typeof buildProfile>;
+
 function CandidateDetail() {
+  const { id } = Route.useParams();
   const { tab } = Route.useSearch();
   const navigate = useNavigate();
+
+  const cand = useMemo(() => candidates.find((c) => c.id === id) ?? candidates[0], [id]);
+  const profile = useMemo(() => buildProfile(cand), [cand]);
+  const { candidate, activeProjects } = profile;
+
   const setTab = (t: string) =>
     navigate({ to: ".", search: { tab: t as never }, replace: true });
 
@@ -326,7 +275,6 @@ function CandidateDetail() {
       {/* Header card */}
       <div className="rounded-xl border border-gray-100 bg-card p-6 shadow-sm">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          {/* Identity */}
           <div className="flex items-center gap-4 min-w-0">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-seafoam text-lg font-semibold text-brand-primary">
               {initials(candidate.name)}
@@ -345,29 +293,27 @@ function CandidateDetail() {
             </div>
           </div>
 
-          {/* Quick info pills */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px]">
             <div className="flex items-center gap-1.5">
               <Award className="h-4 w-4 text-brand-text-secondary" />
-              <StatusBadge status="ai_generated" label="C-Suite" size="sm" />
+              <StatusBadge status="ai_generated" label={SENIORITY_LABEL[cand.seniority]} size="sm" />
             </div>
             <div className="flex items-center gap-1.5 text-brand-text">
               <Clock className="h-4 w-4 text-brand-text-secondary" />
-              {candidate.experience} years
+              ~{candidate.experience} years
             </div>
             <div className="flex items-center gap-1.5">
               <Linkedin className="h-4 w-4 text-status-info" />
               <span className="rounded-full bg-status-info/15 px-2 py-0.5 text-[11px] font-medium text-status-info">
-                {candidate.source}
+                {SOURCE_LABEL[cand.source] ?? cand.source}
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-brand-text">
               <Calendar className="h-4 w-4 text-brand-text-secondary" />
-              {candidate.availability}
+              Last contact: {cand.lastContact}
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -380,10 +326,7 @@ function CandidateDetail() {
                 <DropdownMenuLabel>Active projects</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {activeProjects.map((p) => (
-                  <DropdownMenuItem
-                    key={p}
-                    onClick={() => toast.success(`Added to ${p}`)}
-                  >
+                  <DropdownMenuItem key={p} onClick={() => toast.success(`Added to ${p}`)}>
                     {p}
                   </DropdownMenuItem>
                 ))}
@@ -416,7 +359,6 @@ function CandidateDetail() {
           </div>
         </div>
 
-        {/* Contact bar */}
         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gray-100 pt-4 text-[13px]">
           <ContactItem
             icon={<Mail className="h-4 w-4 text-brand-text-secondary" />}
@@ -449,7 +391,6 @@ function CandidateDetail() {
         </div>
       </div>
 
-      {/* DNC banner */}
       {candidate.dnc && (
         <div className="flex items-center justify-between rounded-lg border border-status-danger/30 bg-status-danger/10 p-3 text-[13px] text-status-danger">
           <div className="flex items-center gap-2">
@@ -464,12 +405,12 @@ function CandidateDetail() {
       <div className="border-b border-gray-200">
         <div className="flex gap-1 overflow-x-auto">
           {[
-            { id: "profile", label: "Profile", icon: User, badge: null },
-            { id: "work", label: "Work history", icon: Briefcase, badge: "4 roles" },
-            { id: "jobs", label: "Jobs", icon: Target, badge: "3 projects" },
-            { id: "outreach", label: "Outreach", icon: Send, badge: "2 messages" },
-            { id: "notes", label: "Notes", icon: StickyNote, badge: "5 notes" },
-            { id: "files", label: "Files", icon: Paperclip, badge: "2 files" },
+            { id: "profile", label: "Profile", icon: User, badge: null as string | null },
+            { id: "work", label: "Work history", icon: Briefcase, badge: `${profile.workHistory.length} roles` },
+            { id: "jobs", label: "Jobs", icon: Target, badge: `${profile.jobsData.length} projects` },
+            { id: "outreach", label: "Outreach", icon: Send, badge: `${profile.outreach.length} messages` },
+            { id: "notes", label: "Notes", icon: StickyNote, badge: `${profile.notes.length} notes` },
+            { id: "files", label: "Files", icon: Paperclip, badge: `${profile.files.length} files` },
           ].map((t) => {
             const active = tab === t.id;
             const Icon = t.icon;
@@ -502,13 +443,12 @@ function CandidateDetail() {
         </div>
       </div>
 
-      {/* Tab content */}
-      {tab === "profile" && <ProfileTab />}
-      {tab === "work" && <WorkTab />}
-      {tab === "jobs" && <JobsTab />}
-      {tab === "outreach" && <OutreachTab />}
-      {tab === "notes" && <NotesTab />}
-      {tab === "files" && <FilesTab />}
+      {tab === "profile" && <ProfileTab profile={profile} />}
+      {tab === "work" && <WorkTab profile={profile} />}
+      {tab === "jobs" && <JobsTab profile={profile} />}
+      {tab === "outreach" && <OutreachTab profile={profile} />}
+      {tab === "notes" && <NotesTab profile={profile} />}
+      {tab === "files" && <FilesTab profile={profile} />}
     </div>
   );
 }
@@ -558,8 +498,8 @@ function Card({
   );
 }
 
-// ---------- Profile Tab ----------
-function ProfileTab() {
+function ProfileTab({ profile }: { profile: Profile }) {
+  const { candidate, education, additionalDetails, matchHistory, currentProject } = profile;
   return (
     <div className="grid gap-4 lg:grid-cols-5">
       <div className="space-y-4 lg:col-span-3">
@@ -664,7 +604,7 @@ function ProfileTab() {
           <div className="space-y-3">
             <p className="text-sm text-brand-text">
               <span className="text-brand-text-secondary">Current: </span>
-              CFO — Indorama Ventures
+              {currentProject}
             </p>
             <div className="flex items-center gap-2">
               <StatusBadge status="shortlisted" />
@@ -722,15 +662,14 @@ function ProfileTab() {
   );
 }
 
-// ---------- Work Tab ----------
-function WorkTab() {
+function WorkTab({ profile }: { profile: Profile }) {
   return (
     <Card>
       <div className="relative pl-10">
         <div className="absolute left-5 top-2 bottom-2 border-l-2 border-gray-200" />
         <div className="space-y-6">
-          {workHistory.map((w) => (
-            <div key={w.role} className="relative">
+          {profile.workHistory.map((w) => (
+            <div key={w.role + w.company} className="relative">
               <div
                 className={cn(
                   "absolute -left-[22px] top-1.5 h-2.5 w-2.5 rounded-full",
@@ -755,8 +694,7 @@ function WorkTab() {
   );
 }
 
-// ---------- Jobs Tab ----------
-function JobsTab() {
+function JobsTab({ profile }: { profile: Profile }) {
   return (
     <Card>
       <div className="overflow-x-auto">
@@ -771,7 +709,7 @@ function JobsTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {jobsData.map((j) => (
+            {profile.jobsData.map((j) => (
               <tr key={j.project} className="cursor-pointer hover:bg-brand-bg/60">
                 <td className="py-3 pr-4">
                   <p className="font-medium text-brand-text">{j.project}</p>
@@ -794,9 +732,8 @@ function JobsTab() {
   );
 }
 
-// ---------- Outreach Tab ----------
-function OutreachTab() {
-  if (outreach.length === 0) {
+function OutreachTab({ profile }: { profile: Profile }) {
+  if (profile.outreach.length === 0) {
     return (
       <EmptyState
         icon={Send}
@@ -808,7 +745,7 @@ function OutreachTab() {
 
   return (
     <div className="space-y-3">
-      {outreach.map((m) => {
+      {profile.outreach.map((m) => {
         const isIn = m.direction === "in";
         return (
           <div
@@ -858,8 +795,7 @@ function OutreachTab() {
   );
 }
 
-// ---------- Notes Tab ----------
-function NotesTab() {
+function NotesTab({ profile }: { profile: Profile }) {
   const [draft, setDraft] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
 
@@ -895,7 +831,7 @@ function NotesTab() {
       </Card>
 
       <div className="space-y-3">
-        {notes.map((n, i) => (
+        {profile.notes.map((n, i) => (
           <div
             key={i}
             className={cn(
@@ -933,8 +869,7 @@ function NotesTab() {
   );
 }
 
-// ---------- Files Tab ----------
-function FilesTab() {
+function FilesTab({ profile }: { profile: Profile }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 bg-card/40 p-8 text-center">
@@ -948,7 +883,7 @@ function FilesTab() {
 
       <Card>
         <div className="divide-y divide-gray-50">
-          {files.map((f) => (
+          {profile.files.map((f) => (
             <div key={f.name} className="group flex items-center gap-4 py-3 first:pt-0 last:pb-0">
               <FileText className="h-8 w-8 text-status-danger" strokeWidth={1.5} />
               <div className="min-w-0 flex-1">
