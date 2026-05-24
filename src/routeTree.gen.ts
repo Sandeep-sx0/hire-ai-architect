@@ -28,6 +28,7 @@ import { Route as AppInboxRouteImport } from './routes/_app/inbox'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppClientsRouteImport } from './routes/_app/clients'
 import { Route as AppCandidatesRouteImport } from './routes/_app/candidates'
+import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
 import { Route as CareersTrackTokenRouteImport } from './routes/careers.track.$token'
 import { Route as AppProjectsIdRouteImport } from './routes/_app/projects.$id'
@@ -134,6 +135,11 @@ const AppCandidatesRoute = AppCandidatesRouteImport.update({
   path: '/candidates',
   getParentRoute: () => AppRoute,
 } as any)
+const AppApprovalsRoute = AppApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -197,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
   '/analytics': typeof AppAnalyticsRoute
+  '/approvals': typeof AppApprovalsRoute
   '/candidates': typeof AppCandidatesRouteWithChildren
   '/clients': typeof AppClientsRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByTo {
   '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
   '/analytics': typeof AppAnalyticsRoute
+  '/approvals': typeof AppApprovalsRoute
   '/candidates': typeof AppCandidatesRouteWithChildren
   '/clients': typeof AppClientsRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/marketing': typeof MarketingRoute
   '/signup': typeof SignupRoute
   '/_app/analytics': typeof AppAnalyticsRoute
+  '/_app/approvals': typeof AppApprovalsRoute
   '/_app/candidates': typeof AppCandidatesRouteWithChildren
   '/_app/clients': typeof AppClientsRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
@@ -294,6 +303,7 @@ export interface FileRouteTypes {
     | '/marketing'
     | '/signup'
     | '/analytics'
+    | '/approvals'
     | '/candidates'
     | '/clients'
     | '/dashboard'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/marketing'
     | '/signup'
     | '/analytics'
+    | '/approvals'
     | '/candidates'
     | '/clients'
     | '/dashboard'
@@ -357,6 +368,7 @@ export interface FileRouteTypes {
     | '/marketing'
     | '/signup'
     | '/_app/analytics'
+    | '/_app/approvals'
     | '/_app/candidates'
     | '/_app/clients'
     | '/_app/dashboard'
@@ -530,6 +542,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCandidatesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/approvals': {
+      id: '/_app/approvals'
+      path: '/approvals'
+      fullPath: '/approvals'
+      preLoaderRoute: typeof AppApprovalsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/analytics': {
       id: '/_app/analytics'
       path: '/analytics'
@@ -699,6 +718,7 @@ const AppProjectsRouteWithChildren = AppProjectsRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
+  AppApprovalsRoute: typeof AppApprovalsRoute
   AppCandidatesRoute: typeof AppCandidatesRouteWithChildren
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
@@ -711,6 +731,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAnalyticsRoute: AppAnalyticsRoute,
+  AppApprovalsRoute: AppApprovalsRoute,
   AppCandidatesRoute: AppCandidatesRouteWithChildren,
   AppClientsRoute: AppClientsRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
