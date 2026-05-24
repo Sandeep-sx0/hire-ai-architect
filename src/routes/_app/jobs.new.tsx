@@ -194,8 +194,22 @@ function JobWizard() {
   // Step 3
   const [data, setData] = useState(EXTRACTED);
 
-  // Step 4
-  const [publish, setPublish] = useState(false);
+  // Step 4 — Distribution
+  const [publishCareers, setPublishCareers] = useState(true);
+  const [selectedChannels, setSelectedChannels] = useState<Set<ChannelId>>(
+    () => new Set<ChannelId>(["linkedin_jobs"]),
+  );
+  const [channelOptions, setChannelOptions] = useState<
+    Record<ChannelId, { duration: string; employment: string }>
+  >(() =>
+    Object.fromEntries(
+      CHANNELS.map((c) => [c.id, { duration: "30 days", employment: "Full-time" }]),
+    ) as Record<ChannelId, { duration: string; employment: string }>,
+  );
+  const [requestBoardOpen, setRequestBoardOpen] = useState(false);
+  const [requestBoardName, setRequestBoardName] = useState("");
+
+  // Step 5
   const [runMatching, setRunMatching] = useState(true);
 
   const parse = async () => {
@@ -210,8 +224,15 @@ function JobWizard() {
 
   const canNext1 = !!projectId && jobTitle.trim().length > 0;
 
+  const totalChannels = selectedChannels.size + (publishCareers ? 1 : 0);
+
   const create = () => {
-    toast.success("Job created successfully");
+    const n = totalChannels;
+    toast.success(
+      n > 0
+        ? `Job created — posting to ${n} channel${n === 1 ? "" : "s"}`
+        : "Job created — not distributed",
+    );
     navigate({ to: "/jobs/$id", params: { id: "j1" } });
   };
 
