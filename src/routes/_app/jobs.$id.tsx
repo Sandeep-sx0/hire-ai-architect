@@ -389,7 +389,7 @@ function JobDetail() {
         alreadyPosted={postingsForJob(job.id).map((p) => p.channel)}
         onConfirm={(chs) =>
           toast.success(
-            `Queued ${chs.length} posting${chs.length === 1 ? "" : "s"} for ${job.title}`,
+            `Queued ${chs.length} posting${chs.length === 1 ? "" : "s"} for ${job.jobTitle}`,
           )
         }
       />
