@@ -6,9 +6,13 @@ import { toast } from "sonner";
 import {
   Check,
   ChevronRight,
+  Clock,
   FileText,
+  Globe,
   Loader2,
   MapPin,
+  PlusCircle,
+  Send,
   Sparkles,
   Upload,
   X,
@@ -25,6 +29,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { projects } from "@/lib/mock-data";
 
@@ -34,7 +45,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_app/jobs/new")({
   validateSearch: zodValidator(searchSchema),
-  head: () => ({ meta: [{ title: "New Job — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "New Job — Norvex" }] }),
   component: JobWizard,
 });
 
@@ -42,8 +53,71 @@ const STEPS = [
   { id: 1, label: "Project & basics" },
   { id: 2, label: "JD input" },
   { id: 3, label: "AI review" },
-  { id: 4, label: "Confirm" },
+  { id: 4, label: "Distribute & publish" },
+  { id: 5, label: "Confirm" },
 ];
+
+// === Distribution channels (design-reference posting adapter) =================
+type ChannelId = "linkedin_jobs" | "indeed" | "seek" | "jobstreet" | "jobsdb";
+type ConnectionStatus = "connected" | "not_connected" | "pending" | "coming_soon";
+
+interface ChannelConfig {
+  id: ChannelId;
+  name: string;
+  blurb: string;
+  initial: string;
+  accent: string; // bg color for logo tile
+}
+
+const CHANNELS: ChannelConfig[] = [
+  {
+    id: "linkedin_jobs",
+    name: "LinkedIn Jobs",
+    blurb: "Largest professional network — strong for mid-to-senior across APAC.",
+    initial: "in",
+    accent: "bg-[#0A66C2]",
+  },
+  {
+    id: "jobstreet",
+    name: "JobStreet",
+    blurb: "Leading SE-Asia board — strong volume in ID, MY, SG.",
+    initial: "JS",
+    accent: "bg-[#D11F2C]",
+  },
+  {
+    id: "seek",
+    name: "Seek",
+    blurb: "Dominant in AU/NZ, growing presence across SE-Asia.",
+    initial: "Sk",
+    accent: "bg-[#0D3880]",
+  },
+  {
+    id: "indeed",
+    name: "Indeed",
+    blurb: "High-volume global aggregator — broad funnel, light targeting.",
+    initial: "id",
+    accent: "bg-[#2164F3]",
+  },
+  {
+    id: "jobsdb",
+    name: "JobsDB",
+    blurb: "Strong in HK, TH, ID — professional and tech roles.",
+    initial: "DB",
+    accent: "bg-[#FF6B00]",
+  },
+];
+
+// Tenant connection state — design-reference; mirrors channel_connections table
+const CONNECTIONS: Record<ChannelId, { status: ConnectionStatus; account?: string }> = {
+  linkedin_jobs: { status: "connected", account: "Norvex Solutions · LinkedIn Recruiter" },
+  jobstreet: { status: "connected", account: "Norvex Solutions · JobStreet Employer" },
+  seek: { status: "not_connected" },
+  indeed: { status: "pending" },
+  jobsdb: { status: "coming_soon" },
+};
+
+const POSTING_DURATIONS = ["30 days", "60 days", "90 days"];
+const EMPLOYMENT_TYPES = ["Full-time", "Part-time", "Contract"];
 
 const SAMPLE_JD = `CHIEF FINANCIAL OFFICER — INDORAMA VENTURES
 
