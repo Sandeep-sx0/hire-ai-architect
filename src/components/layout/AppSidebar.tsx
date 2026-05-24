@@ -9,6 +9,7 @@ import {
   Inbox,
   BarChart3,
   Settings,
+  Share2,
 } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -23,6 +24,7 @@ const nav = [
   { to: "/clients", label: "Clients", icon: Building2 },
   { to: "/outreach", label: "Outreach", icon: Send },
   { to: "/approvals", label: "Approval Queue", icon: ShieldCheck, badge: 12 },
+  { to: "/distribution", label: "Distribution", icon: Share2 },
   { to: "/inbox", label: "Inbox", icon: Inbox, badge: unreadInboxCount },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
 ] as const;
