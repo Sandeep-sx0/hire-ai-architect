@@ -279,7 +279,12 @@ function JobDetail() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => toast("Posted to job boards")}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setTab("distribution");
+                    setTimeout(() => setPickerOpen(true), 50);
+                  }}
+                >
                   Post to job boards
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => toast("Duplicate — coming soon")}>
