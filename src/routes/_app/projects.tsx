@@ -452,6 +452,8 @@ function ProjectsPage() {
           dir={dir}
           toggleSort={toggleSort}
         />
+      ) : view === "card" ? (
+        <CardView rows={sorted} />
       ) : (
         <KanbanView rows={sorted} showClosed={showClosed} setShowClosed={setShowClosed} />
       )}
