@@ -23,7 +23,6 @@ import { Route as CareersIdRouteImport } from './routes/careers.$id'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppProjectsRouteImport } from './routes/_app/projects'
 import { Route as AppOutreachRouteImport } from './routes/_app/outreach'
-import { Route as AppJobsRouteImport } from './routes/_app/jobs'
 import { Route as AppInboxRouteImport } from './routes/_app/inbox'
 import { Route as AppDistributionRouteImport } from './routes/_app/distribution'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -31,6 +30,7 @@ import { Route as AppClientsRouteImport } from './routes/_app/clients'
 import { Route as AppCandidatesRouteImport } from './routes/_app/candidates'
 import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
+import { Route as AppJobsIndexRouteImport } from './routes/_app/jobs.index'
 import { Route as CareersTrackTokenRouteImport } from './routes/careers.track.$token'
 import { Route as AppSettingsDistributionRouteImport } from './routes/_app/settings_.distribution'
 import { Route as AppProjectsIdRouteImport } from './routes/_app/projects.$id'
@@ -112,11 +112,6 @@ const AppOutreachRoute = AppOutreachRouteImport.update({
   path: '/outreach',
   getParentRoute: () => AppRoute,
 } as any)
-const AppJobsRoute = AppJobsRouteImport.update({
-  id: '/jobs',
-  path: '/jobs',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppInboxRoute = AppInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -152,6 +147,11 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
+const AppJobsIndexRoute = AppJobsIndexRouteImport.update({
+  id: '/jobs/',
+  path: '/jobs/',
+  getParentRoute: () => AppRoute,
+} as any)
 const CareersTrackTokenRoute = CareersTrackTokenRouteImport.update({
   id: '/track/$token',
   path: '/track/$token',
@@ -178,14 +178,14 @@ const AppOutreachIdRoute = AppOutreachIdRouteImport.update({
   getParentRoute: () => AppOutreachRoute,
 } as any)
 const AppJobsNewRoute = AppJobsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AppJobsRoute,
+  id: '/jobs/new',
+  path: '/jobs/new',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppJobsIdRoute = AppJobsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AppJobsRoute,
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppClientsIdRoute = AppClientsIdRouteImport.update({
   id: '/$id',
@@ -221,7 +221,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/distribution': typeof AppDistributionRoute
   '/inbox': typeof AppInboxRoute
-  '/jobs': typeof AppJobsRouteWithChildren
   '/outreach': typeof AppOutreachRouteWithChildren
   '/projects': typeof AppProjectsRouteWithChildren
   '/settings': typeof AppSettingsRoute
@@ -239,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/settings/distribution': typeof AppSettingsDistributionRoute
   '/careers/track/$token': typeof CareersTrackTokenRoute
+  '/jobs/': typeof AppJobsIndexRoute
   '/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
@@ -255,7 +255,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/distribution': typeof AppDistributionRoute
   '/inbox': typeof AppInboxRoute
-  '/jobs': typeof AppJobsRouteWithChildren
   '/outreach': typeof AppOutreachRouteWithChildren
   '/projects': typeof AppProjectsRouteWithChildren
   '/settings': typeof AppSettingsRoute
@@ -273,6 +272,7 @@ export interface FileRoutesByTo {
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/settings/distribution': typeof AppSettingsDistributionRoute
   '/careers/track/$token': typeof CareersTrackTokenRoute
+  '/jobs': typeof AppJobsIndexRoute
   '/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
@@ -291,7 +291,6 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/distribution': typeof AppDistributionRoute
   '/_app/inbox': typeof AppInboxRoute
-  '/_app/jobs': typeof AppJobsRouteWithChildren
   '/_app/outreach': typeof AppOutreachRouteWithChildren
   '/_app/projects': typeof AppProjectsRouteWithChildren
   '/_app/settings': typeof AppSettingsRoute
@@ -309,6 +308,7 @@ export interface FileRoutesById {
   '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
   '/_app/settings_/distribution': typeof AppSettingsDistributionRoute
   '/careers/track/$token': typeof CareersTrackTokenRoute
+  '/_app/jobs/': typeof AppJobsIndexRoute
   '/_app/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/_app/projects/$id/parse': typeof AppProjectsIdParseRoute
 }
@@ -327,7 +327,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/distribution'
     | '/inbox'
-    | '/jobs'
     | '/outreach'
     | '/projects'
     | '/settings'
@@ -345,6 +344,7 @@ export interface FileRouteTypes {
     | '/projects/$id'
     | '/settings/distribution'
     | '/careers/track/$token'
+    | '/jobs/'
     | '/jobs/$id/parse'
     | '/projects/$id/parse'
   fileRoutesByTo: FileRoutesByTo
@@ -361,7 +361,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/distribution'
     | '/inbox'
-    | '/jobs'
     | '/outreach'
     | '/projects'
     | '/settings'
@@ -379,6 +378,7 @@ export interface FileRouteTypes {
     | '/projects/$id'
     | '/settings/distribution'
     | '/careers/track/$token'
+    | '/jobs'
     | '/jobs/$id/parse'
     | '/projects/$id/parse'
   id:
@@ -396,7 +396,6 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/distribution'
     | '/_app/inbox'
-    | '/_app/jobs'
     | '/_app/outreach'
     | '/_app/projects'
     | '/_app/settings'
@@ -414,6 +413,7 @@ export interface FileRouteTypes {
     | '/_app/projects/$id'
     | '/_app/settings_/distribution'
     | '/careers/track/$token'
+    | '/_app/jobs/'
     | '/_app/jobs/$id/parse'
     | '/_app/projects/$id/parse'
   fileRoutesById: FileRoutesById
@@ -531,13 +531,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOutreachRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/jobs': {
-      id: '/_app/jobs'
-      path: '/jobs'
-      fullPath: '/jobs'
-      preLoaderRoute: typeof AppJobsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/inbox': {
       id: '/_app/inbox'
       path: '/inbox'
@@ -587,6 +580,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/jobs/': {
+      id: '/_app/jobs/'
+      path: '/jobs'
+      fullPath: '/jobs/'
+      preLoaderRoute: typeof AppJobsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/careers/track/$token': {
       id: '/careers/track/$token'
       path: '/track/$token'
@@ -624,17 +624,17 @@ declare module '@tanstack/react-router' {
     }
     '/_app/jobs/new': {
       id: '/_app/jobs/new'
-      path: '/new'
+      path: '/jobs/new'
       fullPath: '/jobs/new'
       preLoaderRoute: typeof AppJobsNewRouteImport
-      parentRoute: typeof AppJobsRoute
+      parentRoute: typeof AppRoute
     }
     '/_app/jobs/$id': {
       id: '/_app/jobs/$id'
-      path: '/$id'
+      path: '/jobs/$id'
       fullPath: '/jobs/$id'
       preLoaderRoute: typeof AppJobsIdRouteImport
-      parentRoute: typeof AppJobsRoute
+      parentRoute: typeof AppRoute
     }
     '/_app/clients/$id': {
       id: '/_app/clients/$id'
@@ -691,31 +691,6 @@ const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
   AppClientsRouteChildren,
 )
 
-interface AppJobsIdRouteChildren {
-  AppJobsIdParseRoute: typeof AppJobsIdParseRoute
-}
-
-const AppJobsIdRouteChildren: AppJobsIdRouteChildren = {
-  AppJobsIdParseRoute: AppJobsIdParseRoute,
-}
-
-const AppJobsIdRouteWithChildren = AppJobsIdRoute._addFileChildren(
-  AppJobsIdRouteChildren,
-)
-
-interface AppJobsRouteChildren {
-  AppJobsIdRoute: typeof AppJobsIdRouteWithChildren
-  AppJobsNewRoute: typeof AppJobsNewRoute
-}
-
-const AppJobsRouteChildren: AppJobsRouteChildren = {
-  AppJobsIdRoute: AppJobsIdRouteWithChildren,
-  AppJobsNewRoute: AppJobsNewRoute,
-}
-
-const AppJobsRouteWithChildren =
-  AppJobsRoute._addFileChildren(AppJobsRouteChildren)
-
 interface AppOutreachRouteChildren {
   AppOutreachIdRoute: typeof AppOutreachIdRoute
   AppOutreachNewRoute: typeof AppOutreachNewRoute
@@ -754,6 +729,18 @@ const AppProjectsRouteWithChildren = AppProjectsRoute._addFileChildren(
   AppProjectsRouteChildren,
 )
 
+interface AppJobsIdRouteChildren {
+  AppJobsIdParseRoute: typeof AppJobsIdParseRoute
+}
+
+const AppJobsIdRouteChildren: AppJobsIdRouteChildren = {
+  AppJobsIdParseRoute: AppJobsIdParseRoute,
+}
+
+const AppJobsIdRouteWithChildren = AppJobsIdRoute._addFileChildren(
+  AppJobsIdRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppApprovalsRoute: typeof AppApprovalsRoute
@@ -762,11 +749,13 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppDistributionRoute: typeof AppDistributionRoute
   AppInboxRoute: typeof AppInboxRoute
-  AppJobsRoute: typeof AppJobsRouteWithChildren
   AppOutreachRoute: typeof AppOutreachRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
+  AppJobsIdRoute: typeof AppJobsIdRouteWithChildren
+  AppJobsNewRoute: typeof AppJobsNewRoute
   AppSettingsDistributionRoute: typeof AppSettingsDistributionRoute
+  AppJobsIndexRoute: typeof AppJobsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -777,11 +766,13 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppDistributionRoute: AppDistributionRoute,
   AppInboxRoute: AppInboxRoute,
-  AppJobsRoute: AppJobsRouteWithChildren,
   AppOutreachRoute: AppOutreachRouteWithChildren,
   AppProjectsRoute: AppProjectsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
+  AppJobsIdRoute: AppJobsIdRouteWithChildren,
+  AppJobsNewRoute: AppJobsNewRoute,
   AppSettingsDistributionRoute: AppSettingsDistributionRoute,
+  AppJobsIndexRoute: AppJobsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
