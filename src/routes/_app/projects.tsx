@@ -380,7 +380,7 @@ function ProjectsPage() {
         <ToggleGroup
           type="single"
           value={view}
-          onValueChange={(v) => v && update({ view: v as "table" | "kanban" })}
+          onValueChange={(v) => v && update({ view: v as "table" | "kanban" | "card" })}
           className="ml-auto"
         >
           <ToggleGroupItem
@@ -393,6 +393,13 @@ function ProjectsPage() {
           <ToggleGroupItem
             value="kanban"
             aria-label="Kanban view"
+            className="data-[state=on]:bg-brand-primary data-[state=on]:text-white"
+          >
+            <Columns3 className="h-4 w-4" />
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="card"
+            aria-label="Card view"
             className="data-[state=on]:bg-brand-primary data-[state=on]:text-white"
           >
             <LayoutGrid className="h-4 w-4" />
