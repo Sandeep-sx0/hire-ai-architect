@@ -409,30 +409,29 @@ export function PipelineKanban() {
         </DragOverlay>
       </DndContext>
 
-      {/* Stage detail slide-over */}
-      <SidePanel
-        isOpen={!!selectedCandidate}
-        onClose={() => setSelected(null)}
-        title="Candidate detail"
-        width="lg"
-      >
-        {selectedCandidate && (
-          <StageDetail
-            candidate={selectedCandidate}
-            scorecards={scorecards[selectedCandidate.id] ?? []}
-            onAddScorecard={() => setScorecardOpen(true)}
-            onToggleChecklist={(idx) => toggleChecklist(selectedCandidate.id, idx)}
-            onAdvance={() => {
-              const idx = STAGES.findIndex((s) => s.id === selectedCandidate.stage);
-              const next = STAGES[idx + 1];
-              if (next && next.id !== "rejected") attemptMove(selectedCandidate, next.id);
-            }}
-            onReject={() =>
-              setRejectModal({ candidate: selectedCandidate, from: selectedCandidate.stage })
-            }
-          />
-        )}
-      </SidePanel>
+      {/* Candidate slide-over */}
+      <CandidateSheet
+        open={!!selectedCandidate}
+        onOpenChange={(o) => !o && setSelected(null)}
+        candidate={selectedCandidate}
+        stages={STAGES}
+        jobLabel="CFO Search — Indorama Ventures"
+        requiredSkills={["IFRS", "M&A", "Board", "Treasury", "FP&A"]}
+        onMove={(to) => selectedCandidate && attemptMove(selectedCandidate, to)}
+        onReject={(reason) => {
+          if (!selectedCandidate) return;
+          setCards((prev) =>
+            prev.map((c) =>
+              c.id === selectedCandidate.id
+                ? { ...c, stage: "rejected", daysInStage: 0, rejectionReason: reason }
+                : c,
+            ),
+          );
+          toast.success(`${selectedCandidate.name} rejected — ${reason}`);
+        }}
+        onMessage={() => toast("Open outreach composer")}
+      />
+
 
       {/* Scorecard form */}
       {selectedCandidate && (
