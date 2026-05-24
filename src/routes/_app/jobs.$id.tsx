@@ -22,6 +22,12 @@ import {
   Send,
   Sparkles,
   UserPlus,
+  Share2,
+  ExternalLink,
+  RefreshCw,
+  AlertTriangle,
+  Globe,
+  Copy as CopyIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
