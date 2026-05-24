@@ -52,10 +52,19 @@ import {
 } from "@/lib/mock-data";
 import { MatchResults } from "@/components/match/MatchResults";
 import { PipelineKanban } from "@/components/pipeline/PipelineKanban";
+import { ChannelPickerDialog } from "@/components/distribution/ChannelPickerDialog";
+import {
+  postingsForJob,
+  getChannel,
+  statusTone,
+  daysUntil,
+  type Posting,
+  type ChannelId,
+} from "@/lib/distribution";
 
 const tabSchema = z.object({
   tab: fallback(
-    z.enum(["pipeline", "details", "matching", "campaigns", "inbound", "activity"]),
+    z.enum(["pipeline", "details", "matching", "distribution", "campaigns", "inbound", "activity"]),
     "pipeline",
   ).default("pipeline"),
 });
