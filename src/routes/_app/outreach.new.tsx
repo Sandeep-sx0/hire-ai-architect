@@ -1,22 +1,26 @@
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { projects, getJobsByProject, type Job } from "@/lib/mock-data";
+import { projects, getJobsByProject } from "@/lib/mock-data";
 import {
+  Linkedin,
   Users,
-  GitBranch,
-  Settings as SettingsIcon,
   MessageSquare,
+  ShieldCheck,
   Rocket,
   Check,
-  ShieldCheck,
-  AlertTriangle,
-  RefreshCw,
   CheckCircle2,
   Circle,
-  ChevronDown,
-  ChevronUp,
+  AlertTriangle,
+  Lock,
+  Sparkles,
+  Plus,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+  Briefcase,
 } from "lucide-react";
-import { PageHeader, ScoreRing, StatusBadge } from "@/components/shared";
+import { PageHeader, ScoreRing } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,13 +38,75 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/outreach/new")({
-  head: () => ({ meta: [{ title: "New Campaign — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "New Campaign — Norvex" }] }),
   validateSearch: (s: Record<string, unknown>) => ({
     projectId: typeof s.projectId === "string" ? s.projectId : undefined,
     jobId: typeof s.jobId === "string" ? s.jobId : undefined,
   }),
   component: CampaignBuilder,
 });
+
+/* -------------------------------------------------------------------------- */
+/*  Mock data                                                                 */
+/* -------------------------------------------------------------------------- */
+
+type WarmupStatus = { day: number; todayLimit: number } | null; // null = warmup complete
+
+interface LinkedInAccount {
+  id: string;
+  name: string;
+  initials: string;
+  email: string;
+  connections: number;
+  connectedAgo: string;
+  sentToday: number;
+  dailyCap: number; // 15 default
+  totalSent: number; // for first-50 manual approval logic
+  warmup: WarmupStatus;
+}
+
+const ACCOUNTS: LinkedInAccount[] = [
+  {
+    id: "amarsh",
+    name: "Amarsh Jain",
+    initials: "AJ",
+    email: "amarsh@norvex.id",
+    connections: 1247,
+    connectedAgo: "3 months ago",
+    sentToday: 4,
+    dailyCap: 15,
+    totalSent: 9,
+    warmup: null,
+  },
+  {
+    id: "sarah",
+    name: "Sarah Patel",
+    initials: "SP",
+    email: "sarah@norvex.id",
+    connections: 842,
+    connectedAgo: "12 days ago",
+    sentToday: 7,
+    dailyCap: 15,
+    totalSent: 38,
+    warmup: { day: 4, todayLimit: 10 },
+  },
+  {
+    id: "rio",
+    name: "Rio Hartono",
+    initials: "RH",
+    email: "rio@norvex.id",
+    connections: 2103,
+    connectedAgo: "8 months ago",
+    sentToday: 12,
+    dailyCap: 15,
+    totalSent: 312,
+    warmup: null,
+  },
+];
+
+// 7-day warmup ramp reference (day 1..7): 5, 7, 9, 10, 12, 14, 15
+
+type SourceKey = "shortlist" | "match" | "saved";
 
 type EligibilityReason = "ok" | "no_linkedin" | "dnc" | "in_campaign";
 
@@ -50,37 +116,29 @@ interface Candidate {
   title: string;
   company: string;
   score: number;
-  stage: string;
+  source: SourceKey;
   hasLinkedIn: boolean;
   eligibility: EligibilityReason;
   blockedDetail?: string;
 }
 
-const CANDIDATES: Candidate[] = [
-  { id: "c1", name: "Rina Wijaya", title: "CFO", company: "PT Telkom Indonesia", score: 88, stage: "Shortlisted", hasLinkedIn: true, eligibility: "ok" },
-  { id: "c2", name: "Priya Nair", title: "Finance Director", company: "Reliance Industries", score: 85, stage: "Shortlisted", hasLinkedIn: true, eligibility: "ok" },
-  { id: "c3", name: "Amara Osei", title: "Group CFO", company: "Dangote Group", score: 82, stage: "Shortlisted", hasLinkedIn: true, eligibility: "ok" },
-  { id: "c4", name: "Budi Santoso", title: "VP Finance", company: "Astra International", score: 76, stage: "Approved", hasLinkedIn: true, eligibility: "ok" },
-  { id: "c5", name: "Patrick O'Brien", title: "CFO", company: "CIMB Bank", score: 71, stage: "Approved", hasLinkedIn: true, eligibility: "ok" },
-  { id: "c6", name: "Tom Nguyen", title: "Finance Lead", company: "Vingroup", score: 59, stage: "Screening", hasLinkedIn: true, eligibility: "dnc", blockedDetail: "Do Not Contact" },
-  { id: "c7", name: "James Chen", title: "CFO", company: "Sinopec", score: 55, stage: "Screening", hasLinkedIn: true, eligibility: "in_campaign", blockedDetail: "Active in campaign: CFO — Stylo Q1" },
-  { id: "c8", name: "Kartika Sari", title: "Finance Director", company: "Bank Mandiri", score: 42, stage: "Screening", hasLinkedIn: false, eligibility: "no_linkedin", blockedDetail: "Missing LinkedIn profile" },
+const ALL_CANDIDATES: Candidate[] = [
+  { id: "c1", name: "Rina Wijaya", title: "CFO", company: "PT Telkom Indonesia", score: 88, source: "shortlist", hasLinkedIn: true, eligibility: "ok" },
+  { id: "c2", name: "Priya Nair", title: "Finance Director", company: "Reliance Industries", score: 85, source: "shortlist", hasLinkedIn: true, eligibility: "ok" },
+  { id: "c3", name: "Amara Osei", title: "Group CFO", company: "Dangote Group", score: 82, source: "shortlist", hasLinkedIn: true, eligibility: "ok" },
+  { id: "c4", name: "Budi Santoso", title: "VP Finance", company: "Astra International", score: 76, source: "match", hasLinkedIn: true, eligibility: "ok" },
+  { id: "c5", name: "Patrick O'Brien", title: "CFO", company: "CIMB Bank", score: 71, source: "match", hasLinkedIn: true, eligibility: "ok" },
+  { id: "c6", name: "Kartika Sari", title: "Finance Director", company: "Bank Mandiri", score: 68, source: "match", hasLinkedIn: true, eligibility: "dnc", blockedDetail: "Do Not Contact" },
+  { id: "c7", name: "James Chen", title: "CFO", company: "Sinopec", score: 64, source: "saved", hasLinkedIn: true, eligibility: "in_campaign", blockedDetail: "Active in: CFO — Stylo Q1" },
+  { id: "c8", name: "Tom Nguyen", title: "Finance Lead", company: "Vingroup", score: 59, source: "saved", hasLinkedIn: false, eligibility: "no_linkedin", blockedDetail: "No LinkedIn profile" },
+  { id: "c9", name: "Linh Tran", title: "Finance Director", company: "Masan Group", score: 79, source: "saved", hasLinkedIn: true, eligibility: "ok" },
 ];
 
-const STEPS = [
-  { id: 1, label: "Select candidates", Icon: Users },
-  { id: 2, label: "Sequence", Icon: GitBranch },
-  { id: 3, label: "Settings", Icon: SettingsIcon },
-  { id: 4, label: "Review messages", Icon: MessageSquare },
-  { id: 5, label: "Launch", Icon: Rocket },
+const SOURCES: { id: SourceKey; label: string; hint: string }[] = [
+  { id: "shortlist", label: "From shortlist for this job", hint: "Recruiter-curated, highest intent" },
+  { id: "match", label: "From AI match results", hint: "Top-scoring candidates from matching engine" },
+  { id: "saved", label: "From a saved search", hint: "Reusable candidate list" },
 ];
-
-const PRESETS = {
-  quick: { label: "Quick (2 steps)", steps: 2, waits: [5] },
-  standard: { label: "Standard (3 steps)", steps: 3, waits: [5, 7] },
-  extended: { label: "Extended (4 steps)", steps: 4, waits: [5, 7, 7] },
-} as const;
-type PresetKey = keyof typeof PRESETS;
 
 const TONES = ["Professional", "Warm", "Executive", "Casual"] as const;
 const TONE_DESC: Record<string, string> = {
@@ -90,167 +148,230 @@ const TONE_DESC: Record<string, string> = {
   Casual: "Relaxed, informal, approachable",
 };
 
+const STEPS = [
+  { id: 1, label: "Sending account", Icon: Linkedin },
+  { id: 2, label: "Candidates", Icon: Users },
+  { id: 3, label: "Sequence", Icon: MessageSquare },
+  { id: 4, label: "Schedule & safety", Icon: ShieldCheck },
+  { id: 5, label: "Review & launch", Icon: Rocket },
+];
+
+/* -------------------------------------------------------------------------- */
+/*  Types                                                                     */
+/* -------------------------------------------------------------------------- */
+
+type SequenceStep = {
+  id: string;
+  kind: "connection" | "followup";
+  body: string;
+  waitDays: number; // for followups: days after previous step
+};
+
+/* -------------------------------------------------------------------------- */
+/*  Root                                                                      */
+/* -------------------------------------------------------------------------- */
+
 function CampaignBuilder() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/_app/outreach/new" });
   const [step, setStep] = useState(1);
 
-  // Step 1
-  const initialProject = search.projectId && projects.some((p) => p.id === search.projectId)
+  // Pre-attached project & job (read-only header)
+  const projectId = search.projectId && projects.some((p) => p.id === search.projectId)
     ? search.projectId
     : projects[0]?.id ?? "";
-  const [project, setProject] = useState(initialProject);
-  const jobsForProject = useMemo(() => getJobsByProject(project), [project]);
-  const initialJob = search.jobId && jobsForProject.some((j) => j.id === search.jobId)
+  const project = projects.find((p) => p.id === projectId);
+  const jobsForProject = useMemo(() => getJobsByProject(projectId), [projectId]);
+  const jobId = search.jobId && jobsForProject.some((j) => j.id === search.jobId)
     ? search.jobId
     : jobsForProject[0]?.id ?? "";
-  const [jobId, setJobId] = useState(initialJob);
+  const job = jobsForProject.find((j) => j.id === jobId);
+  const preAttached = !!search.jobId;
 
-  // When project changes, reset job to first available
-  useEffect(() => {
-    if (!jobsForProject.some((j) => j.id === jobId)) {
-      setJobId(jobsForProject[0]?.id ?? "");
-    }
-  }, [project, jobsForProject, jobId]);
+  // Step 1: sending account
+  const [accountId, setAccountId] = useState(ACCOUNTS[0].id);
+  const account = ACCOUNTS.find((a) => a.id === accountId)!;
 
-  const selectedJob = useMemo(
-    () => jobsForProject.find((j) => j.id === jobId),
-    [jobsForProject, jobId],
+  // Step 2: candidates
+  const [source, setSource] = useState<SourceKey>("shortlist");
+  const visibleCandidates = useMemo(
+    () => ALL_CANDIDATES.filter((c) => c.source === source),
+    [source],
   );
-
-  const [selected, setSelected] = useState<Set<string>>(
-    new Set(CANDIDATES.filter((c) => c.eligibility === "ok").slice(0, 5).map((c) => c.id)),
-  );
-
-  // Step 2
-  const [preset, setPreset] = useState<PresetKey>("standard");
-  const [waits, setWaits] = useState<number[]>([...PRESETS.standard.waits]);
-
-  // Step 3
-  const projectObj = projects.find((p) => p.id === project);
-  const defaultName = selectedJob
-    ? `${selectedJob.jobTitle} — ${projectObj?.clientName ?? ""} · Outreach 1`
-    : "New campaign · Outreach 1";
-  const [campaignName, setCampaignName] = useState(defaultName);
-  const [userEditedName, setUserEditedName] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  // Auto-select all eligible candidates when source changes
   useEffect(() => {
-    if (!userEditedName) setCampaignName(defaultName);
-  }, [defaultName, userEditedName]);
-  const handleSetCampaignName = (v: string) => {
-    setUserEditedName(true);
-    setCampaignName(v);
-  };
-  const [linkedInAccount, setLinkedInAccount] = useState("amarsh");
-  const [tone, setTone] = useState("Executive");
+    setSelected(new Set(visibleCandidates.filter((c) => c.eligibility === "ok").map((c) => c.id)));
+  }, [source, visibleCandidates]);
+
+  // Step 3: sequence
+  const [tone, setTone] = useState<string>("Executive");
+  const [steps, setSteps] = useState<SequenceStep[]>(() => [
+    {
+      id: "s0",
+      kind: "connection",
+      body: "",
+      waitDays: 0,
+    },
+    {
+      id: "s1",
+      kind: "followup",
+      body: "",
+      waitDays: 4,
+    },
+    {
+      id: "s2",
+      kind: "followup",
+      body: "",
+      waitDays: 6,
+    },
+  ]);
+  const [previewIdx, setPreviewIdx] = useState(0);
+
+  // Step 4: schedule & safety
+  const [dailyCap, setDailyCap] = useState(account.dailyCap);
   const [startHour, setStartHour] = useState("08:00");
   const [endHour, setEndHour] = useState("18:00");
-  const [timezone, setTimezone] = useState("recipient");
   const [weekends, setWeekends] = useState(false);
-  const [startDate, setStartDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().slice(0, 10);
-  });
 
-  // Step 4
+  // Recompute editable cap when account changes
+  useEffect(() => {
+    setDailyCap(account.dailyCap);
+  }, [accountId, account.dailyCap]);
+
   const selectedCandidates = useMemo(
-    () => CANDIDATES.filter((c) => selected.has(c.id)),
+    () => ALL_CANDIDATES.filter((c) => selected.has(c.id)),
     [selected],
   );
-  const numSteps = PRESETS[preset].steps;
-  const totalMessages = selectedCandidates.length * numSteps;
-  const [reviewed, setReviewed] = useState<Set<string>>(new Set());
-  const reviewedCount = reviewed.size;
 
-  const choosePreset = (k: PresetKey) => {
-    setPreset(k);
-    setWaits([...PRESETS[k].waits]);
+  const effectiveDailyCap = account.warmup
+    ? Math.min(dailyCap, account.warmup.todayLimit)
+    : dailyCap;
+  const daysToComplete = selectedCandidates.length === 0
+    ? 0
+    : Math.max(1, Math.ceil(selectedCandidates.length / Math.max(1, effectiveDailyCap)));
+
+  const remainingManualApprovals = Math.max(0, 50 - account.totalSent);
+  const approvalsNeeded = Math.min(remainingManualApprovals, selectedCandidates.length);
+
+  const canContinueStep = (n: number) => {
+    if (n === 1) return !!accountId;
+    if (n === 2) return selectedCandidates.length > 0;
+    if (n === 3) {
+      const conn = steps.find((s) => s.kind === "connection");
+      if (!conn || conn.body.trim().length === 0 || conn.body.length > 300) return false;
+      return steps.every((s) => s.body.trim().length > 0);
+    }
+    return true;
   };
 
-  const goNext = () => setStep((s) => Math.min(5, s + 1));
-  const goBack = () => setStep((s) => Math.max(1, s - 1));
-
-  const canLaunch = reviewedCount === totalMessages;
-
   const launch = () => {
-    const suffix = selectedJob ? ` for ${selectedJob.jobCode}` : "";
-    toast.success(`Campaign launched${suffix}! ${selectedCandidates.length} connection requests queued.`);
+    toast.success(
+      `Campaign launched. ${selectedCandidates.length} prospects queued${
+        approvalsNeeded > 0 ? ` · ${approvalsNeeded} await your approval` : ""
+      }.`,
+    );
     navigate({ to: "/outreach/$id", params: { id: "new-1" } });
   };
 
-  const canContinueStep1 = !!jobId && selected.size > 0;
-
   return (
-    <div className="mx-auto w-full max-w-[1000px]">
+    <div className="mx-auto w-full max-w-[1080px]">
       <PageHeader
         title="New campaign"
-        subtitle="Build a LinkedIn outreach sequence with built-in safety rails."
+        subtitle="LinkedIn outreach via your connected account — recruiter-approved, never auto-sent."
       />
+
+      {/* Pre-attached job context */}
+      {job && project && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-border bg-brand-seafoam/15 px-4 py-3">
+          <Briefcase className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand-primary" />
+          <div className="flex-1 text-sm">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="font-medium text-brand-text">{job.jobTitle}</span>
+              <span className="font-mono text-[12px] text-brand-text-secondary">{job.jobCode}</span>
+              <span className="text-brand-text-secondary">·</span>
+              <span className="text-brand-text-secondary">
+                {project.clientName} — {project.title}
+              </span>
+            </div>
+            <div className="mt-0.5 text-[12px] text-brand-text-secondary">
+              {preAttached
+                ? "Pre-attached from job · campaign will be linked to this role"
+                : "Default context · pre-attach a job by launching from the job page"}
+            </div>
+          </div>
+          {job && (
+            <Link
+              to="/jobs/$id"
+              params={{ id: job.id }}
+              className="text-[12px] font-medium text-brand-primary hover:underline"
+            >
+              View job →
+            </Link>
+          )}
+        </div>
+      )}
 
       <StepIndicator current={step} />
 
       <div className="mt-8 pb-24">
         {step === 1 && (
-          <Step1
-            project={project}
-            setProject={setProject}
-            jobs={jobsForProject}
-            jobId={jobId}
-            setJobId={setJobId}
-            selected={selected}
-            setSelected={setSelected}
-          />
+          <Step1Account accountId={accountId} setAccountId={setAccountId} />
         )}
         {step === 2 && (
-          <Step2 preset={preset} choose={choosePreset} waits={waits} setWaits={setWaits} />
+          <Step2Candidates
+            source={source}
+            setSource={setSource}
+            visible={visibleCandidates}
+            selected={selected}
+            setSelected={setSelected}
+            effectiveDailyCap={effectiveDailyCap}
+            daysToComplete={daysToComplete}
+          />
         )}
         {step === 3 && (
-          <Step3
-            campaignName={campaignName}
-            setCampaignName={handleSetCampaignName}
-            linkedInAccount={linkedInAccount}
-            setLinkedInAccount={setLinkedInAccount}
+          <Step3Sequence
+            steps={steps}
+            setSteps={setSteps}
             tone={tone}
             setTone={setTone}
+            candidates={selectedCandidates}
+            previewIdx={previewIdx}
+            setPreviewIdx={setPreviewIdx}
+            job={job?.jobTitle ?? "the role"}
+          />
+        )}
+        {step === 4 && (
+          <Step4Safety
+            account={account}
+            dailyCap={dailyCap}
+            setDailyCap={setDailyCap}
             startHour={startHour}
             setStartHour={setStartHour}
             endHour={endHour}
             setEndHour={setEndHour}
-            timezone={timezone}
-            setTimezone={setTimezone}
             weekends={weekends}
             setWeekends={setWeekends}
-            startDate={startDate}
-            setStartDate={setStartDate}
-            numCandidates={selectedCandidates.length}
-            numSteps={numSteps}
-          />
-        )}
-        {step === 4 && (
-          <Step4
-            candidates={selectedCandidates}
-            numSteps={numSteps}
-            waits={waits}
-            tone={tone}
-            reviewed={reviewed}
-            setReviewed={setReviewed}
-            totalMessages={totalMessages}
+            approvalsNeeded={approvalsNeeded}
+            remainingManualApprovals={remainingManualApprovals}
           />
         )}
         {step === 5 && (
-          <Step5
-            campaignName={campaignName}
+          <Step5Review
+            account={account}
+            project={project?.title ?? ""}
+            client={project?.clientName ?? ""}
+            jobTitle={job?.jobTitle ?? ""}
+            jobCode={job?.jobCode ?? ""}
             candidates={selectedCandidates}
-            numSteps={numSteps}
-            waits={waits}
+            steps={steps}
             tone={tone}
+            dailyCap={dailyCap}
             startHour={startHour}
             endHour={endHour}
             weekends={weekends}
-            startDate={startDate}
-            reviewedCount={reviewedCount}
-            totalMessages={totalMessages}
-            canLaunch={canLaunch}
+            approvalsNeeded={approvalsNeeded}
+            daysToComplete={daysToComplete}
             onLaunch={launch}
           />
         )}
@@ -258,36 +379,34 @@ function CampaignBuilder() {
         <div className="mt-10 flex items-center justify-between border-t border-border pt-6">
           <div className="flex items-center gap-3">
             {step > 1 && (
-              <Button variant="outline" onClick={goBack}>
+              <Button variant="outline" onClick={() => setStep(step - 1)}>
+                <ChevronLeft className="mr-1 h-4 w-4" />
                 Back
               </Button>
             )}
-            <button
-              type="button"
-              onClick={() => toast.success("Draft saved")}
-              className="text-sm text-brand-text-secondary hover:text-brand-text"
-            >
-              Save as draft
-            </button>
           </div>
-
-          {step < 4 && (
-            <Button onClick={goNext} disabled={step === 1 && !canContinueStep1}>
-              {step === 3 ? "Generate messages" : "Continue"}
+          {step < 5 && (
+            <Button
+              onClick={() => setStep(step + 1)}
+              disabled={!canContinueStep(step)}
+            >
+              Continue
+              <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           )}
-          {step === 4 && <Button onClick={goNext}>Continue</Button>}
         </div>
       </div>
     </div>
   );
 }
 
-/* -------------------------- Step indicator -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*  Step indicator                                                            */
+/* -------------------------------------------------------------------------- */
 
 function StepIndicator({ current }: { current: number }) {
   return (
-    <div className="sticky top-0 z-10 -mx-8 mb-2 border-b border-border bg-brand-bg/95 px-8 py-4 backdrop-blur">
+    <div className="sticky top-0 z-10 -mx-8 border-b border-border bg-brand-bg/95 px-8 py-4 backdrop-blur">
       <div className="flex items-center">
         {STEPS.map((s, i) => {
           const completed = current > s.id;
@@ -307,7 +426,7 @@ function StepIndicator({ current }: { current: number }) {
                 </div>
                 <span
                   className={cn(
-                    "mt-1.5 text-[11px] whitespace-nowrap",
+                    "mt-1.5 whitespace-nowrap text-[11px]",
                     completed && "text-brand-primary",
                     active && "font-medium text-brand-text",
                     !completed && !active && "text-brand-text-secondary",
@@ -332,134 +451,208 @@ function StepIndicator({ current }: { current: number }) {
   );
 }
 
-/* -------------------------- Step 1 -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*  Step 1 — Sending account                                                  */
+/* -------------------------------------------------------------------------- */
 
-function Step1({
-  project,
-  setProject,
-  jobs,
-  jobId,
-  setJobId,
+function Step1Account({
+  accountId,
+  setAccountId,
+}: {
+  accountId: string;
+  setAccountId: (v: string) => void;
+}) {
+  const account = ACCOUNTS.find((a) => a.id === accountId)!;
+  return (
+    <section>
+      <h2 className="mb-1 text-lg font-semibold text-brand-text">Choose sending account</h2>
+      <p className="mb-6 text-sm text-brand-text-secondary">
+        Outreach goes from a recruiter's own connected LinkedIn account via our licensed Unipile
+        integration. No scraping, no password sharing.
+      </p>
+
+      <div className="mb-4">
+        <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
+          Sending from
+        </label>
+        <Select value={accountId} onValueChange={setAccountId}>
+          <SelectTrigger className="h-auto py-2.5">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {ACCOUNTS.map((a) => (
+              <SelectItem key={a.id} value={a.id}>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary text-[11px] font-semibold text-white">
+                    {a.initials}
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-brand-text">{a.name}</div>
+                    <div className="text-[11px] text-brand-text-secondary">
+                      {a.sentToday}/{a.dailyCap} sent today
+                      {a.warmup ? ` · Warmup day ${a.warmup.day}/7` : ""}
+                    </div>
+                  </div>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary text-sm font-semibold text-white">
+            {account.initials}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold text-brand-text">{account.name}</div>
+              <Linkedin className="h-3.5 w-3.5 text-[#0a66c2]" />
+            </div>
+            <div className="text-[12px] text-brand-text-secondary">
+              {account.email} · {account.connections.toLocaleString()} connections · connected{" "}
+              {account.connectedAgo}
+            </div>
+          </div>
+          {account.warmup ? (
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+              Warmup day {account.warmup.day}/7
+            </span>
+          ) : (
+            <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-medium text-green-700">
+              Healthy
+            </span>
+          )}
+        </div>
+
+        <div className="mt-5 space-y-4">
+          <div>
+            <div className="mb-1 flex justify-between text-[12px] text-brand-text-secondary">
+              <span>Daily sends used today</span>
+              <span className="tabular-nums">
+                {account.sentToday} / {account.warmup?.todayLimit ?? account.dailyCap}
+              </span>
+            </div>
+            <Progress
+              value={
+                (account.sentToday / (account.warmup?.todayLimit ?? account.dailyCap)) * 100
+              }
+              className="h-2"
+            />
+          </div>
+
+          {account.totalSent < 50 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 text-[12px] text-amber-800">
+              <strong>{50 - account.totalSent} manual approvals</strong> still required on this
+              account (first 50 sends are recruiter-approved one-by-one).
+            </div>
+          )}
+        </div>
+      </div>
+
+      {account.warmup && (
+        <div className="mt-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
+          <div className="text-[13px] text-amber-900">
+            <strong>This account is in 7-day warmup (day {account.warmup.day}/7).</strong> Daily
+            sends ramp 5 → 7 → 9 → 10 → 12 → 14 → 15 to protect the LinkedIn account from being
+            flagged. Today's ceiling is{" "}
+            <strong>{account.warmup.todayLimit} sends</strong>. Warmup is not editable.
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => toast("Unipile OAuth flow would open here")}
+        className="mt-6 inline-flex items-center gap-2 text-[13px] font-medium text-brand-primary hover:underline"
+      >
+        <Plus className="h-3.5 w-3.5" />
+        Connect another LinkedIn account
+      </button>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Step 2 — Candidates                                                       */
+/* -------------------------------------------------------------------------- */
+
+function Step2Candidates({
+  source,
+  setSource,
+  visible,
   selected,
   setSelected,
+  effectiveDailyCap,
+  daysToComplete,
 }: {
-  project: string;
-  setProject: (v: string) => void;
-  jobs: Job[];
-  jobId: string;
-  setJobId: (v: string) => void;
+  source: SourceKey;
+  setSource: (v: SourceKey) => void;
+  visible: Candidate[];
   selected: Set<string>;
   setSelected: (s: Set<string>) => void;
+  effectiveDailyCap: number;
+  daysToComplete: number;
 }) {
-  const toggle = (id: string) => {
-    const c = CANDIDATES.find((x) => x.id === id);
-    if (!c || c.eligibility !== "ok") return;
+  const toggle = (c: Candidate) => {
+    if (c.eligibility !== "ok") return;
     const next = new Set(selected);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
+    if (next.has(c.id)) next.delete(c.id);
+    else next.add(c.id);
     setSelected(next);
   };
 
-  const eligibleIds = CANDIDATES.filter((c) => c.eligibility === "ok").map((c) => c.id);
-  const allSelected = eligibleIds.every((id) => selected.has(id));
+  const eligibleIds = visible.filter((c) => c.eligibility === "ok").map((c) => c.id);
+  const allSelected = eligibleIds.length > 0 && eligibleIds.every((id) => selected.has(id));
   const toggleAll = () => {
-    if (allSelected) setSelected(new Set());
-    else setSelected(new Set(eligibleIds));
+    if (allSelected) {
+      const next = new Set(selected);
+      eligibleIds.forEach((id) => next.delete(id));
+      setSelected(next);
+    } else {
+      const next = new Set(selected);
+      eligibleIds.forEach((id) => next.add(id));
+      setSelected(next);
+    }
   };
 
   return (
     <section>
-      <h2 className="mb-1 text-lg font-semibold text-brand-text">Select project, job & candidates</h2>
-      <p className="mb-6 text-sm text-brand-text-secondary">
-        Campaigns target a single open job. Pick the job, then choose its shortlisted candidates.
+      <h2 className="mb-1 text-lg font-semibold text-brand-text">Select candidates</h2>
+      <p className="mb-5 text-sm text-brand-text-secondary">
+        Candidates come from your Norvex database. No live LinkedIn search.
       </p>
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
-            Project
-          </label>
-          <Select value={project} onValueChange={setProject}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.clientName} — {p.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
-            Open jobs in this project
-          </label>
-          <div className="text-sm text-brand-text-secondary">
-            {jobs.length === 0
-              ? "No jobs yet — create one from the project page."
-              : `${jobs.length} job${jobs.length === 1 ? "" : "s"} available`}
-          </div>
-        </div>
-      </div>
-
-      {jobs.length === 0 ? (
-        <div className="mb-6 rounded-xl border border-dashed border-border bg-card p-6 text-center text-sm text-brand-text-secondary">
-          This project has no jobs yet. Add a job before launching a campaign.
-        </div>
-      ) : (
-        <div className="mb-6 grid gap-3 sm:grid-cols-2">
-          {jobs.map((j) => {
-            const active = j.id === jobId;
-            const noShortlist = j.shortlistedCount === 0;
-            return (
-              <button
-                key={j.id}
-                type="button"
-                onClick={() => setJobId(j.id)}
-                className={cn(
-                  "rounded-xl border bg-card p-4 text-left transition-all",
-                  active
-                    ? "border-brand-primary ring-2 ring-brand-mint/40"
-                    : "border-border hover:border-brand-primary/50",
+      <div className="mb-5 grid gap-3 sm:grid-cols-3">
+        {SOURCES.map((s) => {
+          const active = s.id === source;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setSource(s.id)}
+              className={cn(
+                "rounded-xl border bg-card p-4 text-left transition-all",
+                active
+                  ? "border-brand-primary ring-2 ring-brand-mint/40"
+                  : "border-border hover:border-brand-primary/50",
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-brand-text">{s.label}</span>
+                {active ? (
+                  <CheckCircle2 className="h-4 w-4 text-brand-primary" />
+                ) : (
+                  <Circle className="h-4 w-4 text-brand-text-secondary/40" />
                 )}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="text-sm font-semibold text-brand-text">{j.jobTitle}</div>
-                    <div className="text-[12px] font-mono text-brand-text-secondary">{j.jobCode}</div>
-                  </div>
-                  {active ? (
-                    <CheckCircle2 className="h-4 w-4 text-brand-primary" />
-                  ) : (
-                    <Circle className="h-4 w-4 text-brand-text-secondary/50" />
-                  )}
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-brand-text-secondary">
-                  <span className="capitalize">{j.seniorityLevel.replace(/_/g, " ")}</span>
-                  <span>·</span>
-                  <span>{j.location}</span>
-                  <span>·</span>
-                  <StatusBadge status={j.status} />
-                </div>
-                <div className="mt-2 text-[12px]">
-                  <span className={cn("font-medium", noShortlist ? "text-amber-600" : "text-brand-text")}>
-                    {j.shortlistedCount} shortlisted
-                  </span>
-                  {noShortlist && (
-                    <span className="ml-2 inline-flex items-center gap-1 text-amber-600">
-                      <AlertTriangle className="h-3 w-3" />
-                      No shortlisted candidates
-                    </span>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
+              </div>
+              <div className="mt-1 text-[12px] text-brand-text-secondary">{s.hint}</div>
+            </button>
+          );
+        })}
+      </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
@@ -470,25 +663,31 @@ function Step1({
               </th>
               <th className="px-4 py-3 text-left font-semibold">Candidate</th>
               <th className="px-4 py-3 text-left font-semibold">Match</th>
-              <th className="px-4 py-3 text-left font-semibold">Status</th>
-              <th className="px-4 py-3 text-center font-semibold">LinkedIn</th>
               <th className="px-4 py-3 text-left font-semibold">Eligibility</th>
             </tr>
           </thead>
           <tbody>
-            {CANDIDATES.map((c) => {
+            {visible.map((c) => {
               const blocked = c.eligibility !== "ok";
               return (
-                <tr key={c.id} className="border-t border-border">
+                <tr
+                  key={c.id}
+                  className={cn(
+                    "border-t border-border",
+                    blocked && "bg-gray-50/60 text-brand-text-secondary",
+                  )}
+                >
                   <td className="px-4 py-3">
                     <Checkbox
                       checked={selected.has(c.id)}
                       disabled={blocked}
-                      onCheckedChange={() => toggle(c.id)}
+                      onCheckedChange={() => toggle(c)}
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-brand-text">{c.name}</div>
+                    <div className={cn("font-medium", blocked ? "text-brand-text-secondary" : "text-brand-text")}>
+                      {c.name}
+                    </div>
                     <div className="text-[13px] text-brand-text-secondary">
                       {c.title} · {c.company}
                     </div>
@@ -497,573 +696,597 @@ function Step1({
                     <ScoreRing score={c.score} size="sm" />
                   </td>
                   <td className="px-4 py-3">
-                    <StatusBadge status={c.stage} />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {c.hasLinkedIn ? (
-                      <Check className="mx-auto h-4 w-4 text-green-600" />
-                    ) : (
-                      <span className="text-red-500">✕</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
                     {c.eligibility === "ok" ? (
-                      <span className="text-green-700">Eligible</span>
+                      <span className="inline-flex items-center gap-1 text-[12px] text-green-700">
+                        <Check className="h-3.5 w-3.5" /> Eligible
+                      </span>
                     ) : (
-                      <span
-                        className={cn(
-                          c.eligibility === "in_campaign" ? "text-amber-600" : "text-red-500",
-                        )}
-                      >
-                        Blocked — {c.blockedDetail}
+                      <span className="inline-flex items-center gap-1 text-[12px] text-red-600">
+                        <Lock className="h-3.5 w-3.5" /> {c.blockedDetail}
                       </span>
                     )}
                   </td>
                 </tr>
               );
             })}
+            {visible.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-10 text-center text-sm text-brand-text-secondary">
+                  No candidates from this source yet.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
-      <div className="mt-3 text-sm text-brand-text-secondary">
-        {selected.size} of {CANDIDATES.filter((c) => c.eligibility === "ok").length} eligible candidates selected
+      <div className="mt-4 flex items-center justify-between rounded-lg border border-brand-mint/50 bg-brand-seafoam/15 px-4 py-3 text-sm">
+        <div>
+          <span className="font-semibold text-brand-text">{selected.size}</span>{" "}
+          <span className="text-brand-text-secondary">candidates selected</span>
+        </div>
+        {selected.size > 0 && (
+          <div className="text-[12px] text-brand-text-secondary">
+            ≈ <strong className="text-brand-text">{daysToComplete}</strong>{" "}
+            {daysToComplete === 1 ? "day" : "days"} to send all connection requests at{" "}
+            {effectiveDailyCap}/day
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-/* -------------------------- Step 2 -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*  Step 3 — Sequence & messaging                                             */
+/* -------------------------------------------------------------------------- */
 
-function Step2({
-  preset,
-  choose,
-  waits,
-  setWaits,
+function makeDraft(
+  kind: SequenceStep["kind"],
+  stepIdx: number,
+  c: Candidate | undefined,
+  tone: string,
+  jobLabel: string,
+): string {
+  const first = c?.name.split(" ")[0] ?? "there";
+  const companyBit = c ? ` at ${c.company}` : "";
+  const toneOpener =
+    tone === "Casual"
+      ? "Hi"
+      : tone === "Warm"
+        ? "Hello"
+        : tone === "Executive"
+          ? ""
+          : "Dear";
+  const greet = toneOpener ? `${toneOpener} ${first},` : `${first} —`;
+
+  if (kind === "connection") {
+    return `${greet} I'm advising a leading client on a ${jobLabel} appointment in Jakarta. Your track record${companyBit} looks closely aligned with what they need. Open to a brief, confidential chat?`;
+  }
+  if (stepIdx === 1) {
+    return `${greet} thanks for connecting. A bit more context: this ${jobLabel} role reports to the CEO and oversees a sizable team. Compensation is highly competitive. Would early next week work for a 20-minute call?`;
+  }
+  return `${greet} a brief final note on the ${jobLabel} opportunity. Decisions like this take time — happy to reconnect whenever the timing suits.`;
+}
+
+function Step3Sequence({
+  steps,
+  setSteps,
+  tone,
+  setTone,
+  candidates,
+  previewIdx,
+  setPreviewIdx,
+  job,
 }: {
-  preset: PresetKey;
-  choose: (k: PresetKey) => void;
-  waits: number[];
-  setWaits: (w: number[]) => void;
+  steps: SequenceStep[];
+  setSteps: (s: SequenceStep[]) => void;
+  tone: string;
+  setTone: (v: string) => void;
+  candidates: Candidate[];
+  previewIdx: number;
+  setPreviewIdx: (n: number) => void;
+  job: string;
 }) {
-  const numSteps = PRESETS[preset].steps;
-
-  const stepCard = (idx: number) => {
-    const isConnection = idx === 0;
-    const isFinal = idx === numSteps - 1;
-    const label = isConnection
-      ? "Connection request"
-      : isFinal && idx > 0
-        ? `Follow-up message #${idx} (final)`
-        : `Follow-up message #${idx}`;
-    const charLimit = isConnection ? "max 300 characters" : "max 2,000 characters";
-    const channelLabel = isConnection ? "LinkedIn connection note" : "LinkedIn message";
-    const subtitle = isConnection
-      ? "Sent immediately on launch"
-      : idx === 1
-        ? "Sent if no reply after wait period"
-        : isFinal
-          ? "Final touchpoint — stop after this"
-          : "Sent if no reply after wait period";
-
-    return (
-      <div className="rounded-xl border border-border bg-card p-5">
-        <div className="text-[13px] font-medium text-brand-primary">Step {idx + 1}</div>
-        <div className="mt-0.5 text-sm font-semibold text-brand-text">{label}</div>
-        <div className="mt-1 text-[13px] text-brand-text-secondary">
-          {channelLabel} <span className="text-brand-text-secondary/70">({charLimit})</span>
-        </div>
-        <div className="mt-2 text-[13px] text-brand-text-secondary">{subtitle}</div>
-      </div>
-    );
+  const updateStep = (i: number, patch: Partial<SequenceStep>) => {
+    const next = steps.map((s, idx) => (idx === i ? { ...s, ...patch } : s));
+    setSteps(next);
   };
+  const removeStep = (i: number) => {
+    if (steps[i].kind === "connection") return;
+    setSteps(steps.filter((_, idx) => idx !== i));
+  };
+  const addFollowup = () => {
+    if (steps.length >= 4) return;
+    setSteps([
+      ...steps,
+      { id: `s${steps.length}`, kind: "followup", body: "", waitDays: 5 },
+    ]);
+  };
+
+  const draftWithAI = (i: number) => {
+    const previewCand = candidates[previewIdx];
+    const body = makeDraft(steps[i].kind, i, previewCand, tone, job);
+    updateStep(i, { body });
+    toast.success("AI draft generated · personalize before launch");
+  };
+
+  const draftAll = () => {
+    const previewCand = candidates[previewIdx];
+    setSteps(
+      steps.map((s, i) => ({
+        ...s,
+        body: makeDraft(s.kind, i, previewCand, tone, job),
+      })),
+    );
+    toast.success("AI drafted all steps");
+  };
+
+  const preview = candidates[previewIdx];
 
   return (
     <section>
-      <h2 className="mb-1 text-lg font-semibold text-brand-text">Sequence</h2>
-      <p className="mb-6 text-sm text-brand-text-secondary">
-        Define your outreach touchpoints and timing.
-      </p>
-
-      <div className="mb-6 flex flex-wrap gap-2">
-        {(Object.keys(PRESETS) as PresetKey[]).map((k) => (
-          <button
-            key={k}
-            onClick={() => choose(k)}
-            className={cn(
-              "rounded-full border px-4 py-1.5 text-sm transition-all",
-              preset === k
-                ? "border-brand-primary bg-brand-primary text-white"
-                : "border-border bg-card text-brand-text hover:border-brand-primary/50",
-            )}
-          >
-            {PRESETS[k].label}
-          </button>
-        ))}
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-brand-text">Sequence & messaging</h2>
+          <p className="mt-1 text-sm text-brand-text-secondary">
+            Connection note → up to 2 follow-ups. Editable per step. AI drafts personalize per
+            candidate using name, title, company and job selling points.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={draftAll} className="gap-2">
+          <Sparkles className="h-3.5 w-3.5" /> Draft all with AI
+        </Button>
       </div>
 
-      <div className="flex flex-col items-stretch">
-        {Array.from({ length: numSteps }).map((_, idx) => (
-          <div key={idx}>
-            {stepCard(idx)}
-            {idx < numSteps - 1 && (
-              <div className="relative flex h-20 items-center justify-center">
-                <div className="absolute left-1/2 top-0 h-full w-0 -translate-x-1/2 border-l-2 border-dashed border-gray-300" />
-                <div className="relative z-10 flex items-center gap-2 rounded-full border-2 border-gray-300 bg-card px-3 py-1.5 shadow-sm">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={30}
-                    value={waits[idx] ?? 5}
-                    onChange={(e) => {
-                      const next = [...waits];
-                      next[idx] = Number(e.target.value) || 1;
-                      setWaits(next);
-                    }}
-                    className="h-7 w-14 text-center text-sm"
-                  />
-                  <span className="text-xs text-brand-text-secondary">
-                    days {idx === 0 ? "after accepted" : "if no reply"}
+      <div className="mb-5 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
+            Tone
+          </label>
+          <Select value={tone} onValueChange={setTone}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TONES.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="mt-1.5 text-[12px] text-brand-text-secondary">{TONE_DESC[tone]}</p>
+        </div>
+        {candidates.length > 0 && (
+          <div>
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
+              Personalization preview
+            </label>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setPreviewIdx((previewIdx - 1 + candidates.length) % candidates.length)
+                }
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </Button>
+              <div className="flex-1 truncate rounded-md border border-border bg-brand-bg/40 px-3 py-1.5 text-[13px]">
+                <span className="font-medium text-brand-text">{preview?.name}</span>{" "}
+                <span className="text-brand-text-secondary">
+                  · {preview?.title} at {preview?.company}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPreviewIdx((previewIdx + 1) % candidates.length)}
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+            <p className="mt-1.5 text-[12px] text-brand-text-secondary">
+              Cycle to verify AI personalization on different candidates
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col">
+        {steps.map((s, i) => {
+          const isConnection = s.kind === "connection";
+          const limit = isConnection ? 300 : 2000;
+          const overLimit = s.body.length > limit;
+          const empty = s.body.trim().length === 0;
+          return (
+            <div key={s.id}>
+              {i > 0 && (
+                <div className="relative flex h-16 items-center justify-center">
+                  <div className="absolute left-1/2 top-0 h-full w-0 -translate-x-1/2 border-l-2 border-dashed border-gray-300" />
+                  <div className="relative z-10 flex items-center gap-2 rounded-full border-2 border-gray-300 bg-card px-3 py-1.5 shadow-sm">
+                    <span className="text-[12px] text-brand-text-secondary">Wait</span>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={30}
+                      value={s.waitDays}
+                      onChange={(e) =>
+                        updateStep(i, { waitDays: Number(e.target.value) || 1 })
+                      }
+                      className="h-7 w-14 text-center text-sm"
+                    />
+                    <span className="text-[12px] text-brand-text-secondary">
+                      days {i === 1 ? "after accepted" : "after prev. if no reply"}
+                    </span>
+                  </div>
+                </div>
+              )}
+              <div className="rounded-xl border border-border bg-card p-5">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[12px] font-medium text-brand-primary">Step {i + 1}</div>
+                    <div className="mt-0.5 text-sm font-semibold text-brand-text">
+                      {isConnection ? "Connection request note" : `Follow-up message ${i}`}
+                    </div>
+                    <div className="text-[12px] text-brand-text-secondary">
+                      {isConnection
+                        ? "LinkedIn connection note · max 300 characters"
+                        : "LinkedIn message · sent if no reply"}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => draftWithAI(i)}
+                      className="gap-1.5"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" /> Draft with AI
+                    </Button>
+                    {!isConnection && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeStep(i)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <Textarea
+                  value={s.body}
+                  onChange={(e) => updateStep(i, { body: e.target.value })}
+                  placeholder={
+                    isConnection
+                      ? "Short, personal, opens the door…"
+                      : "Add context, value, and a clear ask…"
+                  }
+                  className="min-h-[110px] resize-y text-sm leading-relaxed"
+                />
+                <div className="mt-2 flex items-center justify-between">
+                  <span
+                    className={cn(
+                      "text-[12px]",
+                      empty
+                        ? "text-amber-600"
+                        : overLimit
+                          ? "text-red-600"
+                          : "text-brand-text-secondary",
+                    )}
+                  >
+                    {empty
+                      ? "Required"
+                      : overLimit
+                        ? `${s.body.length - limit} over limit`
+                        : "Looks good"}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-[12px] tabular-nums",
+                      overLimit ? "text-red-600" : "text-brand-text-secondary",
+                    )}
+                  >
+                    {s.body.length} / {limit}
                   </span>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
+
+      {steps.length < 4 && (
+        <button
+          type="button"
+          onClick={addFollowup}
+          className="mt-4 inline-flex items-center gap-2 text-[13px] font-medium text-brand-primary hover:underline"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Add follow-up
+        </button>
+      )}
 
       <div className="mt-8 flex items-start gap-3 rounded-lg border border-brand-mint/50 bg-brand-seafoam/20 p-4">
         <ShieldCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
         <p className="text-[13px] text-brand-text">
-          <span className="font-medium">Auto-stop on reply is always enabled.</span> If a candidate replies at any step,
-          the sequence stops immediately and the reply appears in your Inbox.
+          <span className="font-medium">Stop-on-reply is always on.</span> If a candidate replies
+          at any step, the sequence stops immediately and the reply lands in your Inbox.
         </p>
       </div>
     </section>
   );
 }
 
-/* -------------------------- Step 3 -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*  Step 4 — Schedule & safety                                                */
+/* -------------------------------------------------------------------------- */
 
-function Step3(props: {
-  campaignName: string;
-  setCampaignName: (v: string) => void;
-  linkedInAccount: string;
-  setLinkedInAccount: (v: string) => void;
-  tone: string;
-  setTone: (v: string) => void;
+function Step4Safety({
+  account,
+  dailyCap,
+  setDailyCap,
+  startHour,
+  setStartHour,
+  endHour,
+  setEndHour,
+  weekends,
+  setWeekends,
+  approvalsNeeded,
+  remainingManualApprovals,
+}: {
+  account: LinkedInAccount;
+  dailyCap: number;
+  setDailyCap: (n: number) => void;
   startHour: string;
   setStartHour: (v: string) => void;
   endHour: string;
   setEndHour: (v: string) => void;
-  timezone: string;
-  setTimezone: (v: string) => void;
   weekends: boolean;
   setWeekends: (v: boolean) => void;
-  startDate: string;
-  setStartDate: (v: string) => void;
-  numCandidates: number;
-  numSteps: number;
+  approvalsNeeded: number;
+  remainingManualApprovals: number;
 }) {
-  const totalMsgs = props.numCandidates * props.numSteps;
-  const dailyCap = 15;
-  const todayUsed = 6;
+  const warmupCeiling = account.warmup?.todayLimit ?? null;
+
+  const clampHour = (v: string, fallback: string, min = 8, max = 18) => {
+    const h = parseInt(v.split(":")[0] ?? "0", 10);
+    if (Number.isNaN(h) || h < min || h > max) return fallback;
+    return v;
+  };
 
   return (
     <section>
-      <h2 className="mb-1 text-lg font-semibold text-brand-text">Settings</h2>
+      <h2 className="mb-1 text-lg font-semibold text-brand-text">Schedule & safety</h2>
       <p className="mb-6 text-sm text-brand-text-secondary">
-        Configure campaign details and review your account's safety status.
+        These defaults are deliberate executive-search safety rails. Locked items cannot be
+        disabled — they protect the recruiter's LinkedIn account and candidate experience.
       </p>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left column */}
-        <div className="space-y-6">
-          <Card title="Campaign details">
-            <Field label="Campaign name">
-              <Input value={props.campaignName} onChange={(e) => props.setCampaignName(e.target.value)} />
-            </Field>
-            <Field label="LinkedIn account">
-              <Select value={props.linkedInAccount} onValueChange={props.setLinkedInAccount}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="amarsh">Amarsh Jain — LinkedIn</SelectItem>
-                  <SelectItem value="sarah">Sarah Patel — LinkedIn</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Tone">
-              <Select value={props.tone} onValueChange={props.setTone}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {TONES.map((t) => (
-                    <SelectItem key={t} value={t}>{t}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="mt-1.5 text-[12px] text-brand-text-secondary">{TONE_DESC[props.tone]}</p>
-            </Field>
-          </Card>
-
-          <Card title="Schedule">
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="From">
-                <Input type="time" value={props.startHour} onChange={(e) => props.setStartHour(e.target.value)} />
-              </Field>
-              <Field label="To">
-                <Input type="time" value={props.endHour} onChange={(e) => props.setEndHour(e.target.value)} />
-              </Field>
-            </div>
-            <Field label="Timezone">
-              <Select value={props.timezone} onValueChange={props.setTimezone}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recipient">Recipient's timezone (auto-detected)</SelectItem>
-                  <SelectItem value="sender">Sender's timezone</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <div className="flex items-center justify-between rounded-lg border border-border bg-brand-bg/40 px-3 py-2">
-              <span className="text-sm text-brand-text">Send on weekends</span>
-              <Switch checked={props.weekends} onCheckedChange={props.setWeekends} />
-            </div>
-            <Field label="Start date">
-              <Input type="date" value={props.startDate} onChange={(e) => props.setStartDate(e.target.value)} />
-            </Field>
-          </Card>
-        </div>
-
-        {/* Right column */}
-        <div>
-          <div className="rounded-xl border border-border border-l-4 border-l-brand-primary bg-brand-seafoam/10 p-5">
-            <div className="mb-4">
-              <div className="text-sm font-semibold text-brand-text">Account health</div>
-              <div className="mt-2 text-sm font-medium text-brand-text">Amarsh Jain — LinkedIn</div>
-              <div className="text-[13px] text-brand-text-secondary">1,247 connections</div>
-              <div className="text-[13px] text-brand-text-secondary">Connected 3 months ago</div>
-            </div>
-
-            <div className="space-y-4">
-              <SafetyRow label="Daily send cap">
-                <div className="flex-1">
-                  <div className="mb-1 flex justify-between text-[12px] text-brand-text-secondary">
-                    <span>{todayUsed} of {dailyCap} used today</span>
-                    <span>15 / day</span>
-                  </div>
-                  <Progress value={(todayUsed / dailyCap) * 100} className="h-2" />
-                </div>
-              </SafetyRow>
-
-              <SafetyRow label="Warmup status">
-                <span className="rounded-full bg-green-100 px-2 py-0.5 text-[12px] font-medium text-green-700">
-                  Complete ✓
-                </span>
-              </SafetyRow>
-
-              <SafetyRow label="Manual approval">
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[12px] font-medium text-amber-700">
-                  Required for next 41 sends
-                </span>
-              </SafetyRow>
-
-              <SafetyRow label="Weekend sending">
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[12px] font-medium text-gray-600">
-                  Disabled
-                </span>
-              </SafetyRow>
-
-              <SafetyRow label="Send window">
-                <span className="text-[12px] text-brand-text">
-                  {props.startHour} – {props.endHour} (recipient timezone)
-                </span>
-              </SafetyRow>
-            </div>
-
-            <div className="mt-5 rounded-lg bg-brand-bg p-4 text-[13px] text-brand-text-secondary">
-              <p>
-                This campaign: <strong className="text-brand-text">{props.numCandidates}</strong> candidates ×{" "}
-                <strong className="text-brand-text">{props.numSteps}</strong> steps ={" "}
-                <strong className="text-brand-text">{totalMsgs}</strong> total messages
-              </p>
-              <p className="mt-1">
-                At <strong className="text-brand-text">{dailyCap}</strong> sends/day: ~
-                <strong className="text-brand-text">
-                  {Math.max(1, Math.ceil(props.numCandidates / dailyCap))}
-                </strong>{" "}
-                day to send all connection requests
-              </p>
-              <p className="mt-1">
-                Full sequence completion: <strong className="text-brand-text">~3 weeks</strong> (including follow-up wait times)
-              </p>
-            </div>
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
+        {/* Editable: daily cap */}
+        <SafetyItem
+          label="Daily send cap"
+          help="Hard ceiling is 25. Default 15. Warmup may lower today's effective cap."
+        >
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              min={1}
+              max={25}
+              value={dailyCap}
+              onChange={(e) =>
+                setDailyCap(Math.min(25, Math.max(1, Number(e.target.value) || 15)))
+              }
+              className="h-8 w-20 text-center text-sm"
+            />
+            <span className="text-[12px] text-brand-text-secondary">per day</span>
+            {warmupCeiling !== null && warmupCeiling < dailyCap && (
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+                Capped at {warmupCeiling} today by warmup
+              </span>
+            )}
           </div>
-        </div>
+        </SafetyItem>
+
+        {/* Editable: send window */}
+        <SafetyItem
+          label="Send window"
+          help="Editable between 08:00 and 18:00 only — recipient timezone is enforced."
+        >
+          <div className="flex items-center gap-2">
+            <Input
+              type="time"
+              min="08:00"
+              max="18:00"
+              value={startHour}
+              onChange={(e) => setStartHour(clampHour(e.target.value, startHour))}
+              className="h-8 w-28 text-sm"
+            />
+            <span className="text-[12px] text-brand-text-secondary">to</span>
+            <Input
+              type="time"
+              min="08:00"
+              max="18:00"
+              value={endHour}
+              onChange={(e) => setEndHour(clampHour(e.target.value, endHour))}
+              className="h-8 w-28 text-sm"
+            />
+            <span className="rounded-full bg-brand-seafoam/40 px-2 py-0.5 text-[11px] font-medium text-brand-primary">
+              Recipient TZ
+            </span>
+          </div>
+        </SafetyItem>
+
+        {/* Editable: weekends */}
+        <SafetyItem
+          label="Weekend sending"
+          help="Off by default. Most executives prefer weekday-only outreach."
+        >
+          <div className="flex items-center gap-2">
+            <Switch checked={weekends} onCheckedChange={setWeekends} />
+            <span className="text-[12px] text-brand-text-secondary">
+              {weekends ? "Mon–Sun" : "Mon–Fri only"}
+            </span>
+          </div>
+        </SafetyItem>
+
+        {/* Locked: stop-on-reply */}
+        <SafetyItem
+          label="Stop on reply"
+          locked
+          help="Always on. Any reply at any step halts the sequence for that candidate."
+        >
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-medium text-green-700">
+            <Lock className="h-3 w-3" /> Locked ON
+          </span>
+        </SafetyItem>
+
+        {/* Locked: manual approval first 50 */}
+        <SafetyItem
+          label="Manual approval — first 50 sends"
+          locked
+          help="The first 50 sends from this account go to an Approval Queue. Recruiter clicks Send on each one."
+        >
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-medium text-green-700">
+              <Lock className="h-3 w-3" /> Locked ON
+            </span>
+            {remainingManualApprovals > 0 ? (
+              <span className="text-[12px] text-amber-700">
+                {remainingManualApprovals} approvals remaining on this account
+              </span>
+            ) : (
+              <span className="text-[12px] text-green-700">Threshold reached</span>
+            )}
+          </div>
+        </SafetyItem>
+
+        {/* Locked: warmup */}
+        <SafetyItem
+          label="New account warmup"
+          locked
+          help="New accounts ramp 5 → 7 → 9 → 10 → 12 → 14 → 15 over 7 days. Not editable."
+        >
+          {account.warmup ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+              <Lock className="h-3 w-3" /> Day {account.warmup.day}/7 · {account.warmup.todayLimit}/day
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-medium text-green-700">
+              <Lock className="h-3 w-3" /> Complete
+            </span>
+          )}
+        </SafetyItem>
+
+        {/* Locked: do_not_contact */}
+        <SafetyItem
+          label="Do Not Contact list"
+          locked
+          help="Candidates flagged do_not_contact are excluded automatically and cannot be selected."
+        >
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-medium text-green-700">
+            <Lock className="h-3 w-3" /> Enforced
+          </span>
+        </SafetyItem>
       </div>
-    </section>
-  );
-}
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-5">
-      <div className="mb-4 text-sm font-semibold text-brand-text">{title}</div>
-      <div className="space-y-4">{children}</div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-brand-text-secondary">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function SafetyRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-4">
-      <span className="w-[140px] flex-shrink-0 text-[13px] text-brand-text-secondary">{label}</span>
-      <div className="flex flex-1 items-center justify-end">{children}</div>
-    </div>
-  );
-}
-
-/* -------------------------- Step 4 -------------------------- */
-
-function draftMessage(candidate: Candidate, stepIdx: number, _tone: string): string {
-  const first = candidate.name.split(" ")[0];
-  if (stepIdx === 0) {
-    return `${first} — I'm advising a leading petrochemical company in Jakarta on their CFO appointment. Your track record at ${candidate.company}, particularly the scale of the operation and your M&A experience, aligns closely with what they're looking for. Would you be open to a brief, confidential conversation?`;
-  }
-  if (stepIdx === 1) {
-    return `${first}, thank you for connecting. I wanted to share a bit more context — the role reports directly to the CEO and oversees finance across four business units with a team of 50+. The compensation is highly competitive. Would Tuesday or Wednesday work for a 20-minute call?`;
-  }
-  return `Hi ${first} — just a brief follow-up on the CFO opportunity I mentioned. I appreciate these decisions take time. If the timing isn't right now, I completely understand. Happy to reconnect whenever it suits you.`;
-}
-
-function Step4({
-  candidates,
-  numSteps,
-  waits: _waits,
-  tone,
-  reviewed,
-  setReviewed,
-  totalMessages,
-}: {
-  candidates: Candidate[];
-  numSteps: number;
-  waits: number[];
-  tone: string;
-  reviewed: Set<string>;
-  setReviewed: (s: Set<string>) => void;
-  totalMessages: number;
-}) {
-  const [expanded, setExpanded] = useState<string | null>(candidates[0]?.id ?? null);
-
-  const toggleReviewed = (key: string) => {
-    const next = new Set(reviewed);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    setReviewed(next);
-  };
-
-  const markAll = () => {
-    const next = new Set<string>();
-    candidates.forEach((c) => {
-      for (let i = 0; i < numSteps; i++) next.add(`${c.id}-${i}`);
-    });
-    setReviewed(next);
-  };
-
-  return (
-    <section>
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-brand-text">
-            AI has drafted {totalMessages} messages for {candidates.length} candidates
-          </h2>
-          <p className="mt-1 text-[12px] text-brand-text-secondary">
-            Model: Claude Sonnet 4.6 · Tone: {tone} · Est. cost: ${(totalMessages * 0.011).toFixed(2)}
+      {approvalsNeeded > 0 && (
+        <div className="mt-5 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
+          <p className="text-[13px] text-amber-900">
+            <strong>{approvalsNeeded} of your selected candidates</strong> will require manual
+            approval before sending. They'll appear in the Approval Queue — you click Send on each.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => toast.success("Regenerated all messages")}>
-          <RefreshCw className="mr-2 h-3.5 w-3.5" />
-          Regenerate all
-        </Button>
-      </div>
-
-      <div className="mb-4 rounded-lg border border-border bg-card p-4">
-        <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="font-medium text-brand-text">
-            {reviewed.size} of {totalMessages} messages reviewed
-          </span>
-          <button
-            type="button"
-            onClick={markAll}
-            className="text-[13px] font-medium text-brand-primary hover:underline"
-          >
-            Mark all as reviewed
-          </button>
-        </div>
-        <Progress value={(reviewed.size / totalMessages) * 100} className="h-2" />
-      </div>
-
-      <div className="space-y-3">
-        {candidates.map((c) => {
-          const reviewedCount = Array.from({ length: numSteps }).filter((_, i) =>
-            reviewed.has(`${c.id}-${i}`),
-          ).length;
-          const open = expanded === c.id;
-          return (
-            <div key={c.id} className="overflow-hidden rounded-xl border border-border bg-card">
-              <button
-                type="button"
-                onClick={() => setExpanded(open ? null : c.id)}
-                className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-brand-seafoam/20"
-              >
-                <div>
-                  <div className="font-medium text-brand-text">{c.name}</div>
-                  <div className="text-[13px] text-brand-text-secondary">
-                    {c.title} at {c.company}
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-[13px] text-brand-text-secondary">
-                  <span>{reviewedCount} / {numSteps} reviewed</span>
-                  {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </div>
-              </button>
-              {open && (
-                <div className="space-y-4 border-t border-border bg-brand-bg/40 p-5">
-                  {Array.from({ length: numSteps }).map((_, i) => {
-                    const key = `${c.id}-${i}`;
-                    const isReviewed = reviewed.has(key);
-                    const isConnection = i === 0;
-                    const limit = isConnection ? 300 : 2000;
-                    const draft = draftMessage(c, i, tone);
-                    return (
-                      <MessageEditor
-                        key={key}
-                        title={isConnection ? "Step 1: Connection note" : `Step ${i + 1}: Follow-up #${i}`}
-                        defaultValue={draft}
-                        limit={limit}
-                        reviewed={isReviewed}
-                        onToggleReviewed={() => toggleReviewed(key)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      )}
     </section>
   );
 }
 
-function MessageEditor({
-  title,
-  defaultValue,
-  limit,
-  reviewed,
-  onToggleReviewed,
+function SafetyItem({
+  label,
+  help,
+  locked,
+  children,
 }: {
-  title: string;
-  defaultValue: string;
-  limit: number;
-  reviewed: boolean;
-  onToggleReviewed: () => void;
+  label: string;
+  help: string;
+  locked?: boolean;
+  children: React.ReactNode;
 }) {
-  const [value, setValue] = useState(defaultValue);
-  const over = value.length > limit;
-
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <div className="text-[13px] font-medium text-brand-text">{title}</div>
-        <div className={cn("text-[12px] tabular-nums", over ? "text-red-500" : "text-brand-text-secondary")}>
-          {value.length} / {limit}
+    <div
+      className={cn(
+        "flex flex-wrap items-start justify-between gap-4 border-b border-border px-5 py-4 last:border-b-0",
+        locked && "bg-brand-seafoam/10",
+      )}
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5 text-sm font-medium text-brand-text">
+          {locked && <Lock className="h-3.5 w-3.5 text-brand-primary" />}
+          {label}
         </div>
+        <div className="mt-0.5 text-[12px] text-brand-text-secondary">{help}</div>
       </div>
-      <Textarea
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="min-h-[100px] resize-y text-sm leading-relaxed"
-      />
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setValue(defaultValue)}>
-            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-            Regenerate
-          </Button>
-        </div>
-        <button
-          type="button"
-          onClick={onToggleReviewed}
-          className="flex items-center gap-1.5 text-[13px] font-medium"
-        >
-          {reviewed ? (
-            <>
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span className="text-green-700">Reviewed</span>
-            </>
-          ) : (
-            <>
-              <Circle className="h-4 w-4 text-gray-400" />
-              <span className="text-brand-text-secondary">Mark as reviewed</span>
-            </>
-          )}
-        </button>
-      </div>
+      <div className="flex-shrink-0">{children}</div>
     </div>
   );
 }
 
-/* -------------------------- Step 5 -------------------------- */
+/* -------------------------------------------------------------------------- */
+/*  Step 5 — Review & launch                                                  */
+/* -------------------------------------------------------------------------- */
 
-function Step5({
-  campaignName,
+function Step5Review({
+  account,
+  project,
+  client,
+  jobTitle,
+  jobCode,
   candidates,
-  numSteps,
-  waits,
+  steps,
   tone,
+  dailyCap,
   startHour,
   endHour,
   weekends,
-  startDate,
-  reviewedCount,
-  totalMessages,
-  canLaunch,
+  approvalsNeeded,
+  daysToComplete,
   onLaunch,
 }: {
-  campaignName: string;
+  account: LinkedInAccount;
+  project: string;
+  client: string;
+  jobTitle: string;
+  jobCode: string;
   candidates: Candidate[];
-  numSteps: number;
-  waits: number[];
+  steps: SequenceStep[];
   tone: string;
+  dailyCap: number;
   startHour: string;
   endHour: string;
   weekends: boolean;
-  startDate: string;
-  reviewedCount: number;
-  totalMessages: number;
-  canLaunch: boolean;
+  approvalsNeeded: number;
+  daysToComplete: number;
   onLaunch: () => void;
 }) {
-  const seqStr = `${numSteps}-step sequence: Connection note${waits
-    .slice(0, numSteps - 1)
-    .map((w, i) => ` → ${i === waits.length - 1 || i === numSteps - 2 ? "Final follow-up" : "Follow-up"} (${w} days)`)
-    .join("")}`;
+  const seqDescription =
+    `${steps.length}-step sequence: Connection note` +
+    steps
+      .slice(1)
+      .map((s, i) => ` → Follow-up ${i + 1} (wait ${s.waitDays}d)`)
+      .join("");
 
   return (
     <section className="mx-auto max-w-2xl">
-      <h2 className="mb-1 text-lg font-semibold text-brand-text">Review and launch</h2>
+      <h2 className="mb-1 text-lg font-semibold text-brand-text">Review & launch</h2>
       <p className="mb-6 text-sm text-brand-text-secondary">
-        Confirm your campaign configuration before going live.
+        Confirm campaign configuration. After launch, prospects appear in the campaign detail with
+        per-prospect status and three-level kill switches (prospect / campaign / account).
       </p>
 
       <div className="rounded-xl border border-border bg-card">
@@ -1071,95 +1294,105 @@ function Step5({
           Campaign summary
         </div>
         <dl className="divide-y divide-border">
-          <SumRow label="Campaign" value={campaignName} />
-          <SumRow label="Project" value="Chief Financial Officer — Indorama Ventures" />
+          <SumRow label="Job">
+            <span className="font-medium text-brand-text">{jobTitle}</span>
+            <span className="ml-2 font-mono text-[12px] text-brand-text-secondary">{jobCode}</span>
+          </SumRow>
+          <SumRow label="Project" value={`${client} — ${project}`} />
+          <SumRow label="Sending account">
+            <span className="inline-flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-primary text-[10px] font-semibold text-white">
+                {account.initials}
+              </span>
+              {account.name}
+              {account.warmup ? (
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+                  Warmup day {account.warmup.day}/7
+                </span>
+              ) : (
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">
+                  Healthy
+                </span>
+              )}
+            </span>
+          </SumRow>
           <SumRow label="Candidates">
-            <div className="flex flex-wrap gap-2">
-              {candidates.map((c) => (
+            <div className="flex flex-wrap gap-1.5">
+              {candidates.slice(0, 8).map((c) => (
                 <span
                   key={c.id}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-brand-bg px-2 py-1 text-[12px]"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-brand-bg px-2 py-0.5 text-[12px]"
                 >
-                  <ScoreRing score={c.score} size="sm" />
                   {c.name}
                 </span>
               ))}
+              {candidates.length > 8 && (
+                <span className="text-[12px] text-brand-text-secondary">
+                  +{candidates.length - 8} more
+                </span>
+              )}
             </div>
           </SumRow>
-          <SumRow label="Sequence" value={seqStr} />
-          <SumRow label="LinkedIn account">
-            <span className="inline-flex items-center gap-2">
-              Amarsh Jain
-              <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">
-                Healthy
-              </span>
-            </span>
-          </SumRow>
+          <SumRow label="Sequence" value={seqDescription} />
           <SumRow label="Tone" value={tone} />
           <SumRow
             label="Schedule"
-            value={`${weekends ? "Mon–Sun" : "Mon–Fri"}, ${startHour} – ${endHour} (recipient timezone), starting ${startDate}`}
+            value={`${weekends ? "Mon–Sun" : "Mon–Fri"}, ${startHour}–${endHour} (recipient TZ)`}
           />
-          <SumRow label="Messages reviewed">
-            <span className={cn(reviewedCount === totalMessages ? "text-green-700" : "text-amber-600")}>
-              {reviewedCount} of {totalMessages} reviewed
-              {reviewedCount === totalMessages && " ✓"}
-            </span>
-          </SumRow>
-          <SumRow label="Est. completion" value="~3 weeks for full sequence" />
-          <SumRow label="Est. AI cost" value={`$${(totalMessages * 0.011).toFixed(2)}`} />
+          <SumRow
+            label="Pace"
+            value={`Up to ${dailyCap}/day · ~${daysToComplete} ${daysToComplete === 1 ? "day" : "days"} to send all connection requests`}
+          />
         </dl>
       </div>
 
+      {approvalsNeeded > 0 && (
+        <div className="mt-6 flex items-start gap-3 rounded-xl border-2 border-amber-300 bg-amber-50 p-5">
+          <ShieldCheck className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" />
+          <div>
+            <div className="text-sm font-semibold text-amber-900">
+              The first 50 sends from this account require manual approval
+            </div>
+            <p className="mt-1 text-[13px] text-amber-900">
+              <strong>{approvalsNeeded}</strong> of your selected candidates will appear in the
+              Approval Queue — you click Send on each one. This protects the LinkedIn account and
+              is non-negotiable for executive-search outreach.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 rounded-xl border border-border bg-card p-5">
-        <div className="mb-3 text-sm font-semibold text-brand-text">Safety rails</div>
+        <div className="mb-3 text-sm font-semibold text-brand-text">Safety rails (locked)</div>
         <ul className="space-y-2 text-sm">
           {[
-            "Daily send cap: 15 messages/day",
-            "Manual approval mode: Active (first 50 sends)",
-            "Stop on reply: Enabled",
-            "Business hours only: 8 AM – 6 PM",
-            "Weekend sending: Disabled",
+            "Stop on reply — sequence halts the moment a candidate replies",
+            "Manual approval queue for first 50 sends per account",
+            "7-day account warmup (5 → 15/day) on new accounts",
+            "Send window 08:00 – 18:00, recipient timezone",
+            "Daily cap ≤ 25, default 15",
+            "Do Not Contact list enforced",
+            "No scraping · sent from your own connected LinkedIn",
           ].map((item) => (
             <li key={item} className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />
               <span className="text-brand-text">{item}</span>
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="mt-6 flex items-start gap-3 rounded-lg border border-brand-mint/50 bg-brand-seafoam/20 p-4">
-        <ShieldCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-        <div>
-          <p className="text-[13px] text-brand-text">
-            Because this account has fewer than 50 total sends, every message requires your manual approval
-            before sending. Messages will appear in your Approval Queue — you click Send on each one.
-          </p>
-          <p className="mt-1 text-[12px] text-brand-text-secondary">
-            This is a safety feature that protects your LinkedIn account.
-          </p>
-        </div>
-      </div>
-
-      {!canLaunch && (
-        <div className="mt-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
-          <p className="text-[13px] text-amber-800">
-            Review all messages before launching. {totalMessages - reviewedCount} message
-            {totalMessages - reviewedCount === 1 ? "" : "s"} still need your approval.
-          </p>
-        </div>
-      )}
-
       <Button
         onClick={onLaunch}
-        disabled={!canLaunch}
         className="mt-6 w-full rounded-xl py-6 text-base font-medium"
+        disabled={candidates.length === 0}
       >
         <Rocket className="mr-2 h-5 w-5" />
-        Launch campaign
+        Launch campaign · {candidates.length} prospect{candidates.length === 1 ? "" : "s"}
       </Button>
+      <p className="mt-2 text-center text-[12px] text-brand-text-secondary">
+        AI drafts the messages. You approve and send. No auto-send, ever.
+      </p>
     </section>
   );
 }
@@ -1180,3 +1413,4 @@ function SumRow({
     </div>
   );
 }
+

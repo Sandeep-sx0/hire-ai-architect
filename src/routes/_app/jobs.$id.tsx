@@ -230,7 +230,12 @@ function JobDetail() {
             <Button
               variant="outline"
               className="gap-2"
-              onClick={() => navigate({ to: "/outreach/new" })}
+              onClick={() =>
+                navigate({
+                  to: "/outreach/new",
+                  search: { projectId: job.projectId, jobId: job.id },
+                })
+              }
             >
               <Send className="h-4 w-4" />
               New Campaign
@@ -502,7 +507,12 @@ function CampaignsTab({ job }: { job: Job }) {
         </div>
         <Button
           className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
-          onClick={() => navigate({ to: "/outreach/new" })}
+          onClick={() =>
+            navigate({
+              to: "/outreach/new",
+              search: { projectId: job.projectId, jobId: job.id },
+            })
+          }
         >
           <Plus className="h-4 w-4" />
           New Campaign
