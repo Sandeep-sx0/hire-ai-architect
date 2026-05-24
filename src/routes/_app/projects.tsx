@@ -852,6 +852,9 @@ function KanbanView({
 }
 
 function KanbanCard({ project }: { project: Project }) {
+  const summary = summarizeJobs(getJobsByProject(project.id));
+  const mix = jobMixLabel(summary);
+  const industry = industryOf(project.clientId);
   return (
     <Link
       to="/projects/$id"
@@ -861,8 +864,15 @@ function KanbanCard({ project }: { project: Project }) {
       <div className="text-[14px] font-medium leading-snug text-brand-text">
         {project.title}
       </div>
-      <div className="mt-0.5 text-[12px] text-brand-text-secondary">
-        {project.clientName}
+      <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+        <span className="text-[12px] text-brand-text-secondary">
+          {project.clientName}
+        </span>
+        {industry && (
+          <span className="inline-flex items-center rounded-full bg-brand-bg px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand-text-secondary">
+            {industry}
+          </span>
+        )}
       </div>
 
       <div className="mt-3 flex items-center justify-between text-[12px]">
@@ -883,17 +893,103 @@ function KanbanCard({ project }: { project: Project }) {
         </span>
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-3 flex items-center justify-between gap-2">
         <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-brand-text-secondary">
           {seniorityLabel[project.seniority]}
         </span>
-        <span className="text-[11px] font-medium text-brand-primary">
-          {getJobsByProject(project.id).length} jobs
-        </span>
+        <div className="text-right">
+          <div className="text-[11px] font-medium text-brand-primary">
+            {summary.count} {summary.count === 1 ? "job" : "jobs"}
+          </div>
+          {mix && (
+            <div className="text-[10px] text-brand-text-secondary">{mix}</div>
+          )}
+        </div>
       </div>
       <div className="mt-1.5 text-right text-[11px] text-brand-text-secondary">
         {relativeCreated(project.daysOpen)}
       </div>
     </Link>
+  );
+}
+
+// === Card View ===============================================
+function CardView({ rows }: { rows: Project[] }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 transition-opacity duration-200 sm:grid-cols-2 xl:grid-cols-3">
+      {rows.map((project) => {
+        const summary = summarizeJobs(getJobsByProject(project.id));
+        const mix = jobMixLabel(summary);
+        const industry = industryOf(project.clientId);
+        return (
+          <Link
+            key={project.id}
+            to="/projects/$id"
+            params={{ id: project.id }}
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 transition-all hover:border-brand-mint hover:shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-[15px] font-semibold text-brand-text">
+                  {project.title}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[12.5px] text-brand-text-secondary">
+                    {project.clientName}
+                  </span>
+                  {industry && (
+                    <span className="inline-flex items-center rounded-full bg-brand-bg px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand-text-secondary">
+                      {industry}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <StatusBadge status={project.status} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 rounded-lg bg-brand-bg/50 p-3 text-[12px]">
+              <div>
+                <div className="text-[10px] uppercase tracking-wide text-brand-text-secondary">
+                  Jobs
+                </div>
+                <div className="mt-0.5 font-semibold text-brand-text">
+                  {summary.count} {summary.count === 1 ? "job" : "jobs"}
+                </div>
+                {mix && (
+                  <div className="text-[10.5px] text-brand-text-secondary">
+                    {mix}
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-wide text-brand-text-secondary">
+                  Candidates
+                </div>
+                <div className="mt-0.5 font-semibold text-brand-text">
+                  {project.candidates === 0
+                    ? "None yet"
+                    : `${project.candidates}`}
+                </div>
+                <div className="text-[10.5px] text-brand-text-secondary">
+                  {seniorityLabel[project.seniority]}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-border pt-3 text-[12px]">
+              <span className="flex items-center gap-1.5 text-brand-text-secondary">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-seafoam text-[10px] font-semibold text-brand-primary">
+                  {initialsOf(project.owner)}
+                </span>
+                {project.owner}
+              </span>
+              <span className="text-brand-text-secondary">
+                {relativeCreated(project.daysOpen)}
+              </span>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
