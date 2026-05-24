@@ -13,6 +13,7 @@ import {
   Search,
   List,
   LayoutGrid,
+  Columns3,
 } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState, KanbanColumn } from "@/components/shared";
 import { Button } from "@/components/ui/button";
