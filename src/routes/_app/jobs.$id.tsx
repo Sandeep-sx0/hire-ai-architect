@@ -148,6 +148,7 @@ function JobDetail() {
   const client = project ? clients.find((c) => c.id === project.clientId) : undefined;
 
   const [status, setStatus] = useState<JobStatus>(job.status);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const window_ = targetWindowDays(job.seniorityLevel);
   const daysToClose = window_ - job.daysOpen;
