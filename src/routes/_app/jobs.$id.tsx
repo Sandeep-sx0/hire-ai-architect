@@ -715,3 +715,312 @@ function ActivityTab() {
     </div>
   );
 }
+
+// ============================ Distribution tab =============================
+
+function DistributionTab({
+  job,
+  onOpenPicker,
+  setTab,
+}: {
+  job: Job;
+  onOpenPicker: () => void;
+  setTab: (t: "pipeline" | "details" | "matching" | "distribution" | "campaigns" | "inbound" | "activity") => void;
+}) {
+  const rows = postingsForJob(job.id);
+  const careersUrl = `https://norvex-careers.example/jobs/${job.jobCode.toLowerCase()}`;
+  const careersRow = rows.find((r) => r.channel === "careers_page");
+  const totalApps = rows.reduce((s, r) => s + r.applicants, 0);
+  const liveCount = rows.filter((r) => r.status === "live").length;
+  const expiringSoon = rows.filter((r) => {
+    const d = daysUntil(r.expiresAt);
+    return d !== null && d >= 0 && d <= 7;
+  }).length;
+
+  return (
+    <div className="space-y-6">
+      {/* Top summary */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+        <SummaryStat label="Channels live" value={liveCount} />
+        <SummaryStat label="Applicants from postings" value={totalApps} />
+        <SummaryStat
+          label="Expiring in 7 days"
+          value={expiringSoon}
+          tone={expiringSoon > 0 ? "warn" : undefined}
+        />
+        <SummaryStat label="Posted channels" value={rows.length} />
+      </div>
+
+      {/* Careers page row (always present) */}
+      <div className="rounded-xl border border-border bg-card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-brand-primary text-sm font-bold text-white">
+              Nx
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-brand-text">Norvex Careers Page</div>
+              <div className="text-xs text-brand-text-secondary">
+                {careersRow?.status === "live"
+                  ? "Live on your white-label careers site"
+                  : "Not currently published"}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2 rounded-md border border-border bg-brand-bg/50 px-3 py-1.5">
+              <Globe className="h-3.5 w-3.5 text-brand-text-secondary" />
+              <code className="text-xs text-brand-text">{careersUrl}</code>
+              <button
+                onClick={() => {
+                  navigator.clipboard?.writeText(careersUrl);
+                  toast.success("URL copied");
+                }}
+                className="rounded p-1 hover:bg-muted"
+                aria-label="Copy URL"
+              >
+                <CopyIcon className="h-3.5 w-3.5 text-brand-text-secondary" />
+              </button>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => toast.success(careersRow?.status === "live" ? "Unpublished" : "Published")}
+            >
+              {careersRow?.status === "live" ? "Unpublish" : "Publish"}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Per-channel posting status table */}
+      <div className="rounded-xl border border-border bg-card">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
+          <div>
+            <div className="text-sm font-semibold text-brand-text">Channel postings</div>
+            <div className="text-xs text-brand-text-secondary">
+              Status synced from each board. Errors and expired postings need recruiter action.
+            </div>
+          </div>
+          <Button
+            size="sm"
+            onClick={onOpenPicker}
+            className="gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
+          >
+            <Plus className="h-4 w-4" />
+            Post to more channels
+          </Button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-muted/50 text-xs uppercase tracking-wide text-brand-text-secondary">
+              <tr>
+                <th className="px-4 py-3 text-left font-semibold">Channel</th>
+                <th className="px-4 py-3 text-left font-semibold">Status</th>
+                <th className="px-4 py-3 text-left font-semibold">Posted</th>
+                <th className="px-4 py-3 text-left font-semibold">Expires</th>
+                <th className="px-4 py-3 text-left font-semibold">Applicants</th>
+                <th className="px-4 py-3 text-left font-semibold">Last synced</th>
+                <th className="px-4 py-3 text-right font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((p) => (
+                <PostingRow key={p.id} posting={p} setTab={setTab} />
+              ))}
+              {rows.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-brand-text-secondary">
+                    No postings yet. Use “Post to more channels” to distribute this role.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Source effectiveness mini-chart */}
+      <SourceEffectiveness rows={rows} setTab={setTab} />
+    </div>
+  );
+}
+
+function PostingRow({
+  posting,
+  setTab,
+}: {
+  posting: Posting;
+  setTab: (t: "inbound") => void;
+}) {
+  const ch = getChannel(posting.channel);
+  const tone = statusTone(posting.status);
+  const expiryDays = daysUntil(posting.expiresAt);
+  const expiringSoon =
+    expiryDays !== null && expiryDays >= 0 && expiryDays <= 7 && posting.status === "live";
+
+  return (
+    <tr className="border-t border-border align-top hover:bg-brand-bg/40">
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-3">
+          <div className={cn("flex h-8 w-8 items-center justify-center rounded text-[11px] font-bold text-white", ch.accent)}>
+            {ch.initial}
+          </div>
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-brand-text">{ch.name}</div>
+            {posting.errorMessage && (
+              <div className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-status-danger">
+                <AlertTriangle className="h-3 w-3" /> {posting.errorMessage}
+              </div>
+            )}
+          </div>
+        </div>
+      </td>
+      <td className="px-4 py-3">
+        <span className={cn("inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-medium", tone.className)}>
+          {tone.label}
+        </span>
+        {expiringSoon && (
+          <div className="mt-1 text-[11px] font-medium text-status-warning">
+            Expires in {expiryDays}d
+          </div>
+        )}
+      </td>
+      <td className="px-4 py-3 text-brand-text-secondary">{posting.postedAt ?? "—"}</td>
+      <td className={cn("px-4 py-3", expiringSoon ? "text-status-warning font-medium" : "text-brand-text-secondary")}>
+        {posting.expiresAt ?? "—"}
+      </td>
+      <td className="px-4 py-3">
+        {posting.applicants > 0 ? (
+          <button
+            onClick={() => setTab("inbound")}
+            className="font-medium text-brand-primary hover:underline"
+          >
+            {posting.applicants}
+          </button>
+        ) : (
+          <span className="text-brand-text-secondary">0</span>
+        )}
+      </td>
+      <td className="px-4 py-3 text-brand-text-secondary">{posting.lastSyncedAt ?? "—"}</td>
+      <td className="px-4 py-3 text-right">
+        <div className="inline-flex items-center gap-1">
+          {posting.status === "live" && posting.externalUrl && (
+            <Button variant="ghost" size="sm" className="gap-1" asChild>
+              <a href={posting.externalUrl} target="_blank" rel="noreferrer">
+                <ExternalLink className="h-3.5 w-3.5" /> View
+              </a>
+            </Button>
+          )}
+          {posting.status === "live" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => toast.success(`${ch.name} posting closed`)}
+            >
+              Close
+            </Button>
+          )}
+          {posting.status === "expired" && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              onClick={() => toast.success(`Re-posted to ${ch.name}`)}
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Re-post
+            </Button>
+          )}
+          {posting.status === "error" && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1 text-status-danger"
+              onClick={() => toast(`Retrying ${ch.name}…`)}
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Retry
+            </Button>
+          )}
+          {posting.status === "pending" && (
+            <span className="text-xs text-brand-text-secondary">Queued</span>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function SummaryStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number | string;
+  tone?: "warn" | "danger";
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-card px-4 py-3">
+      <div className="text-[11px] uppercase tracking-wide text-brand-text-secondary">{label}</div>
+      <div
+        className={cn(
+          "mt-1 text-2xl font-semibold",
+          tone === "warn" ? "text-status-warning" : tone === "danger" ? "text-status-danger" : "text-brand-text",
+        )}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function SourceEffectiveness({
+  rows,
+  setTab,
+}: {
+  rows: Posting[];
+  setTab: (t: "inbound") => void;
+}) {
+  const max = Math.max(1, ...rows.map((r) => r.applicants));
+  const sorted = [...rows].sort((a, b) => b.applicants - a.applicants);
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold text-brand-text">Applicants by source</div>
+          <div className="text-xs text-brand-text-secondary">
+            Which channel is producing this role's inbound funnel.
+          </div>
+        </div>
+        <button
+          onClick={() => setTab("inbound")}
+          className="text-xs font-medium text-brand-primary hover:underline"
+        >
+          View all inbound →
+        </button>
+      </div>
+      <div className="space-y-2">
+        {sorted.map((p) => {
+          const ch = getChannel(p.channel);
+          const pct = (p.applicants / max) * 100;
+          return (
+            <div key={p.id} className="flex items-center gap-3">
+              <div className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-bold text-white", ch.accent)}>
+                {ch.initial}
+              </div>
+              <div className="w-36 truncate text-sm text-brand-text">{ch.name}</div>
+              <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full bg-brand-primary/80"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+              <div className="w-10 text-right text-sm tabular-nums text-brand-text">{p.applicants}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
