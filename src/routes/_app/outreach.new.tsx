@@ -104,7 +104,7 @@ const ACCOUNTS: LinkedInAccount[] = [
   },
 ];
 
-const WARMUP_RAMP = [5, 7, 9, 10, 12, 14, 15]; // day 1..7
+// 7-day warmup ramp reference (day 1..7): 5, 7, 9, 10, 12, 14, 15
 
 type SourceKey = "shortlist" | "match" | "saved";
 
