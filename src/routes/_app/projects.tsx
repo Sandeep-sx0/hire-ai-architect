@@ -51,7 +51,7 @@ const searchSchema = z.object({
   client: fallback(z.string(), "all").default("all"),
   seniority: fallback(z.string(), "all").default("all"),
   assigned: fallback(z.string(), "all").default("all"),
-  view: fallback(z.enum(["table", "kanban"]), "table").default("table"),
+  view: fallback(z.enum(["table", "kanban", "card"]), "table").default("table"),
   sort: fallback(z.string(), "created").default("created"),
   dir: fallback(z.enum(["asc", "desc"]), "desc").default("desc"),
 });
