@@ -31,6 +31,7 @@ import { Route as AppCandidatesRouteImport } from './routes/_app/candidates'
 import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
 import { Route as CareersTrackTokenRouteImport } from './routes/careers.track.$token'
+import { Route as AppSettingsDistributionRouteImport } from './routes/_app/settings_.distribution'
 import { Route as AppProjectsIdRouteImport } from './routes/_app/projects.$id'
 import { Route as AppOutreachNewRouteImport } from './routes/_app/outreach.new'
 import { Route as AppOutreachIdRouteImport } from './routes/_app/outreach.$id'
@@ -150,6 +151,11 @@ const CareersTrackTokenRoute = CareersTrackTokenRouteImport.update({
   path: '/track/$token',
   getParentRoute: () => CareersRoute,
 } as any)
+const AppSettingsDistributionRoute = AppSettingsDistributionRouteImport.update({
+  id: '/settings_/distribution',
+  path: '/settings/distribution',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProjectsIdRoute = AppProjectsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/outreach/$id': typeof AppOutreachIdRoute
   '/outreach/new': typeof AppOutreachNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/settings/distribution': typeof AppSettingsDistributionRoute
   '/careers/track/$token': typeof CareersTrackTokenRoute
   '/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
@@ -256,6 +263,7 @@ export interface FileRoutesByTo {
   '/outreach/$id': typeof AppOutreachIdRoute
   '/outreach/new': typeof AppOutreachNewRoute
   '/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/settings/distribution': typeof AppSettingsDistributionRoute
   '/careers/track/$token': typeof CareersTrackTokenRoute
   '/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/projects/$id/parse': typeof AppProjectsIdParseRoute
@@ -290,6 +298,7 @@ export interface FileRoutesById {
   '/_app/outreach/$id': typeof AppOutreachIdRoute
   '/_app/outreach/new': typeof AppOutreachNewRoute
   '/_app/projects/$id': typeof AppProjectsIdRouteWithChildren
+  '/_app/settings_/distribution': typeof AppSettingsDistributionRoute
   '/careers/track/$token': typeof CareersTrackTokenRoute
   '/_app/jobs/$id/parse': typeof AppJobsIdParseRoute
   '/_app/projects/$id/parse': typeof AppProjectsIdParseRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/outreach/$id'
     | '/outreach/new'
     | '/projects/$id'
+    | '/settings/distribution'
     | '/careers/track/$token'
     | '/jobs/$id/parse'
     | '/projects/$id/parse'
@@ -356,6 +366,7 @@ export interface FileRouteTypes {
     | '/outreach/$id'
     | '/outreach/new'
     | '/projects/$id'
+    | '/settings/distribution'
     | '/careers/track/$token'
     | '/jobs/$id/parse'
     | '/projects/$id/parse'
@@ -389,6 +400,7 @@ export interface FileRouteTypes {
     | '/_app/outreach/$id'
     | '/_app/outreach/new'
     | '/_app/projects/$id'
+    | '/_app/settings_/distribution'
     | '/careers/track/$token'
     | '/_app/jobs/$id/parse'
     | '/_app/projects/$id/parse'
@@ -563,6 +575,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareersTrackTokenRouteImport
       parentRoute: typeof CareersRoute
     }
+    '/_app/settings_/distribution': {
+      id: '/_app/settings_/distribution'
+      path: '/settings/distribution'
+      fullPath: '/settings/distribution'
+      preLoaderRoute: typeof AppSettingsDistributionRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/projects/$id': {
       id: '/_app/projects/$id'
       path: '/$id'
@@ -727,6 +746,7 @@ interface AppRouteChildren {
   AppOutreachRoute: typeof AppOutreachRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
+  AppSettingsDistributionRoute: typeof AppSettingsDistributionRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -740,6 +760,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppOutreachRoute: AppOutreachRouteWithChildren,
   AppProjectsRoute: AppProjectsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
+  AppSettingsDistributionRoute: AppSettingsDistributionRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -772,3 +793,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
