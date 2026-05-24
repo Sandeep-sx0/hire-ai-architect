@@ -7,7 +7,6 @@ import {
   Activity,
   Briefcase,
   Building2,
-  Calendar,
   ChevronRight,
   Clock,
   Copy,
@@ -23,7 +22,6 @@ import {
   Send,
   Sparkles,
   UserPlus,
-  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
