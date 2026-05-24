@@ -25,6 +25,7 @@ import { Route as AppProjectsRouteImport } from './routes/_app/projects'
 import { Route as AppOutreachRouteImport } from './routes/_app/outreach'
 import { Route as AppJobsRouteImport } from './routes/_app/jobs'
 import { Route as AppInboxRouteImport } from './routes/_app/inbox'
+import { Route as AppDistributionRouteImport } from './routes/_app/distribution'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppClientsRouteImport } from './routes/_app/clients'
 import { Route as AppCandidatesRouteImport } from './routes/_app/candidates'
@@ -121,6 +122,11 @@ const AppInboxRoute = AppInboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDistributionRoute = AppDistributionRouteImport.update({
+  id: '/distribution',
+  path: '/distribution',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -213,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/candidates': typeof AppCandidatesRouteWithChildren
   '/clients': typeof AppClientsRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
+  '/distribution': typeof AppDistributionRoute
   '/inbox': typeof AppInboxRoute
   '/jobs': typeof AppJobsRouteWithChildren
   '/outreach': typeof AppOutreachRouteWithChildren
@@ -246,6 +253,7 @@ export interface FileRoutesByTo {
   '/candidates': typeof AppCandidatesRouteWithChildren
   '/clients': typeof AppClientsRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
+  '/distribution': typeof AppDistributionRoute
   '/inbox': typeof AppInboxRoute
   '/jobs': typeof AppJobsRouteWithChildren
   '/outreach': typeof AppOutreachRouteWithChildren
@@ -281,6 +289,7 @@ export interface FileRoutesById {
   '/_app/candidates': typeof AppCandidatesRouteWithChildren
   '/_app/clients': typeof AppClientsRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/distribution': typeof AppDistributionRoute
   '/_app/inbox': typeof AppInboxRoute
   '/_app/jobs': typeof AppJobsRouteWithChildren
   '/_app/outreach': typeof AppOutreachRouteWithChildren
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/candidates'
     | '/clients'
     | '/dashboard'
+    | '/distribution'
     | '/inbox'
     | '/jobs'
     | '/outreach'
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/candidates'
     | '/clients'
     | '/dashboard'
+    | '/distribution'
     | '/inbox'
     | '/jobs'
     | '/outreach'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/_app/candidates'
     | '/_app/clients'
     | '/_app/dashboard'
+    | '/_app/distribution'
     | '/_app/inbox'
     | '/_app/jobs'
     | '/_app/outreach'
@@ -531,6 +543,13 @@ declare module '@tanstack/react-router' {
       path: '/inbox'
       fullPath: '/inbox'
       preLoaderRoute: typeof AppInboxRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/distribution': {
+      id: '/_app/distribution'
+      path: '/distribution'
+      fullPath: '/distribution'
+      preLoaderRoute: typeof AppDistributionRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/dashboard': {
@@ -741,6 +760,7 @@ interface AppRouteChildren {
   AppCandidatesRoute: typeof AppCandidatesRouteWithChildren
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
+  AppDistributionRoute: typeof AppDistributionRoute
   AppInboxRoute: typeof AppInboxRoute
   AppJobsRoute: typeof AppJobsRouteWithChildren
   AppOutreachRoute: typeof AppOutreachRouteWithChildren
@@ -755,6 +775,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCandidatesRoute: AppCandidatesRouteWithChildren,
   AppClientsRoute: AppClientsRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
+  AppDistributionRoute: AppDistributionRoute,
   AppInboxRoute: AppInboxRoute,
   AppJobsRoute: AppJobsRouteWithChildren,
   AppOutreachRoute: AppOutreachRouteWithChildren,
@@ -793,3 +814,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
