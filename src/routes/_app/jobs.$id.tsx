@@ -376,9 +376,23 @@ function JobDetail() {
           <MatchResults projectId={job.projectId} />
         </div>
       )}
+      {tab === "distribution" && (
+        <DistributionTab job={job} onOpenPicker={() => setPickerOpen(true)} setTab={setTab} />
+      )}
       {tab === "campaigns" && <CampaignsTab job={job} />}
       {tab === "inbound" && <InboundTab job={job} />}
       {tab === "activity" && <ActivityTab />}
+
+      <ChannelPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        alreadyPosted={postingsForJob(job.id).map((p) => p.channel)}
+        onConfirm={(chs) =>
+          toast.success(
+            `Queued ${chs.length} posting${chs.length === 1 ? "" : "s"} for ${job.title}`,
+          )
+        }
+      />
     </div>
   );
 }
