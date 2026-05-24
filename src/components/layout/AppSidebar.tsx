@@ -9,6 +9,7 @@ import {
   Inbox,
   BarChart3,
   Settings,
+  Share2,
 } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
