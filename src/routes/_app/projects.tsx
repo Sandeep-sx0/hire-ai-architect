@@ -621,25 +621,52 @@ function TableView({
                   />
                 </td>
                 <td className="px-3 py-2 align-middle">
-                  <div className="text-[14px] font-medium text-brand-text">
+                  <Link
+                    to="/projects/$id"
+                    params={{ id: p.id }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="block text-[14px] font-medium text-brand-text hover:text-brand-primary hover:underline"
+                  >
                     {p.title}
-                  </div>
-                  <div className="text-[13px] text-brand-text-secondary">
-                    {p.clientName}
+                  </Link>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                    <span className="text-[13px] text-brand-text-secondary">
+                      {p.clientName}
+                    </span>
+                    {industryOf(p.clientId) && (
+                      <span className="inline-flex items-center rounded-full bg-brand-bg px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand-text-secondary">
+                        {industryOf(p.clientId)}
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="px-3 align-middle text-sm" onClick={(e) => e.stopPropagation()}>
                   {(() => {
-                    const count = getJobsByProject(p.id).length;
-                    if (count === 0) return <span className="text-brand-text-secondary/60">—</span>;
+                    const jobs = getJobsByProject(p.id);
+                    const summary = summarizeJobs(jobs);
+                    const mix = jobMixLabel(summary);
                     return (
                       <Link
                         to="/projects/$id"
                         params={{ id: p.id }}
                         search={{ tab: "jobs" } as never}
-                        className="font-medium text-brand-primary hover:underline"
+                        className="block leading-tight"
                       >
-                        {count} {count === 1 ? "job" : "jobs"}
+                        <span
+                          className={cn(
+                            "font-medium",
+                            summary.count === 0
+                              ? "text-brand-text-secondary"
+                              : "text-brand-primary hover:underline",
+                          )}
+                        >
+                          {summary.count} {summary.count === 1 ? "job" : "jobs"}
+                        </span>
+                        {mix && (
+                          <div className="mt-0.5 text-[11px] text-brand-text-secondary">
+                            {mix}
+                          </div>
+                        )}
                       </Link>
                     );
                   })()}
