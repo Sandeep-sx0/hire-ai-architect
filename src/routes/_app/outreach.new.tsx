@@ -1414,5 +1414,3 @@ function SumRow({
   );
 }
 
-// Re-export to satisfy unused warm-up constant reference
-export const _WARMUP = WARMUP_RAMP;
