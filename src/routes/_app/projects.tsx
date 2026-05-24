@@ -13,6 +13,7 @@ import {
   Search,
   List,
   LayoutGrid,
+  Columns3,
 } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState, KanbanColumn } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ import {
   type Project,
   type ProjectStatus,
   type SeniorityLevel,
+  type Job,
 } from "@/lib/mock-data";
 import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 
@@ -51,7 +53,7 @@ const searchSchema = z.object({
   client: fallback(z.string(), "all").default("all"),
   seniority: fallback(z.string(), "all").default("all"),
   assigned: fallback(z.string(), "all").default("all"),
-  view: fallback(z.enum(["table", "kanban"]), "table").default("table"),
+  view: fallback(z.enum(["table", "kanban", "card"]), "table").default("table"),
   sort: fallback(z.string(), "created").default("created"),
   dir: fallback(z.enum(["asc", "desc"]), "desc").default("desc"),
 });
@@ -137,6 +139,69 @@ function initialsOf(name: string): string {
     .slice(0, 2)
     .join("")
     .toUpperCase();
+}
+
+function industryOf(clientId: string): string | undefined {
+  return allClients.find((c) => c.id === clientId)?.industry;
+}
+
+interface JobsSummary {
+  count: number;
+  open: number;
+  active: number;
+  filled: number;
+  draft: number;
+  onHold: number;
+  closed: number;
+}
+
+function summarizeJobs(jobs: Job[]): JobsSummary {
+  const s: JobsSummary = {
+    count: jobs.length,
+    open: 0,
+    active: 0,
+    filled: 0,
+    draft: 0,
+    onHold: 0,
+    closed: 0,
+  };
+  for (const j of jobs) {
+    switch (j.status) {
+      case "open":
+        s.open += 1;
+        break;
+      case "sourcing":
+      case "shortlisted":
+      case "interviewing":
+      case "offer":
+        s.active += 1;
+        break;
+      case "placed":
+        s.filled += 1;
+        break;
+      case "draft":
+        s.draft += 1;
+        break;
+      case "on_hold":
+        s.onHold += 1;
+        break;
+      case "closed":
+        s.closed += 1;
+        break;
+    }
+  }
+  return s;
+}
+
+function jobMixLabel(s: JobsSummary): string {
+  const parts: string[] = [];
+  if (s.open) parts.push(`${s.open} open`);
+  if (s.active) parts.push(`${s.active} active`);
+  if (s.filled) parts.push(`${s.filled} filled`);
+  if (s.draft) parts.push(`${s.draft} draft`);
+  if (s.onHold) parts.push(`${s.onHold} on hold`);
+  if (s.closed && parts.length === 0) parts.push(`${s.closed} closed`);
+  return parts.join(" · ");
 }
 
 // All recruiters/owners present in mock data
@@ -315,7 +380,7 @@ function ProjectsPage() {
         <ToggleGroup
           type="single"
           value={view}
-          onValueChange={(v) => v && update({ view: v as "table" | "kanban" })}
+          onValueChange={(v) => v && update({ view: v as "table" | "kanban" | "card" })}
           className="ml-auto"
         >
           <ToggleGroupItem
@@ -328,6 +393,13 @@ function ProjectsPage() {
           <ToggleGroupItem
             value="kanban"
             aria-label="Kanban view"
+            className="data-[state=on]:bg-brand-primary data-[state=on]:text-white"
+          >
+            <Columns3 className="h-4 w-4" />
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="card"
+            aria-label="Card view"
             className="data-[state=on]:bg-brand-primary data-[state=on]:text-white"
           >
             <LayoutGrid className="h-4 w-4" />
@@ -380,6 +452,8 @@ function ProjectsPage() {
           dir={dir}
           toggleSort={toggleSort}
         />
+      ) : view === "card" ? (
+        <CardView rows={sorted} />
       ) : (
         <KanbanView rows={sorted} showClosed={showClosed} setShowClosed={setShowClosed} />
       )}
@@ -547,25 +621,52 @@ function TableView({
                   />
                 </td>
                 <td className="px-3 py-2 align-middle">
-                  <div className="text-[14px] font-medium text-brand-text">
+                  <Link
+                    to="/projects/$id"
+                    params={{ id: p.id }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="block text-[14px] font-medium text-brand-text hover:text-brand-primary hover:underline"
+                  >
                     {p.title}
-                  </div>
-                  <div className="text-[13px] text-brand-text-secondary">
-                    {p.clientName}
+                  </Link>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                    <span className="text-[13px] text-brand-text-secondary">
+                      {p.clientName}
+                    </span>
+                    {industryOf(p.clientId) && (
+                      <span className="inline-flex items-center rounded-full bg-brand-bg px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand-text-secondary">
+                        {industryOf(p.clientId)}
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="px-3 align-middle text-sm" onClick={(e) => e.stopPropagation()}>
                   {(() => {
-                    const count = getJobsByProject(p.id).length;
-                    if (count === 0) return <span className="text-brand-text-secondary/60">—</span>;
+                    const jobs = getJobsByProject(p.id);
+                    const summary = summarizeJobs(jobs);
+                    const mix = jobMixLabel(summary);
                     return (
                       <Link
                         to="/projects/$id"
                         params={{ id: p.id }}
                         search={{ tab: "jobs" } as never}
-                        className="font-medium text-brand-primary hover:underline"
+                        className="block leading-tight"
                       >
-                        {count} {count === 1 ? "job" : "jobs"}
+                        <span
+                          className={cn(
+                            "font-medium",
+                            summary.count === 0
+                              ? "text-brand-text-secondary"
+                              : "text-brand-primary hover:underline",
+                          )}
+                        >
+                          {summary.count} {summary.count === 1 ? "job" : "jobs"}
+                        </span>
+                        {mix && (
+                          <div className="mt-0.5 text-[11px] text-brand-text-secondary">
+                            {mix}
+                          </div>
+                        )}
                       </Link>
                     );
                   })()}
@@ -751,6 +852,9 @@ function KanbanView({
 }
 
 function KanbanCard({ project }: { project: Project }) {
+  const summary = summarizeJobs(getJobsByProject(project.id));
+  const mix = jobMixLabel(summary);
+  const industry = industryOf(project.clientId);
   return (
     <Link
       to="/projects/$id"
@@ -760,8 +864,15 @@ function KanbanCard({ project }: { project: Project }) {
       <div className="text-[14px] font-medium leading-snug text-brand-text">
         {project.title}
       </div>
-      <div className="mt-0.5 text-[12px] text-brand-text-secondary">
-        {project.clientName}
+      <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+        <span className="text-[12px] text-brand-text-secondary">
+          {project.clientName}
+        </span>
+        {industry && (
+          <span className="inline-flex items-center rounded-full bg-brand-bg px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand-text-secondary">
+            {industry}
+          </span>
+        )}
       </div>
 
       <div className="mt-3 flex items-center justify-between text-[12px]">
@@ -782,17 +893,103 @@ function KanbanCard({ project }: { project: Project }) {
         </span>
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-3 flex items-center justify-between gap-2">
         <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-brand-text-secondary">
           {seniorityLabel[project.seniority]}
         </span>
-        <span className="text-[11px] font-medium text-brand-primary">
-          {getJobsByProject(project.id).length} jobs
-        </span>
+        <div className="text-right">
+          <div className="text-[11px] font-medium text-brand-primary">
+            {summary.count} {summary.count === 1 ? "job" : "jobs"}
+          </div>
+          {mix && (
+            <div className="text-[10px] text-brand-text-secondary">{mix}</div>
+          )}
+        </div>
       </div>
       <div className="mt-1.5 text-right text-[11px] text-brand-text-secondary">
         {relativeCreated(project.daysOpen)}
       </div>
     </Link>
+  );
+}
+
+// === Card View ===============================================
+function CardView({ rows }: { rows: Project[] }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 transition-opacity duration-200 sm:grid-cols-2 xl:grid-cols-3">
+      {rows.map((project) => {
+        const summary = summarizeJobs(getJobsByProject(project.id));
+        const mix = jobMixLabel(summary);
+        const industry = industryOf(project.clientId);
+        return (
+          <Link
+            key={project.id}
+            to="/projects/$id"
+            params={{ id: project.id }}
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 transition-all hover:border-brand-mint hover:shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-[15px] font-semibold text-brand-text">
+                  {project.title}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[12.5px] text-brand-text-secondary">
+                    {project.clientName}
+                  </span>
+                  {industry && (
+                    <span className="inline-flex items-center rounded-full bg-brand-bg px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand-text-secondary">
+                      {industry}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <StatusBadge status={project.status} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 rounded-lg bg-brand-bg/50 p-3 text-[12px]">
+              <div>
+                <div className="text-[10px] uppercase tracking-wide text-brand-text-secondary">
+                  Jobs
+                </div>
+                <div className="mt-0.5 font-semibold text-brand-text">
+                  {summary.count} {summary.count === 1 ? "job" : "jobs"}
+                </div>
+                {mix && (
+                  <div className="text-[10.5px] text-brand-text-secondary">
+                    {mix}
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-wide text-brand-text-secondary">
+                  Candidates
+                </div>
+                <div className="mt-0.5 font-semibold text-brand-text">
+                  {project.candidates === 0
+                    ? "None yet"
+                    : `${project.candidates}`}
+                </div>
+                <div className="text-[10.5px] text-brand-text-secondary">
+                  {seniorityLabel[project.seniority]}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-border pt-3 text-[12px]">
+              <span className="flex items-center gap-1.5 text-brand-text-secondary">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-seafoam text-[10px] font-semibold text-brand-primary">
+                  {initialsOf(project.owner)}
+                </span>
+                {project.owner}
+              </span>
+              <span className="text-brand-text-secondary">
+                {relativeCreated(project.daysOpen)}
+              </span>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
