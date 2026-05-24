@@ -5,6 +5,7 @@ import {
   Users,
   Building2,
   Send,
+  ShieldCheck,
   Inbox,
   BarChart3,
   Settings,
@@ -21,6 +22,7 @@ const nav = [
   { to: "/candidates", label: "Candidates", icon: Users },
   { to: "/clients", label: "Clients", icon: Building2 },
   { to: "/outreach", label: "Outreach", icon: Send },
+  { to: "/approvals", label: "Approval Queue", icon: ShieldCheck, badge: 12 },
   { to: "/inbox", label: "Inbox", icon: Inbox, badge: unreadInboxCount },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
 ] as const;
