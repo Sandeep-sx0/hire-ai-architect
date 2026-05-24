@@ -6,9 +6,13 @@ import { toast } from "sonner";
 import {
   Check,
   ChevronRight,
+  Clock,
   FileText,
+  Globe,
   Loader2,
   MapPin,
+  PlusCircle,
+  Send,
   Sparkles,
   Upload,
   X,
@@ -25,6 +29,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { projects } from "@/lib/mock-data";
 
@@ -34,7 +45,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_app/jobs/new")({
   validateSearch: zodValidator(searchSchema),
-  head: () => ({ meta: [{ title: "New Job — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "New Job — Norvex" }] }),
   component: JobWizard,
 });
 
@@ -42,8 +53,71 @@ const STEPS = [
   { id: 1, label: "Project & basics" },
   { id: 2, label: "JD input" },
   { id: 3, label: "AI review" },
-  { id: 4, label: "Confirm" },
+  { id: 4, label: "Distribute & publish" },
+  { id: 5, label: "Confirm" },
 ];
+
+// === Distribution channels (design-reference posting adapter) =================
+type ChannelId = "linkedin_jobs" | "indeed" | "seek" | "jobstreet" | "jobsdb";
+type ConnectionStatus = "connected" | "not_connected" | "pending" | "coming_soon";
+
+interface ChannelConfig {
+  id: ChannelId;
+  name: string;
+  blurb: string;
+  initial: string;
+  accent: string; // bg color for logo tile
+}
+
+const CHANNELS: ChannelConfig[] = [
+  {
+    id: "linkedin_jobs",
+    name: "LinkedIn Jobs",
+    blurb: "Largest professional network — strong for mid-to-senior across APAC.",
+    initial: "in",
+    accent: "bg-[#0A66C2]",
+  },
+  {
+    id: "jobstreet",
+    name: "JobStreet",
+    blurb: "Leading SE-Asia board — strong volume in ID, MY, SG.",
+    initial: "JS",
+    accent: "bg-[#D11F2C]",
+  },
+  {
+    id: "seek",
+    name: "Seek",
+    blurb: "Dominant in AU/NZ, growing presence across SE-Asia.",
+    initial: "Sk",
+    accent: "bg-[#0D3880]",
+  },
+  {
+    id: "indeed",
+    name: "Indeed",
+    blurb: "High-volume global aggregator — broad funnel, light targeting.",
+    initial: "id",
+    accent: "bg-[#2164F3]",
+  },
+  {
+    id: "jobsdb",
+    name: "JobsDB",
+    blurb: "Strong in HK, TH, ID — professional and tech roles.",
+    initial: "DB",
+    accent: "bg-[#FF6B00]",
+  },
+];
+
+// Tenant connection state — design-reference; mirrors channel_connections table
+const CONNECTIONS: Record<ChannelId, { status: ConnectionStatus; account?: string }> = {
+  linkedin_jobs: { status: "connected", account: "Norvex Solutions · LinkedIn Recruiter" },
+  jobstreet: { status: "connected", account: "Norvex Solutions · JobStreet Employer" },
+  seek: { status: "not_connected" },
+  indeed: { status: "pending" },
+  jobsdb: { status: "coming_soon" },
+};
+
+const POSTING_DURATIONS = ["30 days", "60 days", "90 days"];
+const EMPLOYMENT_TYPES = ["Full-time", "Part-time", "Contract"];
 
 const SAMPLE_JD = `CHIEF FINANCIAL OFFICER — INDORAMA VENTURES
 
@@ -120,8 +194,22 @@ function JobWizard() {
   // Step 3
   const [data, setData] = useState(EXTRACTED);
 
-  // Step 4
-  const [publish, setPublish] = useState(false);
+  // Step 4 — Distribution
+  const [publishCareers, setPublishCareers] = useState(true);
+  const [selectedChannels, setSelectedChannels] = useState<Set<ChannelId>>(
+    () => new Set<ChannelId>(["linkedin_jobs"]),
+  );
+  const [channelOptions, setChannelOptions] = useState<
+    Record<ChannelId, { duration: string; employment: string }>
+  >(() =>
+    Object.fromEntries(
+      CHANNELS.map((c) => [c.id, { duration: "30 days", employment: "Full-time" }]),
+    ) as Record<ChannelId, { duration: string; employment: string }>,
+  );
+  const [requestBoardOpen, setRequestBoardOpen] = useState(false);
+  const [requestBoardName, setRequestBoardName] = useState("");
+
+  // Step 5
   const [runMatching, setRunMatching] = useState(true);
 
   const parse = async () => {
@@ -136,8 +224,15 @@ function JobWizard() {
 
   const canNext1 = !!projectId && jobTitle.trim().length > 0;
 
+  const totalChannels = selectedChannels.size + (publishCareers ? 1 : 0);
+
   const create = () => {
-    toast.success("Job created successfully");
+    const n = totalChannels;
+    toast.success(
+      n > 0
+        ? `Job created — posting to ${n} channel${n === 1 ? "" : "s"}`
+        : "Job created — not distributed",
+    );
     navigate({ to: "/jobs/$id", params: { id: "j1" } });
   };
 
@@ -355,15 +450,28 @@ function JobWizard() {
         )}
 
         {step === 4 && (
+          <DistributeStep
+            publishCareers={publishCareers}
+            setPublishCareers={setPublishCareers}
+            selectedChannels={selectedChannels}
+            setSelectedChannels={setSelectedChannels}
+            channelOptions={channelOptions}
+            setChannelOptions={setChannelOptions}
+            requestBoardOpen={requestBoardOpen}
+            setRequestBoardOpen={setRequestBoardOpen}
+            requestBoardName={requestBoardName}
+            setRequestBoardName={setRequestBoardName}
+          />
+        )}
+
+        {step === 5 && (
           <Card>
             <h2 className="mb-1 text-lg font-semibold">Confirm & create</h2>
             <p className="mb-6 text-sm text-brand-text-secondary">
               Review the brief before creating the job.
             </p>
             <div className="rounded-xl border border-border bg-brand-bg/40 p-5">
-              <h3 className="text-xl font-semibold text-brand-text">
-                {data.jobTitle}
-              </h3>
+              <h3 className="text-xl font-semibold text-brand-text">{data.jobTitle}</h3>
               <p className="mt-1 text-sm text-brand-text-secondary">
                 {data.location} · {data.workModel} · {data.expMin}-{data.expMax} years
               </p>
@@ -384,11 +492,39 @@ function JobWizard() {
                 <Row label="Assigned" value={assignee === "priya" ? "Priya Sharma" : assignee === "daniel" ? "Daniel Wirawan" : "Aisha Rahman"} />
               </dl>
             </div>
+
+            <div className="mt-5 rounded-xl border border-border bg-card p-4">
+              <div className="text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
+                Distribution
+              </div>
+              {totalChannels === 0 ? (
+                <div className="mt-2 text-sm text-brand-text-secondary">
+                  No channels selected — job will be created but not posted.
+                </div>
+              ) : (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-sm text-brand-text">
+                  <span>Posting to:</span>
+                  {publishCareers && (
+                    <span className="rounded-full bg-status-success/15 px-2 py-0.5 text-xs font-medium text-status-success">
+                      Careers page
+                    </span>
+                  )}
+                  {Array.from(selectedChannels).map((id) => {
+                    const ch = CHANNELS.find((c) => c.id === id)!;
+                    return (
+                      <span
+                        key={id}
+                        className="rounded-full bg-brand-seafoam/40 px-2 py-0.5 text-xs font-medium text-brand-primary"
+                      >
+                        {ch.name}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             <div className="mt-5 space-y-3">
-              <label className="flex items-start gap-2.5 text-sm">
-                <Checkbox checked={publish} onCheckedChange={(v) => setPublish(!!v)} />
-                <span>Publish this job to the candidate portal</span>
-              </label>
               <label className="flex items-start gap-2.5 text-sm">
                 <Checkbox checked={runMatching} onCheckedChange={(v) => setRunMatching(!!v)} />
                 <span>Run AI matching against existing candidates immediately</span>
@@ -432,7 +568,8 @@ function JobWizard() {
               <Button onClick={() => setStep(4)}>Next</Button>
             </>
           )}
-          {step === 4 && (
+          {step === 4 && <Button onClick={() => setStep(5)}>Next</Button>}
+          {step === 5 && (
             <Button onClick={create} className="gap-2 bg-status-success text-white hover:bg-status-success/90">
               <Check className="h-4 w-4" />
               Create job
@@ -441,6 +578,372 @@ function JobWizard() {
         </div>
       </div>
     </div>
+  );
+}
+
+// ===== Distribution step =====================================================
+function DistributeStep({
+  publishCareers,
+  setPublishCareers,
+  selectedChannels,
+  setSelectedChannels,
+  channelOptions,
+  setChannelOptions,
+  requestBoardOpen,
+  setRequestBoardOpen,
+  requestBoardName,
+  setRequestBoardName,
+}: {
+  publishCareers: boolean;
+  setPublishCareers: (v: boolean) => void;
+  selectedChannels: Set<ChannelId>;
+  setSelectedChannels: (v: Set<ChannelId>) => void;
+  channelOptions: Record<ChannelId, { duration: string; employment: string }>;
+  setChannelOptions: (
+    v: Record<ChannelId, { duration: string; employment: string }>,
+  ) => void;
+  requestBoardOpen: boolean;
+  setRequestBoardOpen: (v: boolean) => void;
+  requestBoardName: string;
+  setRequestBoardName: (v: string) => void;
+}) {
+  const toggleChannel = (id: ChannelId) => {
+    const next = new Set(selectedChannels);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedChannels(next);
+  };
+
+  const setOption = (id: ChannelId, key: "duration" | "employment", value: string) => {
+    setChannelOptions({ ...channelOptions, [id]: { ...channelOptions[id], [key]: value } });
+  };
+
+  const total =
+    selectedChannels.size + (publishCareers ? 1 : 0);
+
+  const summary: string[] = [];
+  if (publishCareers) summary.push("Careers page");
+  Array.from(selectedChannels).forEach((id) => {
+    const ch = CHANNELS.find((c) => c.id === id);
+    if (ch) summary.push(ch.name);
+  });
+
+  return (
+    <TooltipProvider delayDuration={200}>
+      <div className="space-y-6">
+        {/* Owned channel: Norvex careers page */}
+        <Card>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-primary text-white">
+                <Globe className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-semibold text-brand-text">
+                    Norvex careers page
+                  </h3>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-status-success/15 px-2 py-0.5 text-[11px] font-medium text-status-success">
+                    <span className="h-1.5 w-1.5 rounded-full bg-status-success" />
+                    Connected
+                  </span>
+                </div>
+                <p className="mt-0.5 text-sm text-brand-text-secondary">
+                  jobs.norvexsolutions.com — your owned, always-on channel.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-brand-text-secondary">
+                {publishCareers ? "Published" : "Unpublished"}
+              </span>
+              <Switch checked={publishCareers} onCheckedChange={setPublishCareers} />
+            </div>
+          </div>
+        </Card>
+
+        {/* External boards */}
+        <div>
+          <div className="mb-3 flex items-end justify-between">
+            <div>
+              <h3 className="text-base font-semibold text-brand-text">External job boards</h3>
+              <p className="text-sm text-brand-text-secondary">
+                Posts go live only on boards you've connected. Pending boards await partner
+                approval and can't be selected yet.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {CHANNELS.map((ch) => {
+              const conn = CONNECTIONS[ch.id];
+              const isConnected = conn.status === "connected";
+              const isSelected = selectedChannels.has(ch.id);
+              const isPendingOrSoon =
+                conn.status === "pending" || conn.status === "coming_soon";
+
+              return (
+                <div
+                  key={ch.id}
+                  className={cn(
+                    "rounded-xl border p-4 transition-colors",
+                    isPendingOrSoon
+                      ? "border-border bg-muted/30 opacity-75"
+                      : isSelected
+                        ? "border-brand-primary bg-brand-seafoam/15"
+                        : "border-border bg-card hover:border-brand-primary/40",
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={cn(
+                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white",
+                        ch.accent,
+                      )}
+                    >
+                      {ch.initial}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="font-semibold text-brand-text">{ch.name}</div>
+                        <ConnBadge status={conn.status} />
+                      </div>
+                      <p className="mt-0.5 text-xs leading-snug text-brand-text-secondary">
+                        {ch.blurb}
+                      </p>
+                      {isConnected && conn.account && (
+                        <div className="mt-1.5 text-[11px] text-brand-text-secondary">
+                          {conn.account}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Per-state controls */}
+                  {isConnected && (
+                    <div className="mt-3 border-t border-border/60 pt-3">
+                      <label className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => toggleChannel(ch.id)}
+                        />
+                        <span>Post to {ch.name}</span>
+                      </label>
+                      {isSelected && (
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="mb-1 block text-[11px] uppercase tracking-wide text-brand-text-secondary">
+                              Employment
+                            </Label>
+                            <Select
+                              value={channelOptions[ch.id].employment}
+                              onValueChange={(v) => setOption(ch.id, "employment", v)}
+                            >
+                              <SelectTrigger className="h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMPLOYMENT_TYPES.map((t) => (
+                                  <SelectItem key={t} value={t} className="text-xs">
+                                    {t}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="mb-1 block text-[11px] uppercase tracking-wide text-brand-text-secondary">
+                              Duration
+                            </Label>
+                            <Select
+                              value={channelOptions[ch.id].duration}
+                              onValueChange={(v) => setOption(ch.id, "duration", v)}
+                            >
+                              <SelectTrigger className="h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {POSTING_DURATIONS.map((d) => (
+                                  <SelectItem key={d} value={d} className="text-xs">
+                                    {d}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {conn.status === "not_connected" && (
+                    <div className="mt-3 border-t border-border/60 pt-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full"
+                        onClick={() =>
+                          toast("Opening connection flow for " + ch.name + " — coming soon")
+                        }
+                      >
+                        Connect {ch.name}
+                      </Button>
+                    </div>
+                  )}
+
+                  {isPendingOrSoon && (
+                    <div className="mt-3 flex items-center gap-2 border-t border-border/60 pt-3 text-xs text-brand-text-secondary">
+                      <Clock className="h-3.5 w-3.5" />
+                      <span>
+                        {conn.status === "pending"
+                          ? "Awaiting partner access"
+                          : "Coming soon — partner integration not yet available"}
+                      </span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="ml-auto rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-brand-text-secondary">
+                            Info
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs text-xs">
+                          {conn.status === "pending"
+                            ? "Norvex has requested partner access — typically takes 5–10 business days. You'll be notified when it's live."
+                            : "We're working with this partner on a direct integration. Until it lands, this channel can't be selected."}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Request a board */}
+            <div className="rounded-xl border border-dashed border-border bg-brand-bg/40 p-4">
+              {!requestBoardOpen ? (
+                <button
+                  type="button"
+                  onClick={() => setRequestBoardOpen(true)}
+                  className="flex h-full w-full flex-col items-start gap-2 text-left"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted text-brand-text-secondary">
+                    <PlusCircle className="h-5 w-5" />
+                  </div>
+                  <div className="font-semibold text-brand-text">Request a board</div>
+                  <p className="text-xs leading-snug text-brand-text-secondary">
+                    Need a regional or niche board not listed here? Tell us and we'll
+                    prioritise the integration.
+                  </p>
+                </button>
+              ) : (
+                <div>
+                  <Label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-text-secondary">
+                    Which board do you need?
+                  </Label>
+                  <Input
+                    value={requestBoardName}
+                    onChange={(e) => setRequestBoardName(e.target.value)}
+                    placeholder="e.g. Kalibrr, Glints, TopDev"
+                    className="h-9"
+                  />
+                  <div className="mt-2 flex justify-end gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setRequestBoardOpen(false);
+                        setRequestBoardName("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      disabled={!requestBoardName.trim()}
+                      onClick={() => {
+                        toast.success(`Request logged: ${requestBoardName.trim()}`);
+                        setRequestBoardOpen(false);
+                        setRequestBoardName("");
+                      }}
+                    >
+                      Submit request
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Summary */}
+        <div className="sticky bottom-0 rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-seafoam text-brand-primary">
+                <Send className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-brand-text">
+                  {total === 0
+                    ? "No channels selected"
+                    : `Posting to ${total} channel${total === 1 ? "" : "s"}`}
+                </div>
+                <div className="text-xs text-brand-text-secondary">
+                  {total === 0
+                    ? "Job will be created but not distributed."
+                    : summary.join(" · ")}
+                </div>
+              </div>
+            </div>
+            <div className="text-[11px] text-brand-text-secondary">
+              {total > 1
+                ? "Combined reach across owned and connected boards."
+                : total === 1 && publishCareers
+                  ? "Owned channel only — consider adding a connected board."
+                  : total === 1
+                    ? "Single external board selected."
+                    : ""}
+            </div>
+          </div>
+        </div>
+      </div>
+    </TooltipProvider>
+  );
+}
+
+function ConnBadge({ status }: { status: ConnectionStatus }) {
+  const cfg: Record<ConnectionStatus, { label: string; cls: string; dot: string }> = {
+    connected: {
+      label: "Connected",
+      cls: "bg-status-success/15 text-status-success",
+      dot: "bg-status-success",
+    },
+    not_connected: {
+      label: "Not connected",
+      cls: "bg-muted text-brand-text-secondary",
+      dot: "bg-brand-text-secondary/60",
+    },
+    pending: {
+      label: "Pending",
+      cls: "bg-status-warning/15 text-status-warning",
+      dot: "bg-status-warning",
+    },
+    coming_soon: {
+      label: "Coming soon",
+      cls: "bg-status-neutral/15 text-status-neutral",
+      dot: "bg-status-neutral",
+    },
+  };
+  const c = cfg[status];
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+        c.cls,
+      )}
+    >
+      <span className={cn("h-1.5 w-1.5 rounded-full", c.dot)} />
+      {c.label}
+    </span>
   );
 }
 
