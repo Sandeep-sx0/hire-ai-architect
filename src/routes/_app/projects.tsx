@@ -140,6 +140,69 @@ function initialsOf(name: string): string {
     .toUpperCase();
 }
 
+function industryOf(clientId: string): string | undefined {
+  return allClients.find((c) => c.id === clientId)?.industry;
+}
+
+interface JobsSummary {
+  count: number;
+  open: number;
+  active: number;
+  filled: number;
+  draft: number;
+  onHold: number;
+  closed: number;
+}
+
+function summarizeJobs(jobs: Job[]): JobsSummary {
+  const s: JobsSummary = {
+    count: jobs.length,
+    open: 0,
+    active: 0,
+    filled: 0,
+    draft: 0,
+    onHold: 0,
+    closed: 0,
+  };
+  for (const j of jobs) {
+    switch (j.status) {
+      case "open":
+        s.open += 1;
+        break;
+      case "sourcing":
+      case "shortlisted":
+      case "interviewing":
+      case "offer":
+        s.active += 1;
+        break;
+      case "placed":
+        s.filled += 1;
+        break;
+      case "draft":
+        s.draft += 1;
+        break;
+      case "on_hold":
+        s.onHold += 1;
+        break;
+      case "closed":
+        s.closed += 1;
+        break;
+    }
+  }
+  return s;
+}
+
+function jobMixLabel(s: JobsSummary): string {
+  const parts: string[] = [];
+  if (s.open) parts.push(`${s.open} open`);
+  if (s.active) parts.push(`${s.active} active`);
+  if (s.filled) parts.push(`${s.filled} filled`);
+  if (s.draft) parts.push(`${s.draft} draft`);
+  if (s.onHold) parts.push(`${s.onHold} on hold`);
+  if (s.closed && parts.length === 0) parts.push(`${s.closed} closed`);
+  return parts.join(" · ");
+}
+
 // All recruiters/owners present in mock data
 const allOwners = Array.from(new Set(allProjects.map((p) => p.owner))).sort();
 
