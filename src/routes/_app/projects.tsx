@@ -41,6 +41,7 @@ import {
   type Project,
   type ProjectStatus,
   type SeniorityLevel,
+  type Job,
 } from "@/lib/mock-data";
 import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 
