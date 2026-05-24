@@ -51,13 +51,13 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ScoreRing, SidePanel, StatusBadge } from "@/components/shared";
+import { ScoreRing, StatusBadge } from "@/components/shared";
 import {
   ScorecardForm,
-  ScorecardsStack,
   MOCK_RINA_SCORECARD,
   type SubmittedScorecard,
 } from "./ScorecardForm";
+import { CandidateSheet } from "./CandidateSheet";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -409,30 +409,29 @@ export function PipelineKanban() {
         </DragOverlay>
       </DndContext>
 
-      {/* Stage detail slide-over */}
-      <SidePanel
-        isOpen={!!selectedCandidate}
-        onClose={() => setSelected(null)}
-        title="Candidate detail"
-        width="lg"
-      >
-        {selectedCandidate && (
-          <StageDetail
-            candidate={selectedCandidate}
-            scorecards={scorecards[selectedCandidate.id] ?? []}
-            onAddScorecard={() => setScorecardOpen(true)}
-            onToggleChecklist={(idx) => toggleChecklist(selectedCandidate.id, idx)}
-            onAdvance={() => {
-              const idx = STAGES.findIndex((s) => s.id === selectedCandidate.stage);
-              const next = STAGES[idx + 1];
-              if (next && next.id !== "rejected") attemptMove(selectedCandidate, next.id);
-            }}
-            onReject={() =>
-              setRejectModal({ candidate: selectedCandidate, from: selectedCandidate.stage })
-            }
-          />
-        )}
-      </SidePanel>
+      {/* Candidate slide-over */}
+      <CandidateSheet
+        open={!!selectedCandidate}
+        onOpenChange={(o) => !o && setSelected(null)}
+        candidate={selectedCandidate}
+        stages={STAGES}
+        jobLabel="CFO Search — Indorama Ventures"
+        requiredSkills={["IFRS", "M&A", "Board", "Treasury", "FP&A"]}
+        onMove={(to) => selectedCandidate && attemptMove(selectedCandidate, to)}
+        onReject={(reason) => {
+          if (!selectedCandidate) return;
+          setCards((prev) =>
+            prev.map((c) =>
+              c.id === selectedCandidate.id
+                ? { ...c, stage: "rejected", daysInStage: 0, rejectionReason: reason }
+                : c,
+            ),
+          );
+          toast.success(`${selectedCandidate.name} rejected — ${reason}`);
+        }}
+        onMessage={() => toast("Open outreach composer")}
+      />
+
 
       {/* Scorecard form */}
       {selectedCandidate && (
@@ -784,143 +783,8 @@ function CardBody({
   );
 }
 
-/* ----------------- Stage detail panel ----------------- */
 
-function StageDetail({
-  candidate,
-  scorecards,
-  onAddScorecard,
-  onToggleChecklist,
-  onAdvance,
-  onReject,
-}: {
-  candidate: Candidate;
-  scorecards: SubmittedScorecard[];
-  onAddScorecard: () => void;
-  onToggleChecklist: (idx: number) => void;
-  onAdvance: () => void;
-  onReject: () => void;
-}) {
-  const stage = STAGES.find((s) => s.id === candidate.stage)!;
-  const idx = STAGES.findIndex((s) => s.id === candidate.stage);
-  const next = STAGES[idx + 1];
-  const history = [
-    { from: "Applied", to: "Screening", who: "Amarsh", when: "5 days ago" },
-    { from: "Screening", to: "Shortlisted", who: "Amarsh", when: "3 days ago" },
-  ];
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-start gap-3">
-        <ScoreRing score={candidate.score} size="lg" />
-        <div className="min-w-0 flex-1">
-          <div className="text-lg font-semibold text-brand-text">{candidate.name}</div>
-          <div className="text-sm text-brand-text-secondary">
-            {candidate.title} · {candidate.company}
-          </div>
-          <div className="mt-2">
-            <StatusBadge status={stage.id === "submitted" ? "submitted" : stage.id} label={stage.label} />
-          </div>
-        </div>
-      </div>
-
-      {/* Checklist */}
-      <section>
-        <h3 className="mb-2 text-sm font-medium text-brand-text">
-          {stage.label} checklist
-        </h3>
-        {candidate.checklist.length === 0 ? (
-          <p className="text-[13px] text-brand-text-secondary">
-            No checklist for this stage.
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {candidate.checklist.map((item, i) => (
-              <li key={i} className="flex items-start gap-2.5">
-                <Checkbox
-                  checked={item.done}
-                  onCheckedChange={() => onToggleChecklist(i)}
-                  className="mt-0.5"
-                />
-                <span
-                  className={cn(
-                    "text-sm",
-                    item.done
-                      ? "text-brand-text-secondary line-through"
-                      : "text-brand-text",
-                  )}
-                >
-                  {item.label}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* Scorecards */}
-      <section>
-        <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-medium text-brand-text">Scorecards</h3>
-          <Button variant="outline" size="sm" onClick={onAddScorecard}>
-            Add scorecard
-          </Button>
-        </div>
-        <ScorecardsStack cards={scorecards} />
-      </section>
-
-      {/* Stage history */}
-      <section>
-        <h3 className="mb-2 text-sm font-medium text-brand-text">Stage history</h3>
-        <ul className="space-y-2">
-          {history.map((h, i) => (
-            <li key={i} className="flex flex-wrap items-center gap-2 text-[13px]">
-              <span className="rounded-md bg-brand-bg px-2 py-0.5 text-brand-text-secondary">
-                {h.from}
-              </span>
-              <ArrowRight className="h-3 w-3 text-brand-text-secondary" />
-              <span className="rounded-md bg-brand-seafoam px-2 py-0.5 text-brand-primary">
-                {h.to}
-              </span>
-              <span className="text-brand-text-secondary">
-                · {h.who}, {h.when}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Notes */}
-      <section>
-        <h3 className="mb-2 text-sm font-medium text-brand-text">Notes</h3>
-        <Textarea placeholder="Add a quick note…" className="min-h-[80px]" />
-        <div className="mt-2 flex justify-end">
-          <Button size="sm" onClick={() => toast.success("Note saved")}>
-            Add note
-          </Button>
-        </div>
-      </section>
-
-      {/* Quick actions */}
-      <section className="border-t border-border pt-4">
-        <div className="flex flex-wrap items-center gap-2">
-          {next && next.id !== "rejected" && (
-            <Button onClick={onAdvance}>Move to {next.label}</Button>
-          )}
-          <Button variant="outline" className="text-status-danger" onClick={onReject}>
-            Reject
-          </Button>
-          <button
-            className="text-sm text-brand-primary hover:underline"
-            onClick={() => toast("Open full profile")}
-          >
-            View full profile
-          </button>
-        </div>
-      </section>
-    </div>
-  );
-}
 
 /* ----------------- Dialogs ----------------- */
 
