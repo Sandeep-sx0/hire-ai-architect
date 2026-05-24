@@ -79,6 +79,7 @@ const TABS = [
   { id: "pipeline" as const, label: "Pipeline", icon: GitBranch },
   { id: "details" as const, label: "Details", icon: FileText },
   { id: "matching" as const, label: "Matching", icon: Sparkles },
+  { id: "distribution" as const, label: "Distribution", icon: Share2 },
   { id: "campaigns" as const, label: "Campaigns", icon: Send },
   { id: "inbound" as const, label: "Inbound", icon: Inbox },
   { id: "activity" as const, label: "Activity", icon: Activity },
