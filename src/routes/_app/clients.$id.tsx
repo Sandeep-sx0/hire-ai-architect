@@ -74,6 +74,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { CLIENTS } from "./clients";
+import { EmptyState } from "@/components/shared";
 
 // ──────────────── Route ────────────────
 const tabSchema = z.object({
@@ -85,23 +87,41 @@ const tabSchema = z.object({
 
 export const Route = createFileRoute("/_app/clients/$id")({
   validateSearch: zodValidator(tabSchema),
-  head: () => ({ meta: [{ title: "Indorama Ventures — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Client — HireSmart" }] }),
   component: ClientDetailPage,
 });
 
-// ──────────────── Mock client (Indorama) ────────────────
-const CLIENT = {
-  id: "indorama",
-  name: "Indorama Ventures",
-  industry: "Manufacturing / Petrochemicals",
-  location: "Jakarta, Indonesia",
-  openProjects: 3,
-  placements: 7,
-  contacts: 4,
-  since: "Jan 2024",
-  portalToken: "indorama-portal-2026",
-  portalLastAccessed: "3 days ago",
+// ──────────────── Per-client overlay (fields not in list seed) ────────────────
+const CLIENT_DETAIL_OVERLAY: Record<
+  string,
+  { location: string; contacts: number; since: string; portalLastAccessed: string }
+> = {
+  indorama: { location: "Jakarta, Indonesia", contacts: 4, since: "Jan 2024", portalLastAccessed: "3 days ago" },
+  oyo: { location: "Gurugram, India", contacts: 3, since: "May 2024", portalLastAccessed: "1 week ago" },
+  kns: { location: "Jakarta, Indonesia", contacts: 2, since: "Aug 2024", portalLastAccessed: "4 days ago" },
+  oasis: { location: "Dubai, UAE", contacts: 2, since: "Nov 2024", portalLastAccessed: "2 weeks ago" },
+  stylo: { location: "Singapore", contacts: 3, since: "Feb 2025", portalLastAccessed: "Yesterday" },
 };
+
+function getClientById(id: string) {
+  const row = CLIENTS.find((c) => c.id === id);
+  if (!row) return null;
+  const overlay = CLIENT_DETAIL_OVERLAY[id] ?? {
+    location: "—",
+    contacts: 1,
+    since: "2025",
+    portalLastAccessed: "Recently",
+  };
+  return {
+    id: row.id,
+    name: row.name,
+    industry: row.industry,
+    openProjects: row.openProjects,
+    placements: row.placements,
+    portalToken: row.portalToken,
+    ...overlay,
+  };
+}
 
 interface ProjectRow {
   id: string;
