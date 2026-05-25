@@ -554,7 +554,7 @@ function OverviewTab({
               </Button>
             </div>
             <div className="text-[12px] text-brand-text-secondary">
-              Last accessed: {CLIENT.portalLastAccessed}
+              Last accessed: {portalLastAccessed}
             </div>
             <button
               type="button"
