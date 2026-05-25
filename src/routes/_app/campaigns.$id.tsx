@@ -1786,15 +1786,8 @@ function CampaignNotFound({ id }: { id?: string }) {
             ? `We couldn't find a campaign with id "${id}". It may have been deleted or archived.`
             : "We couldn't find this campaign."
         }
-        action={
-          <Button
-            onClick={() => navigate({ to: "/outreach" })}
-            className="bg-brand-primary text-white hover:bg-brand-primary/90"
-          >
-            <ArrowRight className="h-4 w-4" />
-            Back to campaigns
-          </Button>
-        }
+        actionLabel="Back to campaigns"
+        onAction={() => navigate({ to: "/outreach" })}
       />
     </div>
   );
