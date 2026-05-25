@@ -123,7 +123,7 @@ function LinkToJobPanel({
               const client = project ? allClients.find((c) => c.id === project.clientId) : undefined;
               return (
                 <SelectItem key={j.id} value={j.id}>
-                  {j.jobTitle}{client ? ` — ${client.companyName}` : ""}
+                  {j.jobTitle}{client ? ` — ${client.name}` : ""}
                 </SelectItem>
               );
             })}
