@@ -78,7 +78,7 @@ const CHANNEL_META: Record<
   Channel,
   {
     label: string;
-    Icon: (props: { className?: string }) => JSX.Element;
+    Icon: (props: { className?: string }) => React.ReactElement;
     iconBg: string;
     text: string;
     accent: string;
