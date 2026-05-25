@@ -389,7 +389,7 @@ const searchSchema = z.object({
   view: fallback(z.enum(["list", "board"]), "list").default("list"),
 });
 
-export const Route = createFileRoute("/_app/candidates")({
+export const Route = createFileRoute("/_app/candidates/")({
   validateSearch: zodValidator(searchSchema),
   head: () => ({ meta: [{ title: "Candidates — HireSmart" }] }),
   component: CandidatesPage,
