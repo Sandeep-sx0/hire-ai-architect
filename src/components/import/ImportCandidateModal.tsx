@@ -118,11 +118,15 @@ function LinkToJobPanel({
             <SelectValue placeholder="No job — add to database only" />
           </SelectTrigger>
           <SelectContent>
-            {openJobs.map((j) => (
-              <SelectItem key={j.id} value={j.id}>
-                {j.title} — {j.clientName}
-              </SelectItem>
-            ))}
+            {openJobs.map((j) => {
+              const project = allProjects.find((p) => p.id === j.projectId);
+              const client = project ? allClients.find((c) => c.id === project.clientId) : undefined;
+              return (
+                <SelectItem key={j.id} value={j.id}>
+                  {j.jobTitle}{client ? ` — ${client.companyName}` : ""}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
         <Select
