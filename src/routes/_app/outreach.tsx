@@ -84,7 +84,7 @@ function OutreachListPage() {
       accessor: (r) => r.name,
       render: (r) => (
         <Link
-          to="/outreach/$id"
+          to="/campaigns/$id"
           params={{ id: r.id }}
           className="font-medium text-brand-primary hover:underline"
         >
