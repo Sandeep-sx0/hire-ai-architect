@@ -40,6 +40,7 @@ import { Route as AppJobsNewRouteImport } from './routes/_app/jobs.new'
 import { Route as AppJobsIdRouteImport } from './routes/_app/jobs.$id'
 import { Route as AppClientsIdRouteImport } from './routes/_app/clients.$id'
 import { Route as AppCandidatesIdRouteImport } from './routes/_app/candidates.$id'
+import { Route as AppCampaignsIdRouteImport } from './routes/_app/campaigns.$id'
 import { Route as AppProjectsIdParseRouteImport } from './routes/_app/projects.$id.parse'
 import { Route as AppJobsIdParseRouteImport } from './routes/_app/jobs.$id.parse'
 
@@ -197,6 +198,11 @@ const AppCandidatesIdRoute = AppCandidatesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AppCandidatesRoute,
 } as any)
+const AppCampaignsIdRoute = AppCampaignsIdRouteImport.update({
+  id: '/campaigns/$id',
+  path: '/campaigns/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProjectsIdParseRoute = AppProjectsIdParseRouteImport.update({
   id: '/parse',
   path: '/parse',
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/site/about': typeof SiteAboutRoute
   '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
+  '/campaigns/$id': typeof AppCampaignsIdRoute
   '/candidates/$id': typeof AppCandidatesIdRoute
   '/clients/$id': typeof AppClientsIdRoute
   '/jobs/$id': typeof AppJobsIdRouteWithChildren
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/site/about': typeof SiteAboutRoute
   '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
+  '/campaigns/$id': typeof AppCampaignsIdRoute
   '/candidates/$id': typeof AppCandidatesIdRoute
   '/clients/$id': typeof AppClientsIdRoute
   '/jobs/$id': typeof AppJobsIdRouteWithChildren
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   '/site/about': typeof SiteAboutRoute
   '/site/contact': typeof SiteContactRoute
   '/site/home': typeof SiteHomeRoute
+  '/_app/campaigns/$id': typeof AppCampaignsIdRoute
   '/_app/candidates/$id': typeof AppCandidatesIdRoute
   '/_app/clients/$id': typeof AppClientsIdRoute
   '/_app/jobs/$id': typeof AppJobsIdRouteWithChildren
@@ -335,6 +344,7 @@ export interface FileRouteTypes {
     | '/site/about'
     | '/site/contact'
     | '/site/home'
+    | '/campaigns/$id'
     | '/candidates/$id'
     | '/clients/$id'
     | '/jobs/$id'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/site/about'
     | '/site/contact'
     | '/site/home'
+    | '/campaigns/$id'
     | '/candidates/$id'
     | '/clients/$id'
     | '/jobs/$id'
@@ -404,6 +415,7 @@ export interface FileRouteTypes {
     | '/site/about'
     | '/site/contact'
     | '/site/home'
+    | '/_app/campaigns/$id'
     | '/_app/candidates/$id'
     | '/_app/clients/$id'
     | '/_app/jobs/$id'
@@ -650,6 +662,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCandidatesIdRouteImport
       parentRoute: typeof AppCandidatesRoute
     }
+    '/_app/campaigns/$id': {
+      id: '/_app/campaigns/$id'
+      path: '/campaigns/$id'
+      fullPath: '/campaigns/$id'
+      preLoaderRoute: typeof AppCampaignsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/projects/$id/parse': {
       id: '/_app/projects/$id/parse'
       path: '/parse'
@@ -752,6 +771,7 @@ interface AppRouteChildren {
   AppOutreachRoute: typeof AppOutreachRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
+  AppCampaignsIdRoute: typeof AppCampaignsIdRoute
   AppJobsIdRoute: typeof AppJobsIdRouteWithChildren
   AppJobsNewRoute: typeof AppJobsNewRoute
   AppSettingsDistributionRoute: typeof AppSettingsDistributionRoute
@@ -769,6 +789,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppOutreachRoute: AppOutreachRouteWithChildren,
   AppProjectsRoute: AppProjectsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
+  AppCampaignsIdRoute: AppCampaignsIdRoute,
   AppJobsIdRoute: AppJobsIdRouteWithChildren,
   AppJobsNewRoute: AppJobsNewRoute,
   AppSettingsDistributionRoute: AppSettingsDistributionRoute,
