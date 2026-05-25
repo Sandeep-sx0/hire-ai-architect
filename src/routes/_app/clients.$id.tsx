@@ -475,10 +475,12 @@ function TabButton({
 // ──────────────── Overview tab ────────────────
 function OverviewTab({
   portalUrl,
+  portalLastAccessed,
   onRegenerate,
   onCopy,
 }: {
   portalUrl: string;
+  portalLastAccessed: string;
   onRegenerate: () => void;
   onCopy: () => void;
 }) {
