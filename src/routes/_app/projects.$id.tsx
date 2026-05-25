@@ -167,13 +167,29 @@ function deriveJob(job: Job): JobDerived {
   return { ...job, daysToClose, isOverdue, bucket, priority, targetCloseLabel };
 }
 
+function ProjectNotFound({ id }: { id?: string }) {
+  const navigate = useNavigate();
+  return (
+    <div className="mx-auto max-w-3xl py-16">
+      <EmptyState
+        icon={Briefcase}
+        title="Project not found"
+        description={`No project with ID "${id ?? "unknown"}" exists. It may have been archived or the link may be stale.`}
+        actionLabel="Back to projects"
+        onAction={() => navigate({ to: "/projects" })}
+      />
+    </div>
+  );
+}
+
 function ProjectDetail() {
   const { id } = Route.useParams();
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
 
   const [matching, setMatching] = useState(false);
-  const project = projects.find((p) => p.id === id) ?? projects[0];
+  const project = projects.find((p) => p.id === id);
+  if (!project) return <ProjectNotFound id={id} />;
   const client = clients.find((c) => c.id === project.clientId);
   const isFreshProject = ["draft", "open"].includes(project.status);
   const [hasMatched, setHasMatched] = useState(() => !isFreshProject);
