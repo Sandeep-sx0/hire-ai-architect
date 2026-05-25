@@ -802,7 +802,7 @@ function EditorTab() {
         ) : (
           <div className="p-10">
             <EmptyState
-              icon={<Sparkles className="h-6 w-6" />}
+              icon={Sparkles}
               title="No step selected"
               description="Add a step to start building your sequence."
             />
@@ -1779,7 +1779,7 @@ function CampaignNotFound({ id }: { id?: string }) {
   return (
     <div className="py-16">
       <EmptyState
-        icon={<AlertTriangle className="h-7 w-7" />}
+        icon={AlertTriangle}
         title="Campaign not found"
         description={
           id
