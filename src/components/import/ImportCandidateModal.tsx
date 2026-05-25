@@ -46,7 +46,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { jobs as allJobs } from "@/lib/mock-data";
+import { jobs as allJobs, projects as allProjects, clients as allClients } from "@/lib/mock-data";
 import {
   CandidateReviewForm,
   blankCandidate,
