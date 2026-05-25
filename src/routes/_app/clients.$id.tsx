@@ -299,6 +299,21 @@ function ClientDetailPage() {
   const [regenOpen, setRegenOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
 
+  const CLIENT = getClientById(id);
+  if (!CLIENT) {
+    return (
+      <div className="mx-auto max-w-3xl py-16">
+        <EmptyState
+          icon={Building2}
+          title="Client not found"
+          description={`No client with ID "${id}" exists. They may have been removed or the link may be stale.`}
+          actionLabel="Back to clients"
+          onAction={() => navigate({ to: "/clients" })}
+        />
+      </div>
+    );
+  }
+
   const portalUrl = `hire.hiresmart.com/portal/${CLIENT.portalToken}`;
 
   const copyPortal = () => {
