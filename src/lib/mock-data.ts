@@ -288,7 +288,7 @@ export const projects: Project[] = [
 
 export const candidates: Candidate[] = [
   {
-    id: "ca1",
+    id: "c1",
     name: "Rajeev Menon",
     currentTitle: "CFO",
     currentCompany: "Reliance Polymers",
@@ -300,7 +300,7 @@ export const candidates: Candidate[] = [
     email: "rajeev.menon@example.com",
   },
   {
-    id: "ca2",
+    id: "c2",
     name: "Siti Nurhaliza",
     currentTitle: "VP Operations",
     currentCompany: "Traveloka",
@@ -312,7 +312,7 @@ export const candidates: Candidate[] = [
     email: "siti.n@example.com",
   },
   {
-    id: "ca3",
+    id: "c3",
     name: "James Tan Wei Ming",
     currentTitle: "Managing Director",
     currentCompany: "Grab Holdings",
@@ -324,7 +324,7 @@ export const candidates: Candidate[] = [
     email: "james.tan@example.com",
   },
   {
-    id: "ca4",
+    id: "c4",
     name: "Olivia Pemberton",
     currentTitle: "Head of Digital",
     currentCompany: "Woolworths Group",
@@ -336,7 +336,7 @@ export const candidates: Candidate[] = [
     email: "o.pemberton@example.com",
   },
   {
-    id: "ca5",
+    id: "c5",
     name: "Arjun Krishnamurthy",
     currentTitle: "Country Manager",
     currentCompany: "Unilever Indonesia",
@@ -348,7 +348,7 @@ export const candidates: Candidate[] = [
     email: "arjun.k@example.com",
   },
   {
-    id: "ca6",
+    id: "c6",
     name: "Mei Wong",
     currentTitle: "Finance Director",
     currentCompany: "DBS Bank",
@@ -360,7 +360,7 @@ export const candidates: Candidate[] = [
     email: "mei.wong@example.com",
   },
   {
-    id: "ca7",
+    id: "c7",
     name: "Bambang Hartono",
     currentTitle: "Plant Director",
     currentCompany: "Astra International",
@@ -372,7 +372,7 @@ export const candidates: Candidate[] = [
     email: "bambang.h@example.com",
   },
   {
-    id: "ca8",
+    id: "c8",
     name: "Lakshmi Iyer",
     currentTitle: "Chief HR Officer",
     currentCompany: "Tata Steel",
@@ -384,7 +384,7 @@ export const candidates: Candidate[] = [
     email: "l.iyer@example.com",
   },
   {
-    id: "ca9",
+    id: "c9",
     name: "Daniel O'Connor",
     currentTitle: "Regional VP",
     currentCompany: "Marriott International",
@@ -396,7 +396,7 @@ export const candidates: Candidate[] = [
     email: "daniel.oc@example.com",
   },
   {
-    id: "ca10",
+    id: "c10",
     name: "Priscilla Lim",
     currentTitle: "VP Strategy",
     currentCompany: "Shopee",
@@ -408,7 +408,7 @@ export const candidates: Candidate[] = [
     email: "p.lim@example.com",
   },
   {
-    id: "ca11",
+    id: "c11",
     name: "Vikram Singh",
     currentTitle: "Supply Chain Director",
     currentCompany: "Mahindra Logistics",
@@ -420,7 +420,7 @@ export const candidates: Candidate[] = [
     email: "vikram.s@example.com",
   },
   {
-    id: "ca12",
+    id: "c12",
     name: "Ratna Dewi",
     currentTitle: "Head of Sales",
     currentCompany: "Tokopedia",
@@ -432,7 +432,7 @@ export const candidates: Candidate[] = [
     email: "ratna.d@example.com",
   },
   {
-    id: "ca13",
+    id: "c13",
     name: "Hiroshi Yamamoto",
     currentTitle: "Asia CFO",
     currentCompany: "Mitsubishi Chemicals",
@@ -444,7 +444,7 @@ export const candidates: Candidate[] = [
     email: "h.yamamoto@example.com",
   },
   {
-    id: "ca14",
+    id: "c14",
     name: "Amara Okonkwo",
     currentTitle: "VP People",
     currentCompany: "Gojek",
@@ -456,7 +456,7 @@ export const candidates: Candidate[] = [
     email: "a.okonkwo@example.com",
   },
   {
-    id: "ca15",
+    id: "c15",
     name: "Sophie Chen",
     currentTitle: "Director of Operations",
     currentCompany: "Lazada",
@@ -619,26 +619,26 @@ export const inboxMessages: InboxMessage[] = [
 ];
 
 export const pipelineEntries: PipelineEntry[] = [
-  { id: "pe1", candidateId: "ca1", candidateName: "Rajeev Menon", projectId: "p1", projectTitle: "Group CFO", stage: "submitted_to_client", updatedAt: "Today" },
-  { id: "pe2", candidateId: "ca13", candidateName: "Hiroshi Yamamoto", projectId: "p1", projectTitle: "Group CFO", stage: "shortlisted", updatedAt: "Yesterday" },
-  { id: "pe3", candidateId: "ca6", candidateName: "Mei Wong", projectId: "p1", projectTitle: "Group CFO", stage: "screening", updatedAt: "2d" },
-  { id: "pe4", candidateId: "ca8", candidateName: "Lakshmi Iyer", projectId: "p6", projectTitle: "CPO", stage: "placed", updatedAt: "1w" },
-  { id: "pe5", candidateId: "ca2", candidateName: "Siti Nurhaliza", projectId: "p2", projectTitle: "VP Ops SEA", stage: "interview", updatedAt: "Today" },
-  { id: "pe6", candidateId: "ca5", candidateName: "Arjun Krishnamurthy", projectId: "p2", projectTitle: "VP Ops SEA", stage: "submitted_to_client", updatedAt: "2d" },
-  { id: "pe7", candidateId: "ca14", candidateName: "Amara Okonkwo", projectId: "p2", projectTitle: "VP Ops SEA", stage: "screening", updatedAt: "3d" },
-  { id: "pe8", candidateId: "ca12", candidateName: "Ratna Dewi", projectId: "p2", projectTitle: "VP Ops SEA", stage: "applied", updatedAt: "4d" },
-  { id: "pe9", candidateId: "ca3", candidateName: "James Tan Wei Ming", projectId: "p3", projectTitle: "Country Director", stage: "shortlisted", updatedAt: "Yesterday" },
-  { id: "pe10", candidateId: "ca10", candidateName: "Priscilla Lim", projectId: "p3", projectTitle: "Country Director", stage: "screening", updatedAt: "2d" },
-  { id: "pe11", candidateId: "ca4", candidateName: "Olivia Pemberton", projectId: "p4", projectTitle: "Head of Digital", stage: "interview", updatedAt: "Today" },
-  { id: "pe12", candidateId: "ca15", candidateName: "Sophie Chen", projectId: "p4", projectTitle: "Head of Digital", stage: "shortlisted", updatedAt: "3d" },
-  { id: "pe13", candidateId: "ca11", candidateName: "Vikram Singh", projectId: "p7", projectTitle: "Head of Supply Chain", stage: "applied", updatedAt: "1w" },
-  { id: "pe14", candidateId: "ca7", candidateName: "Bambang Hartono", projectId: "p8", projectTitle: "Plant GM", stage: "applied", updatedAt: "2d" },
-  { id: "pe15", candidateId: "ca9", candidateName: "Daniel O'Connor", projectId: "p5", projectTitle: "Regional Sales Director", stage: "offer", updatedAt: "Yesterday" },
-  { id: "pe16", candidateId: "ca6", candidateName: "Mei Wong", projectId: "p5", projectTitle: "Regional Sales Director", stage: "rejected", updatedAt: "1w" },
-  { id: "pe17", candidateId: "ca2", candidateName: "Siti Nurhaliza", projectId: "p4", projectTitle: "Head of Digital", stage: "applied", updatedAt: "5d" },
-  { id: "pe18", candidateId: "ca5", candidateName: "Arjun Krishnamurthy", projectId: "p3", projectTitle: "Country Director", stage: "applied", updatedAt: "3d" },
-  { id: "pe19", candidateId: "ca10", candidateName: "Priscilla Lim", projectId: "p5", projectTitle: "Regional Sales Director", stage: "submitted_to_client", updatedAt: "Today" },
-  { id: "pe20", candidateId: "ca8", candidateName: "Lakshmi Iyer", projectId: "p2", projectTitle: "VP Ops SEA", stage: "shortlisted", updatedAt: "2d" },
+  { id: "pe1", candidateId: "c1", candidateName: "Rajeev Menon", projectId: "p1", projectTitle: "Group CFO", stage: "submitted_to_client", updatedAt: "Today" },
+  { id: "pe2", candidateId: "c13", candidateName: "Hiroshi Yamamoto", projectId: "p1", projectTitle: "Group CFO", stage: "shortlisted", updatedAt: "Yesterday" },
+  { id: "pe3", candidateId: "c6", candidateName: "Mei Wong", projectId: "p1", projectTitle: "Group CFO", stage: "screening", updatedAt: "2d" },
+  { id: "pe4", candidateId: "c8", candidateName: "Lakshmi Iyer", projectId: "p6", projectTitle: "CPO", stage: "placed", updatedAt: "1w" },
+  { id: "pe5", candidateId: "c2", candidateName: "Siti Nurhaliza", projectId: "p2", projectTitle: "VP Ops SEA", stage: "interview", updatedAt: "Today" },
+  { id: "pe6", candidateId: "c5", candidateName: "Arjun Krishnamurthy", projectId: "p2", projectTitle: "VP Ops SEA", stage: "submitted_to_client", updatedAt: "2d" },
+  { id: "pe7", candidateId: "c14", candidateName: "Amara Okonkwo", projectId: "p2", projectTitle: "VP Ops SEA", stage: "screening", updatedAt: "3d" },
+  { id: "pe8", candidateId: "c12", candidateName: "Ratna Dewi", projectId: "p2", projectTitle: "VP Ops SEA", stage: "applied", updatedAt: "4d" },
+  { id: "pe9", candidateId: "c3", candidateName: "James Tan Wei Ming", projectId: "p3", projectTitle: "Country Director", stage: "shortlisted", updatedAt: "Yesterday" },
+  { id: "pe10", candidateId: "c10", candidateName: "Priscilla Lim", projectId: "p3", projectTitle: "Country Director", stage: "screening", updatedAt: "2d" },
+  { id: "pe11", candidateId: "c4", candidateName: "Olivia Pemberton", projectId: "p4", projectTitle: "Head of Digital", stage: "interview", updatedAt: "Today" },
+  { id: "pe12", candidateId: "c15", candidateName: "Sophie Chen", projectId: "p4", projectTitle: "Head of Digital", stage: "shortlisted", updatedAt: "3d" },
+  { id: "pe13", candidateId: "c11", candidateName: "Vikram Singh", projectId: "p7", projectTitle: "Head of Supply Chain", stage: "applied", updatedAt: "1w" },
+  { id: "pe14", candidateId: "c7", candidateName: "Bambang Hartono", projectId: "p8", projectTitle: "Plant GM", stage: "applied", updatedAt: "2d" },
+  { id: "pe15", candidateId: "c9", candidateName: "Daniel O'Connor", projectId: "p5", projectTitle: "Regional Sales Director", stage: "offer", updatedAt: "Yesterday" },
+  { id: "pe16", candidateId: "c6", candidateName: "Mei Wong", projectId: "p5", projectTitle: "Regional Sales Director", stage: "rejected", updatedAt: "1w" },
+  { id: "pe17", candidateId: "c2", candidateName: "Siti Nurhaliza", projectId: "p4", projectTitle: "Head of Digital", stage: "applied", updatedAt: "5d" },
+  { id: "pe18", candidateId: "c5", candidateName: "Arjun Krishnamurthy", projectId: "p3", projectTitle: "Country Director", stage: "applied", updatedAt: "3d" },
+  { id: "pe19", candidateId: "c10", candidateName: "Priscilla Lim", projectId: "p5", projectTitle: "Regional Sales Director", stage: "submitted_to_client", updatedAt: "Today" },
+  { id: "pe20", candidateId: "c8", candidateName: "Lakshmi Iyer", projectId: "p2", projectTitle: "VP Ops SEA", stage: "shortlisted", updatedAt: "2d" },
 ];
 
 export const unreadInboxCount = inboxMessages.filter((m) => m.unread).length;
