@@ -407,7 +407,7 @@ function ClientDetailPage() {
         <TabButton active={tab === "notes"} onClick={() => setTab("notes")} icon={StickyNote} label="Notes" badge="6" />
       </nav>
 
-      {tab === "overview" && <OverviewTab portalUrl={portalUrl} onRegenerate={() => setRegenOpen(true)} onCopy={copyPortal} />}
+      {tab === "overview" && <OverviewTab portalUrl={portalUrl} portalLastAccessed={CLIENT.portalLastAccessed} onRegenerate={() => setRegenOpen(true)} onCopy={copyPortal} />}
       {tab === "jobs" && <JobsTab />}
       {tab === "contacts" && <ContactsTab />}
       {tab === "notes" && <NotesTab />}
