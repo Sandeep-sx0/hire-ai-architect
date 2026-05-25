@@ -253,9 +253,29 @@ function CandidateDetail() {
   const { tab } = Route.useSearch();
   const navigate = useNavigate();
 
-  const cand = useMemo(() => candidates.find((c) => c.id === id) ?? candidates[0], [id]);
-  const profile = useMemo(() => buildProfile(cand), [cand]);
+  const cand = useMemo(() => candidates.find((c) => c.id === id), [id]);
+
+  if (!cand) {
+    return (
+      <div className="mx-auto max-w-3xl py-16">
+        <EmptyState
+          icon={User}
+          title="Candidate not found"
+          description={`No candidate with ID "${id}" exists in your database. They may have been deleted or the link may be stale.`}
+          actionLabel="Back to candidates"
+          onAction={() => navigate({ to: "/candidates" })}
+        />
+      </div>
+    );
+  }
+
+  const profile = buildProfile(cand);
   const { candidate, activeProjects } = profile;
+
+  const idx = candidates.findIndex((c) => c.id === cand.id);
+  const total = candidates.length;
+  const prev = idx > 0 ? candidates[idx - 1] : null;
+  const next = idx < total - 1 ? candidates[idx + 1] : null;
 
   const setTab = (t: string) =>
     navigate({ to: ".", search: { tab: t as never }, replace: true });
@@ -267,14 +287,36 @@ function CandidateDetail() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-4">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-brand-text-secondary">
-        <Link to="/candidates" className="hover:text-brand-primary">
-          Candidates
-        </Link>
-        <span>/</span>
-        <span className="text-brand-text">{candidate.name}</span>
-      </nav>
+      {/* Breadcrumb + pager */}
+      <div className="flex items-center justify-between">
+        <nav className="flex items-center gap-1.5 text-sm text-brand-text-secondary">
+          <Link to="/dashboard" className="hover:text-brand-primary">Home</Link>
+          <span>/</span>
+          <Link to="/candidates" className="hover:text-brand-primary">Candidates</Link>
+          <span>/</span>
+          <span className="text-brand-text">{candidate.name}</span>
+        </nav>
+        <div className="flex items-center gap-1 text-xs text-brand-text-secondary">
+          <Button
+            variant="outline" size="sm" className="h-7 px-2"
+            disabled={!prev}
+            onClick={() => prev && navigate({ to: "/candidates/$id", params: { id: prev.id } })}
+          >
+            ‹ Prev
+          </Button>
+          <span className="px-2 tabular-nums">
+            {idx + 1} of {total} candidates
+          </span>
+          <Button
+            variant="outline" size="sm" className="h-7 px-2"
+            disabled={!next}
+            onClick={() => next && navigate({ to: "/candidates/$id", params: { id: next.id } })}
+          >
+            Next ›
+          </Button>
+        </div>
+      </div>
+
 
       {/* Header card */}
       <div className="rounded-xl border border-gray-100 bg-card p-6 shadow-sm">
