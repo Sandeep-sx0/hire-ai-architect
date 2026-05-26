@@ -209,7 +209,7 @@ const allOwners = Array.from(new Set(allProjects.map((p) => p.owner))).sort();
 
 // === Page =====================================================
 function ProjectsPage() {
-  const navigate = useNavigate({ from: "/projects" });
+  const navigate = useNavigate({ from: "/projects/" });
   const search = Route.useSearch();
   const { q, status, client, seniority, assigned, view, sort, dir } = search;
 
