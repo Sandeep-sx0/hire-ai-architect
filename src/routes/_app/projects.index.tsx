@@ -58,7 +58,7 @@ const searchSchema = z.object({
   dir: fallback(z.enum(["asc", "desc"]), "desc").default("desc"),
 });
 
-export const Route = createFileRoute("/_app/projects")({
+export const Route = createFileRoute("/_app/projects/")({
   validateSearch: zodValidator(searchSchema),
   head: () => ({
     meta: [
@@ -209,7 +209,7 @@ const allOwners = Array.from(new Set(allProjects.map((p) => p.owner))).sort();
 
 // === Page =====================================================
 function ProjectsPage() {
-  const navigate = useNavigate({ from: "/projects" });
+  const navigate = useNavigate({ from: "/projects/" });
   const search = Route.useSearch();
   const { q, status, client, seniority, assigned, view, sort, dir } = search;
 

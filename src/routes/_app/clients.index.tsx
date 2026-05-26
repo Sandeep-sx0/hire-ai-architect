@@ -128,7 +128,7 @@ const INDUSTRIES = [
 ] as const;
 
 // ──────────────── Route ────────────────
-export const Route = createFileRoute("/_app/clients")({
+export const Route = createFileRoute("/_app/clients/")({
   head: () => ({ meta: [{ title: "Clients — Syndie Recruit" }] }),
   component: ClientsListPage,
 });
