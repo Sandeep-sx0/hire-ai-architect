@@ -1649,6 +1649,17 @@ function Step5Review({
             </div>
           </SumRow>
           <SumRow label="Sequence" value={seqDescription} />
+          <SumRow label="Channel coverage">
+            <span className="text-[13px] text-brand-text-secondary">
+              Steps that need a channel a candidate doesn't have (e.g. no LinkedIn URL) are skipped
+              for that prospect — they don't block the sequence.
+              {hasAddonStep && (
+                <span className="mt-1 block text-amber-700">
+                  Add-on steps in this sequence are paused until enabled.
+                </span>
+              )}
+            </span>
+          </SumRow>
           <SumRow label="Tone" value={tone} />
           <SumRow
             label="Schedule"
