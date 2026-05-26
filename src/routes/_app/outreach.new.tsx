@@ -182,11 +182,49 @@ const STEPS = [
 /*  Types                                                                     */
 /* -------------------------------------------------------------------------- */
 
+type StepChannel =
+  | "linkedin_connection"
+  | "linkedin_message"
+  | "email"
+  | "whatsapp"
+  | "phone_call"
+  | "task";
+
+type StepMode = "automated" | "manual";
+
+const ENABLED_CHANNELS: StepChannel[] = ["linkedin_connection", "linkedin_message"];
+
+const CHANNEL_META: Record<
+  StepChannel,
+  { label: string; Icon: React.ComponentType<{ className?: string }>; iconClass: string; mode: StepMode }
+> = {
+  linkedin_connection: { label: "LinkedIn Connection", Icon: UserPlus, iconClass: "text-[#0a66c2]", mode: "automated" },
+  linkedin_message: { label: "LinkedIn Message", Icon: Linkedin, iconClass: "text-[#0a66c2]", mode: "automated" },
+  email: { label: "Email", Icon: Mail, iconClass: "text-brand-primary", mode: "automated" },
+  whatsapp: { label: "WhatsApp Message", Icon: MessageCircle, iconClass: "text-green-600", mode: "manual" },
+  phone_call: { label: "Phone Call", Icon: Phone, iconClass: "text-brand-text-secondary", mode: "manual" },
+  task: { label: "General Task", Icon: ListChecks, iconClass: "text-brand-text-secondary", mode: "manual" },
+};
+
+const MAX_STEPS = 6;
+const ADDON_TOOLTIP = "Email and WhatsApp outreach are paid add-ons — ask your workspace admin to enable.";
+
+const PERSONALIZATION_TOKENS = [
+  "{{first_name}}",
+  "{{title}}",
+  "{{company}}",
+  "{{job_title}}",
+  "{{client_name}}",
+  "✨ AI",
+] as const;
+
 type SequenceStep = {
   id: string;
-  kind: "connection" | "followup";
+  channel: StepChannel;
+  mode: StepMode;
   body: string;
-  waitDays: number; // for followups: days after previous step
+  subject?: string; // email
+  waitDays: number;
 };
 
 /* -------------------------------------------------------------------------- */
