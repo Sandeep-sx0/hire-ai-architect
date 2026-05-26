@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 function Wordmark({ className }: { className?: string }) {
   return (
     <Link to="/careers" className={cn("text-lg leading-none", className)}>
-      <span className="font-normal">Hire</span>
-      <span className="font-semibold">Smart</span>
+      <span className="font-normal">Syndie</span>
+      <span className="font-semibold">Recruit</span>
     </Link>
   );
 }
@@ -125,8 +125,8 @@ function PublicFooter() {
       <div className="mx-auto grid max-w-5xl gap-10 px-6 py-12 md:grid-cols-3">
         <div>
           <div className="text-lg leading-none">
-            <span className="font-normal">Hire</span>
-            <span className="font-semibold">Smart</span>
+            <span className="font-normal">Syndie</span>
+            <span className="font-semibold">Recruit</span>
           </div>
           <p className="mt-3 max-w-xs text-[13px] leading-relaxed text-white/70">
             AI-powered recruitment made smart, fast, and human.

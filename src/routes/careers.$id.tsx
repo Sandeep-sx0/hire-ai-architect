@@ -243,7 +243,7 @@ function JobDetailPage() {
             <div className="mt-8 space-y-2 border-t border-gray-100 pt-6 text-[13px] text-brand-text-secondary">
               <p>
                 This opportunity is managed by{" "}
-                <span className="text-brand-primary"><span className="font-normal">Hire</span><span className="font-semibold">Smart</span></span>
+                <span className="text-brand-primary"><span className="font-normal">Syndie</span><span className="font-semibold">Recruit</span></span>
                 .
               </p>
               <p>All applications are treated with strict confidentiality.</p>

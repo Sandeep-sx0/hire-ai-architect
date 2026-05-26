@@ -45,12 +45,12 @@ function SidebarBody({ collapsed, onNavigate }: { collapsed: boolean; onNavigate
       <div className={cn("flex h-14 items-center border-b border-border", collapsed ? "justify-center px-2" : "px-5")}>
         <Link to="/dashboard" onClick={onNavigate} className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-primary text-white">
-            <span className="text-sm font-bold">H</span>
+            <span className="text-sm font-bold">S</span>
           </div>
           {!collapsed && (
             <span className="text-base text-brand-primary">
-              <span className="font-normal">Hire</span>
-              <span className="font-semibold">Smart</span>
+              <span className="font-normal">Syndie</span>
+              <span className="font-semibold">Recruit</span>
             </span>
           )}
         </Link>

@@ -25,11 +25,11 @@ function LoginPage() {
       <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8">
         <div className="mb-6 flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-md bg-brand-primary text-white">
-            <span className="font-bold">H</span>
+            <span className="font-bold">S</span>
           </div>
           <span className="text-lg text-brand-primary">
-            <span className="font-normal">Hire</span>
-            <span className="font-semibold">Smart</span>
+            <span className="font-normal">Syndie</span>
+            <span className="font-semibold">Recruit</span>
           </span>
         </div>
         <h1 className="text-xl font-semibold text-brand-text">Welcome back</h1>
