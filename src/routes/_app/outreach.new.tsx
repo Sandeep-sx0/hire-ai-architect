@@ -1588,12 +1588,13 @@ function Step5Review({
   daysToComplete: number;
   onLaunch: () => void;
 }) {
-  const seqDescription =
-    `${steps.length}-step sequence: Connection note` +
-    steps
-      .slice(1)
-      .map((s, i) => ` → Follow-up ${i + 1} (wait ${s.waitDays}d)`)
-      .join("");
+  const seqDescription = steps
+    .map((s, i) => {
+      const label = CHANNEL_META[s.channel].label;
+      return i === 0 ? label : `wait ${s.waitDays} business days → ${label}`;
+    })
+    .join(" → ");
+  const hasAddonStep = steps.some((s) => !ENABLED_CHANNELS.includes(s.channel));
 
   return (
     <section className="mx-auto max-w-2xl">
