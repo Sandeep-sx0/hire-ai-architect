@@ -35,7 +35,7 @@ import {
 } from "@/lib/distribution";
 
 export const Route = createFileRoute("/_app/distribution")({
-  head: () => ({ meta: [{ title: "Distribution — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Distribution — Syndie Recruit" }] }),
   component: DistributionDashboard,
 });
 

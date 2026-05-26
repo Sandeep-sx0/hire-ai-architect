@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/projects/$id/parse")({
-  head: () => ({ meta: [{ title: "Parse JD — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Parse JD — Syndie Recruit" }] }),
   component: ParsePage,
 });
 

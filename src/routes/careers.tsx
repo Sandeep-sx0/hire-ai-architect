@@ -62,13 +62,13 @@ const jobPostingLd = (j: PublicJob) => ({
 export const Route = createFileRoute("/careers")({
   head: () => ({
     meta: [
-      { title: "Open Positions — HireSmart | Executive Recruitment" },
+      { title: "Open Positions — Syndie Recruit | Executive Recruitment" },
       {
         name: "description",
         content:
           "Browse executive leadership opportunities with leading companies across Southeast Asia. CFO, VP, Director, and C-Suite roles.",
       },
-      { property: "og:title", content: "Open Positions — HireSmart" },
+      { property: "og:title", content: "Open Positions — Syndie Recruit" },
       {
         property: "og:description",
         content: "AI-powered recruitment made smart, fast, and human.",

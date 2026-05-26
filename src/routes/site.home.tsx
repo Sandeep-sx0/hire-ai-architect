@@ -8,13 +8,13 @@ const PARTNERS = ["Indorama", "OYO", "KNS Group", "Oasis Water", "RTW", "Stylo",
 export const Route = createFileRoute("/site/home")({
   head: () => ({
     meta: [
-      { title: "HireSmart — Executive Recruitment & Strategic Business Consulting" },
+      { title: "Syndie Recruit — Executive Recruitment & Strategic Business Consulting" },
       {
         name: "description",
         content:
-          "HireSmart pairs executive recruitment with strategic business consulting for high-growth companies across Asia.",
+          "Syndie Recruit pairs executive recruitment with strategic business consulting for high-growth companies across Asia.",
       },
-      { property: "og:title", content: "HireSmart — Executive Recruitment & Consulting" },
+      { property: "og:title", content: "Syndie Recruit — Executive Recruitment & Consulting" },
       {
         property: "og:description",
         content: "AI-powered executive search and consulting, made smart, fast, and human.",
@@ -31,7 +31,7 @@ function HomePage() {
       <section className="border-b border-gray-100 bg-white">
         <div className="mx-auto max-w-5xl px-6 py-20 md:py-28">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-brand-primary">
-            HireSmart
+            Syndie Recruit
           </div>
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.1] text-brand-text md:text-6xl">
             Executive Recruitment &{" "}

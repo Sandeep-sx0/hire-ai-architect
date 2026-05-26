@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { getJob, jobs } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/_app/jobs/$id/parse")({
-  head: () => ({ meta: [{ title: "Review JD Parse — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Review JD Parse — Syndie Recruit" }] }),
   component: ParseReview,
 });
 

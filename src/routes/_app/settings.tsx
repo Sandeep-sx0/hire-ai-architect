@@ -60,7 +60,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/settings")({
-  head: () => ({ meta: [{ title: "Settings — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Settings — Syndie Recruit" }] }),
   component: SettingsPage,
 });
 
@@ -216,7 +216,7 @@ function ProfileTab() {
             <Input defaultValue="Amarsh Jain" />
           </Field>
           <Field label="Email">
-            <Input defaultValue="amarsh@hiresmart.com" disabled />
+            <Input defaultValue="amarsh@syndierecruit.com" disabled />
           </Field>
           <Field label="Role">
             <div className="flex h-10 items-center">
@@ -334,9 +334,9 @@ interface TeamMember {
 }
 
 const MOCK_TEAM: TeamMember[] = [
-  { name: "Amarsh Jain", email: "amarsh@hiresmart.com", role: "Owner", status: "Active", linkedin: true, lastActive: "2 hours ago" },
-  { name: "Dewi Putri", email: "dewi@hiresmart.com", role: "Recruiter", status: "Active", linkedin: true, lastActive: "5 hours ago" },
-  { name: "Rahul Mehta", email: "rahul@hiresmart.com", role: "Recruiter", status: "Active", linkedin: false, lastActive: "Yesterday" },
+  { name: "Amarsh Jain", email: "amarsh@syndierecruit.com", role: "Owner", status: "Active", linkedin: true, lastActive: "2 hours ago" },
+  { name: "Dewi Putri", email: "dewi@syndierecruit.com", role: "Recruiter", status: "Active", linkedin: true, lastActive: "5 hours ago" },
+  { name: "Rahul Mehta", email: "rahul@syndierecruit.com", role: "Recruiter", status: "Active", linkedin: false, lastActive: "Yesterday" },
 ];
 
 const ROLE_COLOR: Record<Role, string> = {
@@ -554,7 +554,7 @@ function InviteMemberDialog({
         <DialogHeader>
           <DialogTitle>Invite team member</DialogTitle>
           <DialogDescription>
-            Add a new member to your HireSmart workspace.
+            Add a new member to your Syndie Recruit workspace.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
@@ -580,7 +580,7 @@ function InviteMemberDialog({
             </Select>
           </Field>
           <p className="text-xs text-brand-text-secondary">
-            An invitation email will be sent from hello@hiresmart.com with instructions to join the
+            An invitation email will be sent from hello@syndierecruit.com with instructions to join the
             workspace.
           </p>
         </div>
@@ -637,7 +637,7 @@ function WorkspaceTab() {
       <SCard title="Branding" divided>
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Workspace name">
-            <Input defaultValue="HireSmart" />
+            <Input defaultValue="Syndie Recruit" />
           </Field>
           <Field label="Logo">
             <UploadZone label="Upload logo (200×60px)" />
@@ -704,10 +704,10 @@ function WorkspaceTab() {
           </thead>
           <tbody>
             {[
-              ["Core app", "app.hiresmart.com"],
-              ["Candidate portal", "jobs.hiresmart.com"],
-              ["Employer portal", "hire.hiresmart.com"],
-              ["Corporate website", "hiresmart.com"],
+              ["Core app", "app.syndierecruit.com"],
+              ["Candidate portal", "jobs.syndierecruit.com"],
+              ["Employer portal", "hire.syndierecruit.com"],
+              ["Corporate website", "syndierecruit.com"],
             ].map(([p, u]) => (
               <tr key={u} className="border-b border-gray-50 last:border-0">
                 <td className="py-2.5">{p}</td>
@@ -728,11 +728,11 @@ function WorkspaceTab() {
         <dl className="grid gap-3 text-sm md:grid-cols-3">
           <div>
             <dt className="text-xs text-brand-text-secondary">Sender domain</dt>
-            <dd className="mt-0.5">hiresmart.com</dd>
+            <dd className="mt-0.5">syndierecruit.com</dd>
           </div>
           <div>
             <dt className="text-xs text-brand-text-secondary">Sender address</dt>
-            <dd className="mt-0.5">hello@hiresmart.com</dd>
+            <dd className="mt-0.5">hello@syndierecruit.com</dd>
           </div>
           <div>
             <dt className="text-xs text-brand-text-secondary">Status</dt>
@@ -888,7 +888,7 @@ function BillingTab() {
       <SCard>
         <div className="flex flex-col gap-4">
           <div>
-            <h2 className="text-[18px] font-semibold text-brand-text">HireSmart Professional</h2>
+            <h2 className="text-[18px] font-semibold text-brand-text">Syndie Recruit Professional</h2>
             <p className="mt-1 text-sm text-brand-text-secondary">
               $600 / month · Billed quarterly ($1,800)
             </p>
@@ -990,7 +990,7 @@ function BillingTab() {
         </ul>
         <p className="mt-3 text-[13px]">Estimated total: $55–75/month at current usage</p>
         <p className="mt-1 text-xs italic text-brand-text-secondary">
-          These costs are paid directly to each provider, not through HireSmart.
+          These costs are paid directly to each provider, not through Syndie Recruit.
         </p>
       </SCard>
     </div>
@@ -1051,8 +1051,8 @@ function ExtensionTab() {
         <ol className="space-y-2 text-sm text-brand-text-secondary">
           <li>1. Download the extension once it becomes available.</li>
           <li>2. Open <code className="rounded bg-brand-bg px-1.5 py-0.5 text-xs">chrome://extensions</code> and enable Developer mode.</li>
-          <li>3. Click "Load unpacked" and select the HireSmart extension folder.</li>
-          <li>4. Sign in with your HireSmart workspace credentials.</li>
+          <li>3. Click "Load unpacked" and select the Syndie Recruit extension folder.</li>
+          <li>4. Sign in with your Syndie Recruit workspace credentials.</li>
         </ol>
         <p className="mt-4 text-xs italic text-brand-text-secondary">
           Detailed installation instructions will appear here when the extension ships.

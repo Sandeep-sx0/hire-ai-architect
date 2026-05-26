@@ -13,7 +13,7 @@ export function UnderConstruction({
   title,
   subtitle,
   icon = Hammer,
-  message = "This module is part of the HireSmart roadmap and will be built next. The scaffold, design system, and routing are in place.",
+  message = "This module is part of the Syndie Recruit roadmap and will be built next. The scaffold, design system, and routing are in place.",
 }: UnderConstructionProps) {
   return (
     <div>

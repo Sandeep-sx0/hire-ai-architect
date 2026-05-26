@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 function Wordmark({ className }: { className?: string }) {
   return (
     <Link to="/careers" className={cn("text-lg leading-none", className)}>
-      <span className="font-normal">Hire</span>
-      <span className="font-semibold">Smart</span>
+      <span className="font-normal">Syndie</span>
+      <span className="font-semibold">Recruit</span>
     </Link>
   );
 }
@@ -125,14 +125,14 @@ function PublicFooter() {
       <div className="mx-auto grid max-w-5xl gap-10 px-6 py-12 md:grid-cols-3">
         <div>
           <div className="text-lg leading-none">
-            <span className="font-normal">Hire</span>
-            <span className="font-semibold">Smart</span>
+            <span className="font-normal">Syndie</span>
+            <span className="font-semibold">Recruit</span>
           </div>
           <p className="mt-3 max-w-xs text-[13px] leading-relaxed text-white/70">
             AI-powered recruitment made smart, fast, and human.
           </p>
           <p className="mt-6 text-xs text-white/50">
-            © 2026 HireSmart. All rights reserved.
+            © 2026 Syndie Recruit. All rights reserved.
           </p>
         </div>
 
@@ -152,7 +152,7 @@ function PublicFooter() {
           <ul className="mt-4 space-y-3 text-[13px] text-white/80">
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4 shrink-0 text-white/60" />
-              <a className="hover:text-white" href="mailto:hello@hiresmart.com">hello@hiresmart.com</a>
+              <a className="hover:text-white" href="mailto:hello@syndierecruit.com">hello@syndierecruit.com</a>
             </li>
             <li className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4 shrink-0 text-white/60" />

@@ -62,7 +62,7 @@ export const Route = createFileRoute("/_app/projects")({
   validateSearch: zodValidator(searchSchema),
   head: () => ({
     meta: [
-      { title: "Projects — HireSmart" },
+      { title: "Projects — Syndie Recruit" },
       {
         name: "description",
         content: "All active and historical search projects.",

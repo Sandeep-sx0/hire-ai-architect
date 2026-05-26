@@ -23,7 +23,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Analytics — Syndie Recruit" }] }),
   component: AnalyticsPage,
 });
 
