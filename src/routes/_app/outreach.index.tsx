@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { campaigns, projects } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/_app/outreach")({
+export const Route = createFileRoute("/_app/outreach/")({
   head: () => ({ meta: [{ title: "Outreach — Syndie Recruit" }] }),
   component: OutreachListPage,
 });
