@@ -384,6 +384,7 @@ function CampaignBuilder() {
             previewIdx={previewIdx}
             setPreviewIdx={setPreviewIdx}
             job={job?.jobTitle ?? "the role"}
+            clientName={project?.clientName ?? "our client"}
           />
         )}
         {step === 4 && (
