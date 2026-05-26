@@ -16,17 +16,17 @@ import {
 export const Route = createFileRoute("/marketing")({
   head: () => ({
     meta: [
-      { title: "Hiresmart — White-Label AI Recruitment OS for Agencies" },
+      { title: "Syndie Recruit — White-Label AI Recruitment OS for Agencies" },
       {
         name: "description",
         content:
           "The recruitment operating system that runs under your brand. AI matching, LinkedIn outreach, candidate portals — all at your domain. Six weeks to launch.",
       },
-      { property: "og:title", content: "Hiresmart — White-Label AI Recruitment OS" },
+      { property: "og:title", content: "Syndie Recruit — White-Label AI Recruitment OS" },
       {
         property: "og:description",
         content:
-          "Boutique recruitment agencies deploy Hiresmart under their own brand and domain. AI matching, LinkedIn outreach, branded portals.",
+          "Boutique recruitment agencies deploy Syndie Recruit under their own brand and domain. AI matching, LinkedIn outreach, branded portals.",
       },
       { property: "og:type", content: "website" },
     ],
@@ -166,7 +166,7 @@ function Navbar() {
       <div className="mx-auto flex max-w-[1320px] items-center justify-between px-6 py-4 md:px-10">
         <a href="#top" className="flex flex-col leading-none">
           <span style={{ ...display, color: bone }} className="text-[22px] font-bold tracking-tight">
-            Hiresmart
+            Syndie Recruit
           </span>
           <span style={{ ...mono, color: "#6F757D" }} className="mt-0.5 text-[10px] uppercase tracking-[0.16em]">
             [white-label os]
@@ -249,7 +249,7 @@ function Hero() {
             className="mt-8 max-w-[60ch] text-[17px] leading-[1.6]"
             style={{ ...body, color: "#B6BBC2" }}
           >
-            Hiresmart is the AI-native operating system that powers boutique recruitment
+            Syndie Recruit is the AI-native operating system that powers boutique recruitment
             agencies end-to-end — from JD intake to placement. Deploy it at{" "}
             <span style={mono}>app.youragency.com</span> in six weeks. Your logo, your domain,
             your client experience. We stay invisible.
@@ -543,13 +543,13 @@ function WhiteLabel() {
             <Reveal>
               <p className="text-[17px] leading-[1.7]" style={{ ...body, color: "#B6BBC2" }}>
                 Most &ldquo;white-label&rdquo; tools slap your logo in the corner and call it a day.
-                Hiresmart goes further. Every touchpoint — the app at{" "}
+                Syndie Recruit goes further. Every touchpoint — the app at{" "}
                 <span style={mono}>app.youragency.com</span>, the candidate jobs portal at{" "}
                 <span style={mono}>jobs.youragency.com</span>, the employer brief portal at{" "}
                 <span style={mono}>hire.youragency.com</span>, the corporate website at{" "}
                 <span style={mono}>youragency.com</span>, the transactional emails from{" "}
                 <span style={mono}>hello@youragency.com</span> — all carry your brand. End to end.
-                Zero Hiresmart visible.
+                Zero Syndie Recruit visible.
               </p>
             </Reveal>
             <Reveal delay={120}>
@@ -763,7 +763,7 @@ function AIExplains() {
           className="mx-auto mt-10 max-w-[68ch] text-center text-[16px] leading-[1.7]"
           style={{ ...body, color: "#B6BBC2" }}
         >
-          Every AI decision in Hiresmart comes with its reasoning attached. Recruiters can
+          Every AI decision in Syndie Recruit comes with its reasoning attached. Recruiters can
           override any score. Every override is tracked. The system gets smarter; the recruiter
           stays in charge.
         </p>
@@ -928,12 +928,12 @@ const CASES = [
   {
     n: "01",
     title: "Look like a tech-native firm without hiring a tech team.",
-    body: "Your clients judge you on the experience. Hiresmart gives you a branded candidate portal, a branded employer portal, branded emails, and a real product running at your domain. No screenshots of someone else's SaaS in your pitch decks.",
+    body: "Your clients judge you on the experience. Syndie Recruit gives you a branded candidate portal, a branded employer portal, branded emails, and a real product running at your domain. No screenshots of someone else's SaaS in your pitch decks.",
   },
   {
     n: "02",
     title: "Stop paying for five tools you half-use.",
-    body: "Hiresmart replaces your ATS, your sourcing tool, your CRM, your outreach sequencer, and your candidate portal. One platform. One bill. One source of truth for your candidate database.",
+    body: "Syndie Recruit replaces your ATS, your sourcing tool, your CRM, your outreach sequencer, and your candidate portal. One platform. One bill. One source of truth for your candidate database.",
   },
   {
     n: "03",
@@ -952,7 +952,7 @@ function AgencyOwners() {
           style={{ ...display, color: bone, fontSize: "clamp(2rem, 4.4vw, 3.6rem)" }}
         >
           Three reasons agencies pick{" "}
-          <span style={{ fontStyle: "italic", color: lime }}>Hiresmart.</span>
+          <span style={{ fontStyle: "italic", color: lime }}>Syndie Recruit.</span>
         </h2>
 
         <div className="mt-14 space-y-5">
@@ -1098,7 +1098,7 @@ function Pricing() {
 const FAQ_ITEMS = [
   {
     q: "How is this different from Bullhorn / Loxo / Recruiterflow?",
-    a: "Those are recruitment CRMs you log into. Hiresmart is your own product, on your own domain, that your clients and candidates also touch. Plus AI matching with explanations, not just keyword search.",
+    a: "Those are recruitment CRMs you log into. Syndie Recruit is your own product, on your own domain, that your clients and candidates also touch. Plus AI matching with explanations, not just keyword search.",
   },
   {
     q: "What happens to my data if I leave?",
@@ -1280,7 +1280,7 @@ function Footer() {
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-12 px-6 py-16 md:grid-cols-4 md:px-10">
         <div>
           <div style={{ ...display, color: bone }} className="text-[22px] font-bold leading-none">
-            Hiresmart
+            Syndie Recruit
           </div>
           <p className="mt-4 max-w-[28ch] text-[13px] leading-[1.55]" style={{ ...body, color: "#8C9098" }}>
             The white-label OS for recruitment agencies.
@@ -1328,7 +1328,7 @@ function Footer() {
           className="mx-auto flex max-w-[1320px] items-center justify-between text-[11px]"
           style={{ ...mono, color: "#6F757D" }}
         >
-          <span>© 2026 Hiresmart. Built in Jakarta. Deployed globally.</span>
+          <span>© 2026 Syndie Recruit. Built in Jakarta. Deployed globally.</span>
         </div>
       </div>
     </footer>

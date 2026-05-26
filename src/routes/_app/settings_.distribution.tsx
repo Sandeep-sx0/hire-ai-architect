@@ -35,7 +35,7 @@ import {
 import { currentUser } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/_app/settings_/distribution")({
-  head: () => ({ meta: [{ title: "Distribution — Settings — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Distribution — Settings — Syndie Recruit" }] }),
   component: DistributionSettingsPage,
 });
 
@@ -78,7 +78,7 @@ function DistributionSettingsPage() {
           <h1 className="text-2xl font-semibold text-brand-text">Distribution channels</h1>
           <p className="mt-1 max-w-2xl text-sm text-brand-text-secondary">
             Manage how this workspace posts roles to external job boards. Posting accounts belong to
-            HireSmart — never to individual recruiters — so postings survive staff changes.
+            Syndie Recruit — never to individual recruiters — so postings survive staff changes.
           </p>
         </div>
         <div className="rounded-lg border border-border bg-card px-4 py-3 text-right">

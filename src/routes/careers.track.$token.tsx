@@ -22,7 +22,7 @@ export const Route = createFileRoute("/careers/track/$token")({
   validateSearch: zodValidator(trackSchema),
   head: () => ({
     meta: [
-      { title: "Application status — HireSmart" },
+      { title: "Application status — Syndie Recruit" },
       { name: "description", content: "Track the status of your application." },
       { name: "robots", content: "noindex" },
     ],

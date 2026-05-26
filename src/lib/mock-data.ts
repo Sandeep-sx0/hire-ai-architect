@@ -1,4 +1,4 @@
-// HireSmart mock data — realistic Southeast Asian executive search context.
+// Syndie Recruit mock data — realistic Southeast Asian executive search context.
 
 export type UserRole = "owner" | "admin" | "recruiter" | "sourcer";
 export type ProjectStatus =
@@ -126,7 +126,7 @@ export interface PipelineEntry {
 export const currentUser: User = {
   id: "u1",
   name: "Priya Sharma",
-  email: "priya@hiresmart.io",
+  email: "priya@syndierecruit.com",
   role: "owner",
   initials: "PS",
 };

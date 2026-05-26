@@ -46,7 +46,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/inbox")({
-  head: () => ({ meta: [{ title: "Inbox — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Inbox — Syndie Recruit" }] }),
   component: InboxPage,
 });
 

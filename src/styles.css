@@ -7,7 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * HireSmart white-label design system.
+ * Syndie Recruit white-label design system.
  *
  * Tenants re-skin the entire app by swapping the 9 --brand-* and 6 --status-*
  * variables in :root. Every component references tokens — never hardcoded hex.
@@ -61,7 +61,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* HireSmart brand tokens (white-label swap surface) */
+  /* Syndie Recruit brand tokens (white-label swap surface) */
   --color-brand-primary: var(--brand-primary);
   --color-brand-accent: var(--brand-accent);
   --color-brand-mint: var(--brand-mint);
@@ -84,7 +84,7 @@
 :root {
   --radius: 0.625rem;
 
-  /* === HireSmart brand palette === */
+  /* === Syndie Recruit brand palette === */
   --brand-primary: #004C66;        /* dark teal */
   --brand-accent: #004703;         /* deep green */
   --brand-mint: #9FEBC1;           /* mint */

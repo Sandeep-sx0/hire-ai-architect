@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/signup")({
-  head: () => ({ meta: [{ title: "Create account — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Create account — Syndie Recruit" }] }),
   component: SignupPage,
 });
 

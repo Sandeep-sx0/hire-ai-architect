@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { campaigns, projects } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/_app/outreach/$id")({
-  head: () => ({ meta: [{ title: "Campaign — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Campaign — Syndie Recruit" }] }),
   component: CampaignDetail,
 });
 

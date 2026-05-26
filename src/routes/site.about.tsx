@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/site/about")({
   head: () => ({
     meta: [
-      { title: "About — HireSmart" },
+      { title: "About — Syndie Recruit" },
       {
         name: "description",
         content:
-          "HireSmart blends decades of executive search with AI-native tooling to help leaders build great teams faster.",
+          "Syndie Recruit blends decades of executive search with AI-native tooling to help leaders build great teams faster.",
       },
-      { property: "og:title", content: "About HireSmart" },
+      { property: "og:title", content: "About Syndie Recruit" },
       {
         property: "og:description",
         content: "Our story, our people, and how we work with hiring clients and candidates.",
@@ -33,7 +33,7 @@ function AboutPage() {
             People-first search, powered by smarter tools.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-brand-text-secondary">
-            HireSmart is a boutique executive search and consulting firm working with
+            Syndie Recruit is a boutique executive search and consulting firm working with
             founders, boards, and CHROs across Southeast Asia. We started as a traditional
             search practice and built our own AI tooling to do the craft better — not to
             replace it.
@@ -53,7 +53,7 @@ function AboutPage() {
         <div className="mx-auto max-w-3xl px-6 py-20 space-y-10">
           <Block
             title="Our story"
-            body="Founded in Jakarta, HireSmart grew out of frustration with slow, opaque executive search. We rebuilt the workflow around transparency, candidate experience, and AI-assisted sourcing — and kept the human judgement that matters."
+            body="Founded in Jakarta, Syndie Recruit grew out of frustration with slow, opaque executive search. We rebuilt the workflow around transparency, candidate experience, and AI-assisted sourcing — and kept the human judgement that matters."
           />
           <Block
             title="How we work"

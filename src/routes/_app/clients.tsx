@@ -129,7 +129,7 @@ const INDUSTRIES = [
 
 // ──────────────── Route ────────────────
 export const Route = createFileRoute("/_app/clients")({
-  head: () => ({ meta: [{ title: "Clients — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Clients — Syndie Recruit" }] }),
   component: ClientsListPage,
 });
 
@@ -252,9 +252,9 @@ function ClientsListPage() {
               <DropdownMenuItem
                 onClick={() => {
                   navigator.clipboard
-                    ?.writeText(`hire.hiresmart.com/portal/${r.portalToken}`)
+                    ?.writeText(`hire.syndierecruit.com/portal/${r.portalToken}`)
                     .catch(() => {});
-                  toast.success(`Portal link copied: hire.hiresmart.com/portal/${r.portalToken}`);
+                  toast.success(`Portal link copied: hire.syndierecruit.com/portal/${r.portalToken}`);
                 }}
               >
                 Portal link

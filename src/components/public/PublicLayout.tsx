@@ -132,7 +132,7 @@ function PublicFooter() {
             AI-powered recruitment made smart, fast, and human.
           </p>
           <p className="mt-6 text-xs text-white/50">
-            © 2026 HireSmart. All rights reserved.
+            © 2026 Syndie Recruit. All rights reserved.
           </p>
         </div>
 
@@ -152,7 +152,7 @@ function PublicFooter() {
           <ul className="mt-4 space-y-3 text-[13px] text-white/80">
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4 shrink-0 text-white/60" />
-              <a className="hover:text-white" href="mailto:hello@hiresmart.com">hello@hiresmart.com</a>
+              <a className="hover:text-white" href="mailto:hello@syndierecruit.com">hello@syndierecruit.com</a>
             </li>
             <li className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4 shrink-0 text-white/60" />

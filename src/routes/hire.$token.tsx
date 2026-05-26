@@ -21,11 +21,11 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/hire/$token")({
   head: () => ({
     meta: [
-      { title: "Employer Portal — HireSmart" },
+      { title: "Employer Portal — Syndie Recruit" },
       {
         name: "description",
         content:
-          "Submit new hiring briefs and track the status of your active executive searches with HireSmart.",
+          "Submit new hiring briefs and track the status of your active executive searches with Syndie Recruit.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -47,13 +47,13 @@ const CLIENTS: Record<string, ClientRecord> = {
     token: "indorama-portal-2026",
     name: "Indorama Ventures",
     whatsapp: "https://wa.me/628194421035",
-    emailContact: "hello@hiresmart.com",
+    emailContact: "hello@syndierecruit.com",
   },
   demo: {
     token: "demo",
     name: "Indorama Ventures",
     whatsapp: "https://wa.me/628194421035",
-    emailContact: "hello@hiresmart.com",
+    emailContact: "hello@syndierecruit.com",
   },
 };
 
@@ -163,7 +163,7 @@ function PortalContent({ client }: { client: ClientRecord }) {
             Welcome, {client.name}
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-brand-text-secondary">
-            Submit new hiring briefs and track your active searches with HireSmart.
+            Submit new hiring briefs and track your active searches with Syndie Recruit.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <button
@@ -642,7 +642,7 @@ function SuccessState({
       </h3>
       <p className="mx-auto mt-2 max-w-md text-[14px] text-brand-text-secondary">
         <span className="font-medium text-brand-text">{title}</span> has been submitted to
-        the HireSmart team. Here's what happens next:
+        the Syndie Recruit team. Here's what happens next:
       </p>
 
       <ol className="mx-auto mt-6 max-w-md space-y-2.5 text-left text-[14px] text-brand-text">
@@ -830,15 +830,15 @@ function InvalidTokenState() {
           partner.
         </p>
         <p className="mt-5 text-[13px] text-brand-text-secondary">
-          Please contact HireSmart for a new portal link:
+          Please contact Syndie Recruit for a new portal link:
         </p>
         <div className="mt-3 flex flex-col items-center justify-center gap-2 text-[13px] sm:flex-row sm:gap-5">
           <a
-            href="mailto:hello@hiresmart.com"
+            href="mailto:hello@syndierecruit.com"
             className="inline-flex items-center gap-1.5 text-brand-primary hover:underline"
           >
             <Mail className="h-3.5 w-3.5" />
-            hello@hiresmart.com
+            hello@syndierecruit.com
           </a>
           <a
             href="https://wa.me/628194421035"

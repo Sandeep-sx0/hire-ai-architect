@@ -87,7 +87,7 @@ const tabSchema = z.object({
 
 export const Route = createFileRoute("/_app/clients/$id")({
   validateSearch: zodValidator(tabSchema),
-  head: () => ({ meta: [{ title: "Client — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Client — Syndie Recruit" }] }),
   component: ClientDetailPage,
 });
 
@@ -314,7 +314,7 @@ function ClientDetailPage() {
     );
   }
 
-  const portalUrl = `hire.hiresmart.com/portal/${CLIENT.portalToken}`;
+  const portalUrl = `hire.syndierecruit.com/portal/${CLIENT.portalToken}`;
 
   const copyPortal = () => {
     navigator.clipboard?.writeText(portalUrl).catch(() => {});

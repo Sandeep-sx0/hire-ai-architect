@@ -391,7 +391,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_app/candidates/")({
   validateSearch: zodValidator(searchSchema),
-  head: () => ({ meta: [{ title: "Candidates — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Candidates — Syndie Recruit" }] }),
   component: CandidatesPage,
 });
 

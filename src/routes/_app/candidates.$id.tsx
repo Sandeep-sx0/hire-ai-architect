@@ -54,7 +54,7 @@ const tabSchema = z.object({
 });
 
 export const Route = createFileRoute("/_app/candidates/$id")({
-  head: () => ({ meta: [{ title: "Candidate — HireSmart" }] }),
+  head: () => ({ meta: [{ title: "Candidate — Syndie Recruit" }] }),
   validateSearch: zodValidator(tabSchema),
   component: CandidateDetail,
 });

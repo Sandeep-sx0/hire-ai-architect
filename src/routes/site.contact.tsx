@@ -18,13 +18,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/site/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — HireSmart" },
+      { title: "Contact — Syndie Recruit" },
       {
         name: "description",
         content:
-          "Reach the HireSmart team — hiring clients and candidates have dedicated intake forms plus WhatsApp and email.",
+          "Reach the Syndie Recruit team — hiring clients and candidates have dedicated intake forms plus WhatsApp and email.",
       },
-      { property: "og:title", content: "Contact HireSmart" },
+      { property: "og:title", content: "Contact Syndie Recruit" },
       {
         property: "og:description",
         content: "Whether you're hiring or job-hunting, start the conversation here.",
@@ -66,11 +66,11 @@ function ContactPage() {
               +62 819 4421 0355
             </a>
             <a
-              href="mailto:hello@hiresmart.com"
+              href="mailto:hello@syndierecruit.com"
               className="inline-flex items-center gap-2 rounded-full bg-brand-seafoam/30 px-4 py-2 font-medium text-brand-primary hover:bg-brand-seafoam/50"
             >
               <Mail className="h-4 w-4" />
-              hello@hiresmart.com
+              hello@syndierecruit.com
             </a>
           </div>
         </div>
@@ -169,7 +169,7 @@ function FormShell({
       <h2 className="text-xl font-semibold text-brand-text">{title}</h2>
       {children}
       <p className="text-xs text-brand-text-secondary">
-        We'll confirm via <span className="font-medium text-brand-text">hello@hiresmart.com</span>{" "}
+        We'll confirm via <span className="font-medium text-brand-text">hello@syndierecruit.com</span>{" "}
         within one business day.
       </p>
     </form>
@@ -276,7 +276,7 @@ function SuccessCard({ track, onReset }: { track: Track; onReset: () => void }) 
         {track === "hire" ? "Thanks — we'll be in touch." : "Got it — thanks for reaching out."}
       </h2>
       <p className="mt-3 text-brand-text-secondary">
-        We'll confirm via <span className="font-medium text-brand-text">hello@hiresmart.com</span>{" "}
+        We'll confirm via <span className="font-medium text-brand-text">hello@syndierecruit.com</span>{" "}
         within one business day. For anything urgent, message us on WhatsApp.
       </p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">

@@ -115,8 +115,8 @@ export const Route = createFileRoute("/careers/$id")({
   },
   head: ({ loaderData, params }) => {
     const job = loaderData?.job ?? CFO_DETAIL;
-    const title = `${job.title} — ${job.company} | HireSmart`;
-    const description = `${job.title} at ${job.company} (${job.location}). ${job.experience}. Apply confidentially through HireSmart.`;
+    const title = `${job.title} — ${job.company} | Syndie Recruit`;
+    const description = `${job.title} at ${job.company} (${job.location}). ${job.experience}. Apply confidentially through Syndie Recruit.`;
     return {
       meta: [
         { title },

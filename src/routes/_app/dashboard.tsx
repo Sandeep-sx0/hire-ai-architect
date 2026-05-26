@@ -33,7 +33,7 @@ import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — HireSmart" },
+      { title: "Dashboard — Syndie Recruit" },
       { name: "description", content: "Recruitment operations command center." },
     ],
   }),
