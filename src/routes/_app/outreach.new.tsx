@@ -19,6 +19,14 @@ import {
   ChevronRight,
   Info,
   Briefcase,
+  Mail,
+  MessageCircle,
+  Phone,
+  ListChecks,
+  Send,
+  UserPlus,
+  Zap,
+  Hand,
 } from "lucide-react";
 import { PageHeader, ScoreRing } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -34,6 +42,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -160,11 +182,49 @@ const STEPS = [
 /*  Types                                                                     */
 /* -------------------------------------------------------------------------- */
 
+type StepChannel =
+  | "linkedin_connection"
+  | "linkedin_message"
+  | "email"
+  | "whatsapp"
+  | "phone_call"
+  | "task";
+
+type StepMode = "automated" | "manual";
+
+const ENABLED_CHANNELS: StepChannel[] = ["linkedin_connection", "linkedin_message"];
+
+const CHANNEL_META: Record<
+  StepChannel,
+  { label: string; Icon: React.ComponentType<{ className?: string }>; iconClass: string; mode: StepMode }
+> = {
+  linkedin_connection: { label: "LinkedIn Connection", Icon: UserPlus, iconClass: "text-[#0a66c2]", mode: "automated" },
+  linkedin_message: { label: "LinkedIn Message", Icon: Linkedin, iconClass: "text-[#0a66c2]", mode: "automated" },
+  email: { label: "Email", Icon: Mail, iconClass: "text-brand-primary", mode: "automated" },
+  whatsapp: { label: "WhatsApp Message", Icon: MessageCircle, iconClass: "text-green-600", mode: "manual" },
+  phone_call: { label: "Phone Call", Icon: Phone, iconClass: "text-brand-text-secondary", mode: "manual" },
+  task: { label: "General Task", Icon: ListChecks, iconClass: "text-brand-text-secondary", mode: "manual" },
+};
+
+const MAX_STEPS = 6;
+const ADDON_TOOLTIP = "Email and WhatsApp outreach are paid add-ons — ask your workspace admin to enable.";
+
+const PERSONALIZATION_TOKENS = [
+  "{{first_name}}",
+  "{{title}}",
+  "{{company}}",
+  "{{job_title}}",
+  "{{client_name}}",
+  "✨ AI",
+] as const;
+
 type SequenceStep = {
   id: string;
-  kind: "connection" | "followup";
+  channel: StepChannel;
+  mode: StepMode;
   body: string;
-  waitDays: number; // for followups: days after previous step
+  subject?: string; // email
+  waitDays: number;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -207,24 +267,9 @@ function CampaignBuilder() {
   // Step 3: sequence
   const [tone, setTone] = useState<string>("Executive");
   const [steps, setSteps] = useState<SequenceStep[]>(() => [
-    {
-      id: "s0",
-      kind: "connection",
-      body: "",
-      waitDays: 0,
-    },
-    {
-      id: "s1",
-      kind: "followup",
-      body: "",
-      waitDays: 4,
-    },
-    {
-      id: "s2",
-      kind: "followup",
-      body: "",
-      waitDays: 6,
-    },
+    { id: "s0", channel: "linkedin_connection", mode: "automated", body: "", waitDays: 0 },
+    { id: "s1", channel: "linkedin_message", mode: "automated", body: "", waitDays: 4 },
+    { id: "s2", channel: "linkedin_message", mode: "automated", body: "", waitDays: 6 },
   ]);
   const [previewIdx, setPreviewIdx] = useState(0);
 
@@ -258,7 +303,7 @@ function CampaignBuilder() {
     if (n === 1) return !!accountId;
     if (n === 2) return selectedCandidates.length > 0;
     if (n === 3) {
-      const conn = steps.find((s) => s.kind === "connection");
+      const conn = steps.find((s) => s.channel === "linkedin_connection");
       if (!conn || conn.body.trim().length === 0 || conn.body.length > 300) return false;
       return steps.every((s) => s.body.trim().length > 0);
     }
@@ -339,6 +384,7 @@ function CampaignBuilder() {
             previewIdx={previewIdx}
             setPreviewIdx={setPreviewIdx}
             job={job?.jobTitle ?? "the role"}
+            clientName={project?.clientName ?? "our client"}
           />
         )}
         {step === 4 && (
@@ -742,31 +788,170 @@ function Step2Candidates({
 /* -------------------------------------------------------------------------- */
 
 function makeDraft(
-  kind: SequenceStep["kind"],
+  channel: StepChannel,
   stepIdx: number,
   c: Candidate | undefined,
   tone: string,
   jobLabel: string,
 ): string {
-  const first = c?.name.split(" ")[0] ?? "there";
-  const companyBit = c ? ` at ${c.company}` : "";
+  const first = c?.name.split(" ")[0] ?? "{{first_name}}";
+  const companyBit = c ? ` at ${c.company}` : " at {{company}}";
   const toneOpener =
-    tone === "Casual"
-      ? "Hi"
-      : tone === "Warm"
-        ? "Hello"
-        : tone === "Executive"
-          ? ""
-          : "Dear";
+    tone === "Casual" ? "Hi" : tone === "Warm" ? "Hello" : tone === "Executive" ? "" : "Dear";
   const greet = toneOpener ? `${toneOpener} ${first},` : `${first} —`;
 
-  if (kind === "connection") {
+  if (channel === "linkedin_connection") {
     return `${greet} I'm advising a leading client on a ${jobLabel} appointment in Jakarta. Your track record${companyBit} looks closely aligned with what they need. Open to a brief, confidential chat?`;
   }
   if (stepIdx === 1) {
     return `${greet} thanks for connecting. A bit more context: this ${jobLabel} role reports to the CEO and oversees a sizable team. Compensation is highly competitive. Would early next week work for a 20-minute call?`;
   }
   return `${greet} a brief final note on the ${jobLabel} opportunity. Decisions like this take time — happy to reconnect whenever the timing suits.`;
+}
+
+function resolveTokens(body: string, c: Candidate | undefined, jobLabel: string, clientLabel: string) {
+  if (!c) return body;
+  return body
+    .replaceAll("{{first_name}}", c.name.split(" ")[0] ?? "")
+    .replaceAll("{{title}}", c.title)
+    .replaceAll("{{job_title}}", jobLabel)
+    .replaceAll("{{company}}", c.company)
+    .replaceAll("{{client_name}}", clientLabel)
+    .replaceAll("✨ AI", "");
+}
+
+function ChannelBadge({ channel }: { channel: StepChannel }) {
+  const meta = CHANNEL_META[channel];
+  const Icon = meta.Icon;
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-brand-bg/50 px-2 py-0.5 text-[11px] font-medium text-brand-text">
+      <Icon className={cn("h-3 w-3", meta.iconClass)} />
+      {meta.label}
+    </span>
+  );
+}
+
+function ModePill({ mode }: { mode: StepMode }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+        mode === "automated"
+          ? "bg-brand-seafoam/40 text-brand-primary"
+          : "bg-amber-100 text-amber-700",
+      )}
+    >
+      {mode === "automated" ? <Zap className="h-2.5 w-2.5" /> : <Hand className="h-2.5 w-2.5" />}
+      {mode}
+    </span>
+  );
+}
+
+function AddStepMenu({
+  onAdd,
+  disabled,
+}: {
+  onAdd: (channel: StepChannel) => void;
+  disabled: boolean;
+}) {
+  const automated: StepChannel[] = ["linkedin_message", "email"];
+  const manual: StepChannel[] = ["linkedin_connection", "whatsapp", "phone_call", "task"];
+
+  const renderItem = (ch: StepChannel) => {
+    const meta = CHANNEL_META[ch];
+    const Icon = meta.Icon;
+    const enabled = ENABLED_CHANNELS.includes(ch);
+    const item = (
+      <DropdownMenuItem
+        key={ch}
+        disabled={!enabled}
+        onSelect={(e) => {
+          if (!enabled) {
+            e.preventDefault();
+            return;
+          }
+          onAdd(ch);
+        }}
+        className="gap-2"
+      >
+        <Icon className={cn("h-3.5 w-3.5", meta.iconClass)} />
+        <span className="flex-1">{meta.label}</span>
+        {!enabled && (
+          <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+            <Lock className="h-2.5 w-2.5" /> Add-on
+          </span>
+        )}
+      </DropdownMenuItem>
+    );
+    if (enabled) return item;
+    return (
+      <Tooltip key={ch}>
+        <TooltipTrigger asChild>
+          <div>{item}</div>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-[240px] text-[12px]">
+          {ADDON_TOOLTIP}
+        </TooltipContent>
+      </Tooltip>
+    );
+  };
+
+  return (
+    <TooltipProvider delayDuration={100}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" disabled={disabled} className="gap-1.5">
+            <Plus className="h-3.5 w-3.5" /> Add step
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-60">
+          <DropdownMenuLabel className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-brand-text-secondary">
+            <Zap className="h-3 w-3" /> Automated
+          </DropdownMenuLabel>
+          {automated.map(renderItem)}
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-brand-text-secondary">
+            <Hand className="h-3 w-3" /> Manual
+          </DropdownMenuLabel>
+          {manual.map(renderItem)}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </TooltipProvider>
+  );
+}
+
+function PersonalizationToolbar({
+  onInsert,
+  onAIDraft,
+}: {
+  onInsert: (token: string) => void;
+  onAIDraft: () => void;
+}) {
+  return (
+    <div className="mb-2 flex flex-wrap items-center gap-1.5">
+      <span className="mr-1 text-[11px] font-medium uppercase tracking-wide text-brand-text-secondary">
+        Insert:
+      </span>
+      {PERSONALIZATION_TOKENS.map((tok) => {
+        const isAI = tok === "✨ AI";
+        return (
+          <button
+            key={tok}
+            type="button"
+            onClick={() => (isAI ? onAIDraft() : onInsert(tok))}
+            className={cn(
+              "rounded-md border px-2 py-0.5 text-[11px] font-mono transition-colors",
+              isAI
+                ? "border-brand-mint bg-brand-seafoam/30 text-brand-primary hover:bg-brand-seafoam/50"
+                : "border-border bg-brand-bg/40 text-brand-text hover:bg-brand-bg",
+            )}
+          >
+            {tok}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function Step3Sequence({
@@ -778,6 +963,7 @@ function Step3Sequence({
   previewIdx,
   setPreviewIdx,
   job,
+  clientName,
 }: {
   steps: SequenceStep[];
   setSteps: (s: SequenceStep[]) => void;
@@ -787,27 +973,33 @@ function Step3Sequence({
   previewIdx: number;
   setPreviewIdx: (n: number) => void;
   job: string;
+  clientName: string;
 }) {
   const updateStep = (i: number, patch: Partial<SequenceStep>) => {
-    const next = steps.map((s, idx) => (idx === i ? { ...s, ...patch } : s));
-    setSteps(next);
+    setSteps(steps.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
   };
   const removeStep = (i: number) => {
-    if (steps[i].kind === "connection") return;
+    if (steps[i].channel === "linkedin_connection") return;
     setSteps(steps.filter((_, idx) => idx !== i));
   };
-  const addFollowup = () => {
-    if (steps.length >= 4) return;
+  const addStep = (channel: StepChannel) => {
+    if (steps.length >= MAX_STEPS) return;
     setSteps([
       ...steps,
-      { id: `s${steps.length}`, kind: "followup", body: "", waitDays: 5 },
+      {
+        id: `s${Date.now()}`,
+        channel,
+        mode: CHANNEL_META[channel].mode,
+        body: "",
+        subject: channel === "email" ? "" : undefined,
+        waitDays: 3,
+      },
     ]);
   };
 
   const draftWithAI = (i: number) => {
     const previewCand = candidates[previewIdx];
-    const body = makeDraft(steps[i].kind, i, previewCand, tone, job);
-    updateStep(i, { body });
+    updateStep(i, { body: makeDraft(steps[i].channel, i, previewCand, tone, job) });
     toast.success("AI draft generated · personalize before launch");
   };
 
@@ -816,10 +1008,16 @@ function Step3Sequence({
     setSteps(
       steps.map((s, i) => ({
         ...s,
-        body: makeDraft(s.kind, i, previewCand, tone, job),
+        body: ENABLED_CHANNELS.includes(s.channel)
+          ? makeDraft(s.channel, i, previewCand, tone, job)
+          : s.body,
       })),
     );
-    toast.success("AI drafted all steps");
+    toast.success("AI drafted all enabled steps");
+  };
+
+  const insertToken = (i: number, token: string) => {
+    updateStep(i, { body: (steps[i].body ?? "") + (steps[i].body ? " " : "") + token });
   };
 
   const preview = candidates[previewIdx];
@@ -830,8 +1028,8 @@ function Step3Sequence({
         <div>
           <h2 className="text-lg font-semibold text-brand-text">Sequence & messaging</h2>
           <p className="mt-1 text-sm text-brand-text-secondary">
-            Connection note → up to 2 follow-ups. Editable per step. AI drafts personalize per
-            candidate using name, title, company and job selling points.
+            LinkedIn-primary sequence — up to {MAX_STEPS} steps. Add LinkedIn Messages now; Email,
+            WhatsApp, calls, and tasks are paid add-ons.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={draftAll} className="gap-2">
@@ -888,16 +1086,38 @@ function Step3Sequence({
               </Button>
             </div>
             <p className="mt-1.5 text-[12px] text-brand-text-secondary">
-              Cycle to verify AI personalization on different candidates
+              Tokens resolve against the previewed candidate
             </p>
           </div>
         )}
       </div>
 
+      {/* Exit criteria */}
+      <div className="mb-5 rounded-lg border border-border bg-brand-bg/40 p-4">
+        <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-brand-text-secondary">
+          Exit criteria
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-[12px] font-medium text-green-700">
+            <Lock className="h-3 w-3" /> Reply received
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-0.5 text-[12px] font-medium text-gray-500">
+            <Lock className="h-3 w-3" /> Meeting booked
+            <span className="ml-1 rounded bg-white/60 px-1 text-[10px]">soon</span>
+          </span>
+        </div>
+        <p className="mt-2 text-[12px] text-brand-text-secondary">
+          Reply received is always on — it restates the stop-on-reply rail enforced in Step 4.
+        </p>
+      </div>
+
       <div className="flex flex-col">
         {steps.map((s, i) => {
-          const isConnection = s.kind === "connection";
-          const limit = isConnection ? 300 : 2000;
+          const meta = CHANNEL_META[s.channel];
+          const ChIcon = meta.Icon;
+          const enabled = ENABLED_CHANNELS.includes(s.channel);
+          const isConnection = s.channel === "linkedin_connection";
+          const limit = isConnection ? 300 : s.channel === "linkedin_message" ? 2000 : 1000;
           const overLimit = s.body.length > limit;
           const empty = s.body.trim().length === 0;
           return (
@@ -913,38 +1133,61 @@ function Step3Sequence({
                       max={30}
                       value={s.waitDays}
                       onChange={(e) =>
-                        updateStep(i, { waitDays: Number(e.target.value) || 1 })
+                        updateStep(i, { waitDays: Math.min(30, Math.max(1, Number(e.target.value) || 1)) })
                       }
                       className="h-7 w-14 text-center text-sm"
                     />
-                    <span className="text-[12px] text-brand-text-secondary">
-                      days {i === 1 ? "after accepted" : "after prev. if no reply"}
-                    </span>
+                    <span className="text-[12px] text-brand-text-secondary">business days</span>
                   </div>
                 </div>
               )}
-              <div className="rounded-xl border border-border bg-card p-5">
+              <div
+                className={cn(
+                  "rounded-xl border border-border bg-card p-5",
+                  !enabled && "opacity-70",
+                )}
+              >
                 <div className="mb-3 flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[12px] font-medium text-brand-primary">Step {i + 1}</div>
-                    <div className="mt-0.5 text-sm font-semibold text-brand-text">
-                      {isConnection ? "Connection request note" : `Follow-up message ${i}`}
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[12px] font-medium text-brand-primary">
+                        Step {i + 1}
+                      </span>
+                      <ChannelBadge channel={s.channel} />
+                      <ModePill mode={s.mode} />
+                      {!enabled && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                          <Lock className="h-2.5 w-2.5" /> Add-on
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1.5 text-sm font-semibold text-brand-text">
+                      {isConnection
+                        ? "Connection request note"
+                        : s.channel === "linkedin_message"
+                          ? "LinkedIn message"
+                          : meta.label}
                     </div>
                     <div className="text-[12px] text-brand-text-secondary">
-                      {isConnection
-                        ? "LinkedIn connection note · max 300 characters"
-                        : "LinkedIn message · sent if no reply"}
+                      {isConnection && "LinkedIn connection note · max 300 characters"}
+                      {s.channel === "linkedin_message" && "LinkedIn DM · sent if no reply"}
+                      {s.channel === "email" && "Email · subject + body"}
+                      {s.channel === "whatsapp" && "WhatsApp message · manual send"}
+                      {s.channel === "phone_call" && "Phone call · task for recruiter"}
+                      {s.channel === "task" && "General task · custom action"}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => draftWithAI(i)}
-                      className="gap-1.5"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" /> Draft with AI
-                    </Button>
+                  <div className="flex flex-shrink-0 items-center gap-2">
+                    {enabled && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => draftWithAI(i)}
+                        className="gap-1.5"
+                      >
+                        <Sparkles className="h-3.5 w-3.5" /> Draft with AI
+                      </Button>
+                    )}
                     {!isConnection && (
                       <Button
                         variant="ghost"
@@ -957,57 +1200,128 @@ function Step3Sequence({
                     )}
                   </div>
                 </div>
-                <Textarea
-                  value={s.body}
-                  onChange={(e) => updateStep(i, { body: e.target.value })}
-                  placeholder={
-                    isConnection
-                      ? "Short, personal, opens the door…"
-                      : "Add context, value, and a clear ask…"
-                  }
-                  className="min-h-[110px] resize-y text-sm leading-relaxed"
-                />
-                <div className="mt-2 flex items-center justify-between">
-                  <span
-                    className={cn(
-                      "text-[12px]",
-                      empty
-                        ? "text-amber-600"
-                        : overLimit
-                          ? "text-red-600"
-                          : "text-brand-text-secondary",
+
+                {!enabled && (
+                  <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-[12px] text-amber-900">
+                    <Lock className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+                    <span>{ADDON_TOOLTIP}</span>
+                  </div>
+                )}
+
+                {/* Per-channel editors */}
+                {(s.channel === "linkedin_connection" || s.channel === "linkedin_message") && (
+                  <>
+                    <PersonalizationToolbar
+                      onInsert={(t) => insertToken(i, t)}
+                      onAIDraft={() => draftWithAI(i)}
+                    />
+                    <Textarea
+                      value={s.body}
+                      onChange={(e) => updateStep(i, { body: e.target.value })}
+                      placeholder={
+                        isConnection
+                          ? "Short, personal, opens the door…"
+                          : "Add context, value, and a clear ask…"
+                      }
+                      className="min-h-[110px] resize-y text-sm leading-relaxed"
+                    />
+                    {preview && s.body.trim().length > 0 && (
+                      <div className="mt-2 rounded-md border border-border bg-brand-bg/40 p-2.5 text-[12px] text-brand-text">
+                        <div className="mb-1 text-[10px] font-medium uppercase tracking-wide text-brand-text-secondary">
+                          Preview for {preview.name}
+                        </div>
+                        <div className="whitespace-pre-wrap leading-relaxed">
+                          {resolveTokens(s.body, preview, job, clientName)}
+                        </div>
+                      </div>
                     )}
-                  >
-                    {empty
-                      ? "Required"
-                      : overLimit
-                        ? `${s.body.length - limit} over limit`
-                        : "Looks good"}
-                  </span>
-                  <span
-                    className={cn(
-                      "text-[12px] tabular-nums",
-                      overLimit ? "text-red-600" : "text-brand-text-secondary",
-                    )}
-                  >
-                    {s.body.length} / {limit}
-                  </span>
-                </div>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span
+                        className={cn(
+                          "text-[12px]",
+                          empty
+                            ? "text-amber-600"
+                            : overLimit
+                              ? "text-red-600"
+                              : "text-brand-text-secondary",
+                        )}
+                      >
+                        {empty
+                          ? "Required"
+                          : overLimit
+                            ? `${s.body.length - limit} over limit`
+                            : "Looks good"}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-[12px] tabular-nums",
+                          overLimit ? "text-red-600" : "text-brand-text-secondary",
+                        )}
+                      >
+                        {s.body.length} / {limit}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {s.channel === "email" && (
+                  <div className="space-y-2">
+                    <Input
+                      readOnly
+                      disabled
+                      placeholder="Subject line (locked — add-on)"
+                      value={s.subject ?? ""}
+                      className="h-8 text-sm"
+                    />
+                    <Textarea
+                      readOnly
+                      disabled
+                      placeholder="Email body (locked — add-on)"
+                      value={s.body}
+                      className="min-h-[90px] resize-y text-sm"
+                    />
+                  </div>
+                )}
+
+                {(s.channel === "task" || s.channel === "phone_call") && (
+                  <div className="space-y-2">
+                    <Input
+                      readOnly
+                      disabled
+                      placeholder="Task title (locked — add-on)"
+                      value={s.subject ?? ""}
+                      className="h-8 text-sm"
+                    />
+                    <Textarea
+                      readOnly
+                      disabled
+                      placeholder="Note for recruiter (locked — add-on)"
+                      value={s.body}
+                      className="min-h-[70px] resize-y text-sm"
+                    />
+                  </div>
+                )}
+
+                {s.channel === "whatsapp" && (
+                  <Textarea
+                    readOnly
+                    disabled
+                    placeholder="WhatsApp message (locked — add-on)"
+                    value={s.body}
+                    className="min-h-[90px] resize-y text-sm"
+                  />
+                )}
+                {ChIcon && null /* satisfy linter: ChIcon referenced via meta */}
               </div>
             </div>
           );
         })}
       </div>
 
-      {steps.length < 4 && (
-        <button
-          type="button"
-          onClick={addFollowup}
-          className="mt-4 inline-flex items-center gap-2 text-[13px] font-medium text-brand-primary hover:underline"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          Add follow-up
-        </button>
+      {steps.length < MAX_STEPS && (
+        <div className="mt-4">
+          <AddStepMenu onAdd={addStep} disabled={steps.length >= MAX_STEPS} />
+        </div>
       )}
 
       <div className="mt-8 flex items-start gap-3 rounded-lg border border-brand-mint/50 bg-brand-seafoam/20 p-4">
@@ -1274,12 +1588,13 @@ function Step5Review({
   daysToComplete: number;
   onLaunch: () => void;
 }) {
-  const seqDescription =
-    `${steps.length}-step sequence: Connection note` +
-    steps
-      .slice(1)
-      .map((s, i) => ` → Follow-up ${i + 1} (wait ${s.waitDays}d)`)
-      .join("");
+  const seqDescription = steps
+    .map((s, i) => {
+      const label = CHANNEL_META[s.channel].label;
+      return i === 0 ? label : `wait ${s.waitDays} business days → ${label}`;
+    })
+    .join(" → ");
+  const hasAddonStep = steps.some((s) => !ENABLED_CHANNELS.includes(s.channel));
 
   return (
     <section className="mx-auto max-w-2xl">
@@ -1334,6 +1649,17 @@ function Step5Review({
             </div>
           </SumRow>
           <SumRow label="Sequence" value={seqDescription} />
+          <SumRow label="Channel coverage">
+            <span className="text-[13px] text-brand-text-secondary">
+              Steps that need a channel a candidate doesn't have (e.g. no LinkedIn URL) are skipped
+              for that prospect — they don't block the sequence.
+              {hasAddonStep && (
+                <span className="mt-1 block text-amber-700">
+                  Add-on steps in this sequence are paused until enabled.
+                </span>
+              )}
+            </span>
+          </SumRow>
           <SumRow label="Tone" value={tone} />
           <SumRow
             label="Schedule"
