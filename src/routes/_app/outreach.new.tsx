@@ -19,6 +19,14 @@ import {
   ChevronRight,
   Info,
   Briefcase,
+  Mail,
+  MessageCircle,
+  Phone,
+  ListChecks,
+  Send,
+  UserPlus,
+  Zap,
+  Hand,
 } from "lucide-react";
 import { PageHeader, ScoreRing } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -34,6 +42,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
