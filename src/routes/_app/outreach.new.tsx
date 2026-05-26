@@ -303,7 +303,7 @@ function CampaignBuilder() {
     if (n === 1) return !!accountId;
     if (n === 2) return selectedCandidates.length > 0;
     if (n === 3) {
-      const conn = steps.find((s) => s.kind === "connection");
+      const conn = steps.find((s) => s.channel === "linkedin_connection");
       if (!conn || conn.body.trim().length === 0 || conn.body.length > 300) return false;
       return steps.every((s) => s.body.trim().length > 0);
     }
