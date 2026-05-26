@@ -267,24 +267,9 @@ function CampaignBuilder() {
   // Step 3: sequence
   const [tone, setTone] = useState<string>("Executive");
   const [steps, setSteps] = useState<SequenceStep[]>(() => [
-    {
-      id: "s0",
-      kind: "connection",
-      body: "",
-      waitDays: 0,
-    },
-    {
-      id: "s1",
-      kind: "followup",
-      body: "",
-      waitDays: 4,
-    },
-    {
-      id: "s2",
-      kind: "followup",
-      body: "",
-      waitDays: 6,
-    },
+    { id: "s0", channel: "linkedin_connection", mode: "automated", body: "", waitDays: 0 },
+    { id: "s1", channel: "linkedin_message", mode: "automated", body: "", waitDays: 4 },
+    { id: "s2", channel: "linkedin_message", mode: "automated", body: "", waitDays: 6 },
   ]);
   const [previewIdx, setPreviewIdx] = useState(0);
 
