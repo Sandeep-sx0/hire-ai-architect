@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   Clock,
   Linkedin,
-  Mail,
   MailOpen,
   MessageSquare,
   MoreHorizontal,
